@@ -11,8 +11,8 @@ var app = builder.Build();
 
 // Using these use extension methods, we are configuring the HTTP Request Pipeline
 //"app" is a type of web application that implements several interfaces
-app.
-    UseCatalogModule()
+app
+   .UseCatalogModule()
    .UseBasketModule()
    .UseOrderingModule();
 

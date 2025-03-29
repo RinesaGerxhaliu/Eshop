@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Data;
 
 namespace Catalog
 {
@@ -19,11 +20,13 @@ namespace Catalog
 
         }
 
-        //IApplicationBuilder is one of the interfaces that "app" in Program.cs implements
+        //We call this method to apply migrarion during the application startup
         public static IApplicationBuilder UseCatalogModule(this IApplicationBuilder app)
         {
-            return app;
+            app.UseMigration<CatalogDbContext>();
 
+            return app;
         }
+
     }
 }
