@@ -1,20 +1,37 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-
-namespace Catalog.Products.Features.CreateProduct
+﻿namespace Catalog.Products.Features.CreateProduct
 {
 
-    public record CreateProductCommand(string name, string description, decimal price) : IRequest<CreateProductResult>;
+    public record CreateProductCommand(ProductDTO Product) 
+        : ICommand<CreateProductResult>;
+
     public record CreateProductResult(Guid Id);
-    internal class CreateProductHandler : IRequestHandler<CreateProductCommand, CreateProductResult>
+
+    internal class CreateProductHandler(CatalogDbContext dbContext)
+        : ICommandHandler<CreateProductCommand, CreateProductResult>
     {
 
         public async Task<CreateProductResult> Handle(CreateProductCommand command,
         CancellationToken cancellationToken)
         {
-            //business logic to create a product
-            throw new NotImplementedException();
+            var product = CreateNewProduct(command.Product);
+
+            dbContext.Products.Add(product);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return new CreateProductResult(product.Id);
        
+        }
+
+        private Product CreateNewProduct(ProductDTO productDto)
+        {
+            var product = Product.Create(
+                Guid.NewGuid(),
+                productDto.Name,
+                productDto.Description,
+                productDto.Price
+            );
+
+            return product;
         }
 
     }
