@@ -3,7 +3,15 @@
     public record GetProductByIdQuery(Guid Id)
         : IQuery<GetProductByIdResult>;
 
-    public record GetProductByIdResult(ProductDTO product);
+    public record GetProductByIdResult
+    {
+        public ProductDTO Product { get; init; }
+
+        public GetProductByIdResult(ProductDTO product)
+        {
+            Product = product;
+        }
+    }
 
     internal class GetProductsHandler(CatalogDbContext dbContext)
         : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>

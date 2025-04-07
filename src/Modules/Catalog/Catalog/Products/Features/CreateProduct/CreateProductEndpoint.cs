@@ -1,6 +1,10 @@
 ﻿namespace Catalog.Products.Features.CreateProduct
 {
-    public record CreateProductRequest(CreateProductDTO product);
+    public record CreateProductRequest
+    {
+        public ProductDTO Product { get; init; } = default!;
+    }
+
 
     public record CreateProductResponse(Guid Id);
 

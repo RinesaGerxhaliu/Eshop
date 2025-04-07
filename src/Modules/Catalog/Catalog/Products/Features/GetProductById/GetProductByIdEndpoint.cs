@@ -2,7 +2,11 @@
 {
     //public record GetProductByIdRequest(Guid id);
 
-    public record GetProductByIdResponse(ProductDTO product);
+    public record GetProductByIdResponse
+    {
+        public ProductDTO Product { get; init; }
+    }
+
 
     public class GetProductByIdEndpoint : ICarterModule
     {

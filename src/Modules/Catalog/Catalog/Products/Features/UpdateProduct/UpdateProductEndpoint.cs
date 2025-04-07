@@ -1,6 +1,10 @@
 ﻿namespace Catalog.Products.Features.UpdateProduct
 {
-    public record UpdateProductRequest(ProductDTO product);
+    public record UpdateProductRequest
+    {
+        public ProductDTO Product { get; init; } = default!;
+    }
+
 
     public record UpdateProductResponse(bool isSuccessful);
 

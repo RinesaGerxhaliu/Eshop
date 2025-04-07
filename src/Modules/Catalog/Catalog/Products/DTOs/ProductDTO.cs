@@ -1,11 +1,9 @@
 ﻿namespace Catalog.Products.DTOs;
 
-    public record ProductDTO(
-
-        Guid Id,
-        string Name,
-        string Description,
-        decimal Price
-
-    );
-        
+public record ProductDTO
+{
+    public Guid Id { get; init; } = Guid.Empty;
+    public string Name { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
+    public decimal Price { get; init; }
+}
