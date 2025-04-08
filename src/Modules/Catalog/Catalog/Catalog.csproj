@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared\Shared.csproj" />
+    <Compile Remove="Products\Features\GetProductByCategory\**" />
+    <EmbeddedResource Remove="Products\Features\GetProductByCategory\**" />
+    <None Remove="Products\Features\GetProductByCategory\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Products\Features\GetProductByCategory\" />
+    <ProjectReference Include="..\..\..\Shared\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>
