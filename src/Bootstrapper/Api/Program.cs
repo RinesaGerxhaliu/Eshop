@@ -1,5 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, config) =>
+    config.ReadFrom.Configuration(context.Configuration));
+
 // Adding services to the built-in dependency injection container
 // Each module handles its own dependencies, making the codebase more modular
 
@@ -28,12 +31,12 @@ var app = builder.Build();
 //"app" is a type of web application that implements several interfaces
 
 app.MapCarter();
+app.UseSerilogRequestLogging();
+app.UseExceptionHandler(options => { });
 
 app
    .UseCatalogModule()
    .UseBasketModule()
    .UseOrderingModule();
-
-app.UseExceptionHandler(options => { });
 
 app.Run();
