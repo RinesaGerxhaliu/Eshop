@@ -19,6 +19,9 @@ builder.Services
     .AddBasketModule(builder.Configuration)
     .AddOrderingModule(builder.Configuration);
 
+builder.Services
+    .AddExceptionHandler<CustomExceptionHandler>();
+
 var app = builder.Build();
 
 // Using these use extension methods, we are configuring the HTTP Request Pipeline
@@ -30,5 +33,7 @@ app
    .UseCatalogModule()
    .UseBasketModule()
    .UseOrderingModule();
+
+app.UseExceptionHandler(options => { });
 
 app.Run();
