@@ -25,7 +25,26 @@ builder.Services
 builder.Services
     .AddExceptionHandler<CustomExceptionHandler>();
 
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000") // frontend URL
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+
+
+
+app.UseCors("AllowReactApp");
+
 
 // Using these use extension methods, we are configuring the HTTP Request Pipeline
 //"app" is a type of web application that implements several interfaces

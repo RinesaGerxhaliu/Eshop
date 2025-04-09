@@ -1,0 +1,498 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.reservation-btn {
+    background-color: #7e00a0;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+.reservation-btn:hover {
+    background-color: #7e00a0;
+}
+.hero {
+    display: flex;
+    padding-left: 30px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 140px;
+    background-color: #fdfaf4;
+    background-size: cover; 
+    background-position: right; 
+    background-repeat: no-repeat; 
+}
+
+.hero-text {
+    padding-right: 120px;
+    max-width: 40%;
+}
+
+.hero-text h1 {
+    padding-left: -110px;
+    font-size: 48px;
+    font-weight: normal;
+    margin-bottom: 20px;
+}
+
+.hero-text p {
+    margin-right: 40px;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.hero-text button {
+    border: 1px solid black;
+    background: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+}
+
+  
+
+/*serum*/
+.new-serum{
+    margin-top: 3rem;
+    margin-bottom: 10%;
+}
+
+.new-serum .box{
+    position: relative;
+    overflow: hidden;
+    background: var(--second-color);
+    width: 150px; 
+    height: auto; 
+}
+
+.new-serum .box img{
+    background: var(--second-color);
+    width: 100%; 
+    height: auto; 
+    object-fit: cover; 
+}
+
+
+.new .heading{
+    font: italic small-caps bold 46px cursive;
+    text-align: center;
+    font-variant: small-caps slashed-zero;
+    font-family: cursive;
+    color: #333;
+}
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+
+header {
+    background-color: #f0f4f3;
+    padding: 50px 0;
+}
+
+.header-content {
+    flex: 1;
+    padding-right: 30px;
+}
+
+header h1 {
+    font-size: 36px;
+    color: #1b1b1b;
+}
+
+header p {
+    font-size: 18px;
+    color: #777;
+    margin: 20px 0;
+}
+
+.header-image img {
+    width: 100%;
+    height: auto;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #b607e2;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background-color: #9a00c0;
+}
+
+.services {
+    padding: 50px 0;
+    background-color: #fff;
+}
+
+.container {
+    display: flex; 
+    flex-wrap: wrap;
+    justify-content: center; 
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.service {
+    flex: 1 1 300px; 
+    text-align: center;
+    margin: 30px;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+
+.service img {
+    max-width: 100%; 
+    height: auto;
+    margin-bottom: 10px; 
+}
+
+.service h3 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px; 
+}
+
+.service p {
+    color: #777;
+    margin-bottom: 15px; 
+}
+
+.service a {
+    color: #9a00c0; 
+    text-decoration: none; 
+}
+
+.service a:hover {
+    text-decoration: underline; 
+}
+
+
+
+
+.lifestyle {
+    background-color: #f0f4f3;
+    padding: 50px 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.lifestyle-content {
+    flex: 1;
+    padding-right: 30px;
+}
+
+.lifestyle-content h2 {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.lifestyle-content p {
+    color: #777;
+    margin-bottom: 30px;
+}
+
+.icons {
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+    margin-top: 20px;
+}
+
+.icon-item {
+    text-align: center;
+    margin-left: 100px;
+}
+
+.icon-item img {
+    max-width: 100px;
+    height: auto;
+}
+.lifestyle-image {
+    max-width: 140%;
+    margin-left: 90px;
+    height: auto;
+}
+.product-section {
+    padding: 60px 20px;
+    background-color: #fefefe;
+    text-align: center;
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    padding-top: 30px;
+    margin: 0 auto;
+  }
+  
+  .product-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .product-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .product-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .shop-button {
+    background-color: #c79782;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .shop-button:hover {
+    background-color: #af7e67;
+  }
+  
+.lifestyle-image img {
+    margin-top: 30px;
+    margin-right: 60px;
+    width: 100%;
+    height: auto;
+    margin-left: 0;
+}
+
+.review{
+    background: var(--bg-color);
+   
+}
+
+.review-box{
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(251, 241, 252);
+}
+
+.review .heading{
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: 4rem;
+    margin-bottom: 5rem;
+}
+
+.review-box img{
+    width: 13rem;
+    border-radius: 80%;
+    border: 3px solid var(--main-color);
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 3rem;
+    
+}
+
+.review-item{
+    min-height: 400px;
+    min-width: 350px;
+    background: var(--snd-bg-color);
+    border: 3px solid rgba(224, 81, 217, 0.3);
+    border-radius: 2rem;
+    margin: 0 2rem 2rem 2rem;
+    padding: 30px 60px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    color: rgb(110, 16, 103);
+    transition: 0.5s ease-in-out;
+}
+
+.review-item:hover {
+    border: 3px solid var(--main-color);
+    transform: translateY(-5px) scale(1.03);
+}
+
+.review-item h2{
+    font-size: 2.0rem;
+    color: black;
+}
+
+.review-item p{
+    color: black;
+    font-size: 1.1rem;
+    line-height: 1.3;
+    text-align: center;
+}
+
+#Star {
+    color: gold;
+    font-size: 1.5rem;
+}
+
+@media only screen and (max-width: 768px) {
+
+
+    
+
+  
+    .lifestyle {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .lifestyle-content {
+        padding: 0 20px;
+        text-align: center;
+    }
+
+    .lifestyle-content h2 {
+        font-size: 24px;
+    }
+
+    .icons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .icon-item {
+        margin: 15px 0;
+    }
+
+    .icon-item img {
+        max-width: 60px; 
+    }
+
+    .lifestyle-image img {
+        margin-top: 20px;
+    }
+
+    .wrapper {
+        grid-template-columns: 1fr; 
+        gap: 1.5rem;
+    }
+
+    .review-item {
+        min-height: 300px;
+        min-width: 250px; 
+        padding: 15px 30px;
+    }
+
+    .review .heading {
+        font-size: 1.8rem; 
+        margin-top: 2.5rem;
+        margin-bottom: 3.5rem;
+    }
+
+    .review-box img {
+        width: 8rem; 
+    }
+
+    .review-item h2 {
+        font-size: 1.8rem;
+    }
+
+    .review-item p {
+        font-size: 1rem;
+    }
+
+    #Star {
+        font-size: 1.3rem;
+    }
+}
+
+
+
+
+@media only screen and (max-width: 480px) {
+    .lifestyle-content h2 {
+        font-size: 20px;
+    }
+
+    .icon-item img {
+        max-width: 50px;
+    }
+
+    .lifestyle-content p {
+        font-size: 14px;
+    }
+
+    .review .heading {
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .review-box img {
+        width: 7rem;
+    }
+
+    .review-item {
+        min-height: 250px; 
+        padding: 10px 20px;
+    }
+
+    .review-item h2 {
+        font-size: 1.6rem; 
+    }
+
+    .review-item p {
+        font-size: 0.9rem; 
+    }
+
+    #Star {
+        font-size: 1.2rem; 
+    }
+}
