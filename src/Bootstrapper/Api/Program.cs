@@ -20,6 +20,11 @@ builder.Services
         catalogAssembly,
         basketAssembly);
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+});
+
 // Adding CORS policy
 builder.Services.AddCors(options =>
 {
