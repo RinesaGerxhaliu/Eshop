@@ -6,27 +6,21 @@ builder.Host.UseSerilog((context, config) =>
 // Adding services to the built-in dependency injection container
 // Each module handles its own dependencies, making the codebase more modular
 
-/*builder.Services.AddCarter(configurator: config =>
-{
-    var catalogModules = typeof(CatalogModule).Assembly.GetTypes()
-        .Where(t => t.IsAssignableTo(typeof(ICarterModule))).ToArray();
-
-    config.WithModules(catalogModules);
-});*/
+// Common services such as Carter, MediatR, FluentValidation
+var catalogAssembly = typeof(CatalogModule).Assembly;
+var basketAssembly = typeof(BasketModule).Assembly;
 
 builder.Services
-    .AddCarterWithAssemblies(typeof(CatalogModule).Assembly);
+    .AddCarterWithAssemblies(
+        catalogAssembly,
+        basketAssembly);
 
 builder.Services
-    .AddCatalogModule(builder.Configuration)
-    .AddBasketModule(builder.Configuration)
-    .AddOrderingModule(builder.Configuration);
+    .AddMediatRWithAssemblies(
+        catalogAssembly,
+        basketAssembly);
 
-builder.Services
-    .AddExceptionHandler<CustomExceptionHandler>();
-
-
-// Add CORS policy
+// Adding CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
@@ -38,16 +32,22 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Module services: Catalog, Basket, Ordering 
+
+builder.Services
+    .AddCatalogModule(builder.Configuration)
+    .AddBasketModule(builder.Configuration)
+    .AddOrderingModule(builder.Configuration);
+
+builder.Services
+    .AddExceptionHandler<CustomExceptionHandler>();
+
 var app = builder.Build();
-
-
-
-
-app.UseCors("AllowReactApp");
-
 
 // Using these use extension methods, we are configuring the HTTP Request Pipeline
 //"app" is a type of web application that implements several interfaces
+
+app.UseCors("AllowReactApp");
 
 app.MapCarter();
 app.UseSerilogRequestLogging();

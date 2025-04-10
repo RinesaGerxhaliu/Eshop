@@ -4,7 +4,7 @@
 
     public record GetProductByIdResponse
     {
-        public ProductDTO Product { get; init; }
+        public ProductDTO Product { get; init; } = default!;
     }
 
 
