@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Homepage.css'; 
 import Navbar from './Navbar';
-import heroImg from './heroo.jpg';
+import Footer from './Footer';
 
 
 const ProductCard = ({ name, description, price }) => {
@@ -44,19 +44,19 @@ const Homepage = () => {
   return (
     <>
     <Navbar />
-    <div>
-    <section
-  className="hero"
-  style={{
-    backgroundImage: `url(${heroImg})`
-  }}
->
-  <div className="hero-text">
-    <h1>Nature Your Skin</h1>
-    <p>Discover our natural body oils collection.</p>
-    <button>SHOP COLLECTION</button>
-  </div>
-</section>
+      <div>
+        <section
+              className="hero"
+              style={{
+                  backgroundImage: `url("/Assets/heroo.jpg")`
+              }}
+      >
+            <div className="hero-text">
+              <h1>Nature Your Skin</h1>
+              <p>Discover our natural body oils collection.</p>
+              <button>SHOP COLLECTION</button>
+            </div>
+        </section>
 
 
        {/*  produktet */}
@@ -64,17 +64,13 @@ const Homepage = () => {
        <h2>Popular Product</h2>
         <div className="product-grid">
         {Array.isArray(products) && products.map((product) => (
-  <ProductCard
-    key={product.id}
-    name={product.name}
-    description={product.description}
-    price={product.price}
-  />
-))}
-
-          
-
-
+              <ProductCard
+                key={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+              />
+        ))}
         </div>
       </div>
 
@@ -186,7 +182,8 @@ const Homepage = () => {
         </div>
       </section>
     </div>
-    </>
+    <Footer/>
+    </> 
   );
 };
 
