@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import './Homepage.css'; 
-import Navbar from './Navbar';
-import Footer from './Footer';
+import '../../Styles/Homepage.css'; 
+import Navbar from '../../Components/Navbar/Navbar';
+import Footer from '../../Components/Footer/Footer';
 
 
 const ProductCard = ({ name, description, price }) => {
