@@ -1,6 +1,4 @@
-﻿using Catalog.Products.Features.UpdateProduct;
-
-namespace Catalog.Products.Features.DeleteProduct
+﻿namespace Catalog.Products.Features.DeleteProduct
 {
 
     public record DeleteProductCommand(Guid ProductId)
@@ -8,11 +6,11 @@ namespace Catalog.Products.Features.DeleteProduct
 
     public record DeleteProductResult(bool IsSuccessful);
 
-    public class DeleteProductCommandValidator : AbstractValidator<UpdateProductCommand>
+    public class DeleteProductCommandValidator : AbstractValidator<DeleteProductCommand>
     {
         public DeleteProductCommandValidator()
         {
-            RuleFor(x => x.Product.Id).NotEmpty().WithMessage("Id is required");
+            RuleFor(x => x.ProductId).NotEmpty().WithMessage("Product Id is required");
         }
 
     }

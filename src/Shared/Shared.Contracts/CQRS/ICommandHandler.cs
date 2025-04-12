@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Shared.CQRS;
+namespace Shared.Contracts.CQRS;
 
 //the interface for the command handlers that do not return a response
 public interface ICommandHandler<in TCommand> : ICommandHandler<TCommand, Unit>

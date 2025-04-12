@@ -1,4 +1,4 @@
-﻿namespace Catalog.Products.DTOs;
+﻿namespace Catalog.Contracts.Products.DTOs;
 
 public record ProductDTO
 {
