@@ -35,11 +35,7 @@ public class Product : Aggregate<Guid>
         Description = description;
         Price = price;
 
-        if (Price != price)
-        {
-            Price = price;
-            AddDomainEvent(new ProductPriceChangedEvent(this));
-        }
+        AddDomainEvent(new ProductPriceChangedEvent(this));
 
     }
 

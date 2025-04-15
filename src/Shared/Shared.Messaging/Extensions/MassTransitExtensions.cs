@@ -20,8 +20,13 @@ public static class MassTransitExtentions
             config.AddSagas(assemblies);
             config.AddActivities(assemblies);
 
-            config.UsingInMemory((context, configurator) =>
+            config.UsingRabbitMq((context, configurator) =>
             {
+                configurator.Host(new Uri(configuration["MessageBroker:Host"]!), host =>
+                {
+                    host.Username(configuration["MessageBroker:UserName"]!);
+                    host.Password(configuration["MessageBroker:Password"]!);
+                });
                 configurator.ConfigureEndpoints(context);
             });
         });
