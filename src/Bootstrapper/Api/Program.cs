@@ -28,6 +28,9 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services
      .AddMassTransitWithAssemblies(builder.Configuration, catalogAssembly, basketAssembly);
 
+builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
+
 // Adding CORS policy
 builder.Services.AddCors(options =>
 {
@@ -55,11 +58,14 @@ var app = builder.Build();
 // Using these use extension methods, we are configuring the HTTP Request Pipeline
 //"app" is a type of web application that implements several interfaces
 
+
 app.UseCors("AllowReactApp");
 
 app.MapCarter();
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler(options => { });
+app.UseAuthentication();
+app.UseAuthorization();
 
 app
    .UseCatalogModule()
