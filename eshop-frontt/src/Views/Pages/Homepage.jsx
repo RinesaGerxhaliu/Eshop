@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../../Styles/Homepage.css'; 
-import Navbar from '../../Components/Navbar/Navbar';
-import Footer from '../../Components/Footer/Footer';
-
 
 const ProductCard = ({ name, description, price }) => {
     return (
@@ -32,6 +29,8 @@ const Homepage = () => {
           setProducts([]);
         }
       })
+
+      
       .catch(error => console.error("Gabim:", error));
   }, []);
   
@@ -43,7 +42,6 @@ const Homepage = () => {
 
   return (
     <>
-    <Navbar />
       <div>
         <section
               className="hero"
@@ -182,7 +180,6 @@ const Homepage = () => {
         </div>
       </section>
     </div>
-    <Footer/>
     </> 
   );
 };

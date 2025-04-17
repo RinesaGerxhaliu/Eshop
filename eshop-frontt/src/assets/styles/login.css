@@ -1,0 +1,73 @@
+.login-page {
+  display: flex;
+  height: 88vh;
+}
+
+.login-form {
+  flex: 1;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  background-color: #fff0f5; 
+}
+
+.login-form-inner {
+  max-width: 280px; 
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 1px;
+}
+
+.login-form form {
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.login-form label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.login-form input {
+  padding: 8px 12px; 
+  margin-bottom: 15px;
+  border: 1px solid #debcbc;
+  border-radius: 6px;
+  background-color: #f8f4f4; 
+}
+
+
+.login-form button {
+  padding: 12px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.login-form a {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-decoration: none;
+}
+
+.login-image {
+  flex: 1;
+  background-image: url('../images/makeupp.jpg');
+  background-size: cover;
+  background-position: center;
+}

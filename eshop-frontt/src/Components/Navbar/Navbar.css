@@ -1,31 +1,151 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background-color: #fdfaf4;
-    font-family: 'Georgia', serif;
+  background-color: #f8d7da; 
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;  
+  align-items: center; 
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.left-links {
+  display: flex;
+  gap: 20px; 
+}
+
+.navbar-brand {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #000; 
+  text-align: center;
+  flex-grow: 1; 
+}
+
+.right-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-link {
+  font-size: 1rem;
+  color: #000;
+}
+
+.nav-link:hover {
+  color: #f1c40f;  
+}
+
+.nav-link.login {
+  font-weight: bold;  
+}
+
+.currency-select {
+  color: #000;
+  background-color: transparent;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;  
+    text-align: center;
   }
-  
+
   .left-links, .right-links {
-    display: flex;
-    gap: 20px;
-    font-size: 14px;
+    justify-content: center;
   }
-  
-  .logo {
-    font-size: 24px;
-    font-weight: bold;
+
+  .container {
+    flex-direction: column;
   }
-  
-  a {
-    text-decoration: none;
-    color: black;
+}
+
+.navbar-custom {
+  background-color: #ffffff; 
+  padding: 1rem 2rem; 
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.left-links {
+  display: flex;
+  gap: 20px;
+  font-size: 1rem;
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;  
+  text-align: center;
+  flex-grow: 1;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.right-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-link {
+  font-size: 1rem;
+  color: #333; 
+  font-weight: 500;
+  padding: 8px 15px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #007bff;  
+}
+
+.nav-link.sign-in {
+  font-weight: bold; 
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.nav-link.sign-in:hover {
+  background-color: #0056b3;
+}
+
+.currency-select {
+  color: #333;
+  background-color: transparent;
+  border: 2px solid #333;  
+  border-radius: 25px;
+  padding: 5px 15px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .navbar-custom {
+    flex-direction: column;  
+    text-align: center;
   }
-  
-  select {
-    border: none;
-    background: transparent;
-    font-size: 14px;
+
+  .left-links, .right-links {
+    justify-content: center;
+    width: 100%;
   }
-  
+
+  .container {
+    flex-direction: column;
+  }
+}
