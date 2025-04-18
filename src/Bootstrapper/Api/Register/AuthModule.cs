@@ -1,21 +1,44 @@
-﻿using Carter;
-using Microsoft.AspNetCore.Routing;
-
-namespace Api.Register;
-
-public class AuthModule : CarterModule
+﻿namespace Catalog.Auth.Modules
 {
-    public override void AddRoutes(IEndpointRouteBuilder app)
+    public class AuthModule : ICarterModule
     {
-        app.MapPost("/register", async (RegisterRequest request, HttpContext ctx) =>
+        public void AddRoutes(IEndpointRouteBuilder app)
         {
-            var userService = ctx.RequestServices.GetRequiredService<IUserService>();
+            app.MapPost("/auth/register", async (
+                    [FromBody] RegisterRequest req,
+                    IIdentityService identity) =>
+            {
+                if (string.IsNullOrWhiteSpace(req.FirstName) ||
+                    string.IsNullOrWhiteSpace(req.LastName) ||
+                    string.IsNullOrWhiteSpace(req.Email) ||
+                    string.IsNullOrWhiteSpace(req.Password))
+                {
+                    return Results.BadRequest("All fields are required.");
+                }
 
-            await userService.RegisterUserAsync(request);
+                try
+                {
+                    await identity.RegisterAsync(
+                        req.FirstName,
+                        req.LastName,
+                        req.Email,
+                        req.Password);
 
-            return Results.Ok(new { Message = "User registered successfully" });
-        });
+                    return Results.Created("/login", null);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(
+                        detail: ex.Message,
+                        statusCode: StatusCodes.Status500InternalServerError
+                    );
+                }
+            })
+               .Accepts<RegisterRequest>("application/json")
+               .Produces(StatusCodes.Status201Created)
+               .ProducesProblem(StatusCodes.Status500InternalServerError)
+               .WithName("Register")
+               .WithSummary("Registers a new user in Keycloak");
+        }
     }
 }
-
-

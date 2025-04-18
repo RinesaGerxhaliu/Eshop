@@ -1,4 +1,5 @@
 using Api.Register;
+using Catalog.Auth.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,23 +13,32 @@ builder.Host.UseSerilog((context, config) =>
 var catalogAssembly = typeof(CatalogModule).Assembly;
 var basketAssembly = typeof(BasketModule).Assembly;
 var orderingAssembly = typeof(OrderingModule).Assembly;
-var authAssembly = typeof(AuthModule).Assembly; 
+var authAssembly = typeof(AuthModule).Assembly;
 
 builder.Services
-    .AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, authAssembly); 
+    .AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly,authAssembly); 
 
 builder.Services
-    .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, authAssembly); 
+    .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly); 
 
-builder.Services.AddScoped<IUserService, UserService>(); 
-builder.Services.AddHttpContextAccessor(); 
+builder.Services.AddHttpContextAccessor();
 
+// Bind settings from appsettings.json -> Keycloak section
+builder.Services.Configure<KeycloakSettings>(
+    builder.Configuration.GetSection("Keycloak"));
+
+// Register the HTTP client + service for user creation
+builder.Services.AddHttpClient<IIdentityService, KeycloakIdentityService>();
+
+// —————————————————————————————————————————————————————————
+// 3) Other shared services
+// —————————————————————————————————————————————————————————
 
 //builder.Services
-    //.AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly);
+//.AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly);
 
 //builder.Services
-    //.AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly); 
+//.AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly); 
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {

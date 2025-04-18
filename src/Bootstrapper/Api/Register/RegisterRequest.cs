@@ -1,4 +1,9 @@
-﻿namespace Api.Register;
-    public record RegisterRequest(string Username, string Email, string Password);
-
-
+﻿namespace Api.Register
+{
+    public record RegisterRequest(
+        string FirstName,
+        string LastName,
+        string Email,
+        string Password
+    );
+}
