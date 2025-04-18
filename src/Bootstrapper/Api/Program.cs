@@ -59,11 +59,14 @@ var app = builder.Build();
 
 app.UseCors("AllowReactApp");
 
+app.UseStaticFiles();
 app.MapCarter();
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler(options => { });
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app
    .UseCatalogModule()

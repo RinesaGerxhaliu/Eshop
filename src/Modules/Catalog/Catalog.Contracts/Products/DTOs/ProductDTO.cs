@@ -1,9 +1,11 @@
-﻿namespace Catalog.Contracts.Products.DTOs;
-
-public record ProductDTO
+﻿namespace Catalog.Contracts.Products.DTOs
 {
-    public Guid Id { get; init; } = Guid.Empty;
-    public string Name { get; init; } = string.Empty;
-    public string Description { get; init; } = string.Empty;
-    public decimal Price { get; init; }
+    public record ProductDTO
+    {
+        public Guid Id { get; init; } = Guid.Empty;
+        public string Name { get; init; } = string.Empty;
+        public string Description { get; init; } = string.Empty;
+        public decimal Price { get; init; }
+        public string? ImageUrl { get; init; }
+    }
 }

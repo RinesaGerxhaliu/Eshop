@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using Catalog.Data.Repositories;
+using Catalog.Products.Services;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Behaviors;
@@ -27,6 +29,10 @@ namespace Catalog
             });
 
             services.AddScoped<IDataSeeder, CatalogDataSeeder>();
+
+            services.AddScoped<IProductRepository, ProductRepository>();
+
+            services.AddScoped<IImageService, LocalImageService>();
 
             return services;
 

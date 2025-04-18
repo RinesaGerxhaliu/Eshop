@@ -23,3 +23,7 @@ global using Catalog.Contracts.Products.Features.GetProductById;
 global using Catalog.Categories.Models;
 global using Catalog.Brands.Models;
 global using Catalog.Reviews.Models;
+global using Catalog.Data.Repositories;
+global using Catalog.Products.Services;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Hosting;

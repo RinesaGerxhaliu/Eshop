@@ -1,24 +1,18 @@
 ﻿namespace Catalog.Products.Features.GetProductById
 {
-    internal class GetProductByIdHandler(CatalogDbContext dbContext)
-        : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>
+    internal class GetProductByIdHandler(
+            IProductRepository repository
+        ) : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>
     {
-        public async Task<GetProductByIdResult> Handle(GetProductByIdQuery query,
+        public async Task<GetProductByIdResult> Handle(
+            GetProductByIdQuery query,
             CancellationToken cancellationToken)
         {
-            var product = await dbContext.Products
-                             .AsNoTracking()
-                             .SingleOrDefaultAsync(p => p.Id == query.Id, cancellationToken);
+            var product = await repository.GetByIdAsync(query.Id, cancellationToken)
+                          ?? throw new ProductNotFoundException(query.Id);
 
-            if (product is null)
-            {
-                throw new ProductNotFoundException(query.Id);
-            }
-
-            // mapping product entity to productdto
-            var productDto = product.Adapt<ProductDTO>();
-
-            return new GetProductByIdResult(productDto);
+            var dto = product.Adapt<ProductDTO>();
+            return new GetProductByIdResult(dto);
         }
     }
 }
