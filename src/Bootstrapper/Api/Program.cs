@@ -1,3 +1,5 @@
+using Api.Register;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, config) =>
@@ -10,13 +12,23 @@ builder.Host.UseSerilog((context, config) =>
 var catalogAssembly = typeof(CatalogModule).Assembly;
 var basketAssembly = typeof(BasketModule).Assembly;
 var orderingAssembly = typeof(OrderingModule).Assembly;
-
-
-builder.Services
-    .AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly);
+var authAssembly = typeof(AuthModule).Assembly; 
 
 builder.Services
-    .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly); 
+    .AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, authAssembly); 
+
+builder.Services
+    .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, authAssembly); 
+
+builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddHttpContextAccessor(); 
+
+
+//builder.Services
+    //.AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly);
+
+//builder.Services
+    //.AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly); 
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
