@@ -61,10 +61,11 @@ public class Product : Aggregate<Guid>
     public void RemoveImage(Guid imageId)
     {
         var image = _images.FirstOrDefault(img => img.Id == imageId);
-        if (image is null)
-            throw new InvalidOperationException("Image not found.");
 
+        if (image == null)
+        {
+            throw new InvalidOperationException($"Image with ID {imageId} not found.");
+        }
         _images.Remove(image);
     }
-
 }

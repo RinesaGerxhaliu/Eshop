@@ -1,97 +1,74 @@
-/* Container */
 .login-page {
-    display: flex;
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
-    background-color: #f9f9f9;
-    padding: 20px;
-  }
+  display: flex;
+  height: 88vh;
+}
+
+.login-form {
+  flex: 1;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  background-color: #fff0f5; 
+}
+
+
+
+.login-form h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 1px;
+}
+
+.login-form form {
+  display: flex;
+  flex-direction: column;
   
-  /* Form box */
-  .login-form {
-    background: #ffffff;
-    padding: 40px 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 100%;
-  }
-  
-  .login-form h2 {
-    text-align: center;
-    margin-bottom: 24px;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  /* Inputs and labels */
-  .login-form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #555;
-  }
-  
-  .login-form input {
-    width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .login-form input:focus {
-    outline: none;
-    border-color: #7e00a0;
-  }
-  
-  /* Primary button */
-  .login-form button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-    background-color: #7e00a0;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .login-form button[type="submit"]:hover {
-    background-color: #5e0080;
-  }
-  
-  /* Error messages */
-  .error-message {
-    color: #d32f2f;
-    margin-bottom: 16px;
-    font-size: 13px;
-  }
-  
-  /* Secondary link‐style button */
-  .forgot-password-btn {
-    display: block;
-    width: 100%;
-    background: none;
-    border: none;
-    margin-top: 12px;
-    font-size: 14px;
-    color: #007bff;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  
-  .forgot-password-btn:hover {
-    color: #0056b3;
-  }
-  
-  /* If you have a side/image panel; hide or style as needed */
-  .login-image {
-    display: none;
-  }
-  
+}
+
+.login-form label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.login-form input {
+  padding: 8px 8px; 
+  margin-bottom: 15px;
+  border: 1px solid #debcbc;
+  border-radius: 6px;
+  background-color: #f8f4f4; 
+}
+
+
+.login-form button {
+  padding: 12px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.login-form a {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-decoration: none;
+}
+
+.login-image {
+  flex: 1;
+  background-image: url('../images/makeupp.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}

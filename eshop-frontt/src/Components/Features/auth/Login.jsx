@@ -1,3 +1,4 @@
+// src/Components/Features/auth/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -26,15 +27,13 @@ function Login() {
     e.preventDefault();
     if (!validate()) return;
 
-    // build the form body
     const params = new URLSearchParams();
     params.append('grant_type', 'password');
     params.append('username', email);
     params.append('password', password);
 
-    // build your Basic auth header (Client Id and Secret mode)
     const clientId     = 'myclient';
-    const clientSecret = 'l3CH5cLjdZloCLaLlsBYHqgwA6jUlDY2';
+    const clientSecret = 'VvZg6mZTpji9AQNRwwQLPalqWR015c7q';
     const basic        = btoa(`${clientId}:${clientSecret}`);
 
     try {
@@ -93,7 +92,24 @@ function Login() {
           {errors.password && <div className="error-message">{errors.password}</div>}
 
           <button type="submit">Sign in</button>
-          <a href="#">Forgot Password?</a>
+
+          <div className="login-links" style={{ textAlign: 'center', marginTop: '10px' }}>
+            <a
+              href="#"
+              onClick={() => navigate('/forgot-password')}
+              className="link-text"
+            >
+              Forgot Password?
+            </a>
+            <br />
+            <a
+              href="#"
+              onClick={() => navigate('/register')}
+              className="link-text"
+            >
+              Don't have an account yet? Create Account
+            </a>
+          </div>
         </form>
       </div>
       <div className="login-image"></div>
