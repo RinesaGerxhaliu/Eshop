@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <Folder Include="Products\Features\AddProductImage\" />
+    <Folder Include="Products\Features\DeleteReview\" />
+    <Folder Include="Products\Features\UpdateReview\" />
   </ItemGroup>
 
 </Project>

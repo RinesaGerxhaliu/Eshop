@@ -1,5 +1,6 @@
 using Api.Register;
 using Catalog.Auth.Modules;
+using Catalog.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Services
     .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly); 
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
 
 // Bind settings from appsettings.json -> Keycloak section
 builder.Services.Configure<KeycloakSettings>(
