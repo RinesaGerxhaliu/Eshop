@@ -1,4 +1,3 @@
-// src/Components/Features/auth/Register.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../../assets/styles/login.css';
@@ -22,7 +21,7 @@ function Register() {
     if (!password) newErrors.password = 'Password is required';
     else if (password.length < 6) newErrors.password = 'Must be at least 6 characters';
 
-    if (password !== confirmPassword) 
+    if (password !== confirmPassword)
       newErrors.confirmPassword = 'Passwords do not match';
 
     setErrors(newErrors);
@@ -49,7 +48,6 @@ function Register() {
       });
 
       if (!response.ok) {
-        // Keycloak/Carter returns problem+json with { title, detail, status }
         const err = await response.json();
         setErrors({ general: err.detail || 'Registration failed' });
         return;
@@ -63,7 +61,7 @@ function Register() {
   };
 
   return (
-    <div className="login-page">
+    <div className="login-page center-page">
       <div className="login-form">
         <h2>Create Account</h2>
         <form onSubmit={handleRegister}>
@@ -116,13 +114,13 @@ function Register() {
 
           <button type="submit">Register</button>
 
-          <button
-            type="button"
-            className="forgot-password-btn"
+          <a
+            href="#"
             onClick={() => navigate('/login')}
+            className="link-text"
           >
             Already have an account? Sign in
-          </button>
+          </a>
         </form>
       </div>
       <div className="login-image"></div>
