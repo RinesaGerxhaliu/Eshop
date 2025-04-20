@@ -8,7 +8,12 @@ public class Product : Aggregate<Guid>
     private readonly List<ProductImage> _images = new();
     public IReadOnlyCollection<ProductImage> Images => _images.AsReadOnly();
 
-    public decimal Price { get; private set; } 
+    public decimal Price { get; private set; }
+
+    // Foreign Keys
+    public Guid CategoryId { get; private set; }
+    public Guid BrandId { get; private set; }
+
 
     public static Product Create (Guid id, string name, string description, decimal price)
     {
