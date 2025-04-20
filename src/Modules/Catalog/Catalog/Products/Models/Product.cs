@@ -62,6 +62,14 @@ public class Product : Aggregate<Guid>
         _images.Add(image);
     }
 
+    public void AssignCategory(Guid categoryId)
+    {
+        if (categoryId == Guid.Empty)
+            throw new ArgumentException("Invalid category ID");
+
+        CategoryId = categoryId;
+    }
+
 
     public void RemoveImage(Guid imageId)
     {

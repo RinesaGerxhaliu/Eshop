@@ -23,7 +23,6 @@
         public async Task<CreateProductResult> Handle(CreateProductCommand command,
         CancellationToken cancellationToken)
         {
-            //actual business logic part
             var product = CreateNewProduct(command.Product);
 
             dbContext.Products.Add(product);
