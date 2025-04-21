@@ -1,8 +1,13 @@
 ﻿namespace Catalog.Data.Repositories;
 
-    public interface IProductReviewRepository
-    {
-        Task CreateReview(ProductReview review, CancellationToken cancellationToken);
-    }
+public interface IProductReviewRepository
+{
+    Task CreateReview(ProductReview review, CancellationToken cancellationToken);
+    Task<ProductReview?> GetReviewById(Guid reviewId, CancellationToken cancellationToken);
+    Task UpdateReview(ProductReview review, CancellationToken cancellationToken);
+    Task DeleteReview(ProductReview review, CancellationToken cancellationToken);
+
+}
+
 
 

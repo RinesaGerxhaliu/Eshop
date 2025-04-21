@@ -12,6 +12,28 @@
             await _dbContext.ProductReviews.AddAsync(review, ct);
             await _dbContext.SaveChangesAsync(ct);
         }
-    }
+
+        public async Task<ProductReview?> GetReviewById(Guid reviewId, CancellationToken ct)
+        {
+            return await _dbContext.ProductReviews.FirstOrDefaultAsync(r => r.Id == reviewId, ct);
+        }
+        public async Task UpdateReview(ProductReview review, CancellationToken ct)
+        {
+            _dbContext.ProductReviews.Update(review);
+            await _dbContext.SaveChangesAsync(ct);
+        }
+
+        public async Task DeleteReview(ProductReview review, CancellationToken ct)
+        {
+            _dbContext.ProductReviews.Remove(review);
+            await _dbContext.SaveChangesAsync(ct);
+        }
+
+
+
+
+
+
+}
 
 
