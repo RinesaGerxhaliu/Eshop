@@ -9,6 +9,11 @@
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
+
+        public void Update(string name)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+        }
     }
 
 }
