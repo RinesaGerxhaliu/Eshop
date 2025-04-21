@@ -12,14 +12,20 @@ public class CreateProductReviewEndpoint : ICarterModule
     {
         app.MapPost("/products/reviews", async (CreateProductReviewRequest request, ISender sender, ClaimsPrincipal user) =>
         {
-            var userName = user.Identity?.Name;
+            // Merr preferred_username prej JWT claim-it
+            var userName = user.FindFirst("preferred_username")?.Value;
 
             if (string.IsNullOrWhiteSpace(userName))
             {
                 return Results.Problem("Unauthorized: User name not found.", statusCode: StatusCodes.Status401Unauthorized);
             }
 
-            var command = new CreateProductReviewCommand(request.ProductId, request.ReviewText, request.Rating, userName);
+            var command = new CreateProductReviewCommand(
+                request.ProductId,
+                request.ReviewText,
+                request.Rating,
+                userName
+            );
 
             var result = await sender.Send(command);
 
