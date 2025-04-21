@@ -69,6 +69,13 @@ public class Product : Aggregate<Guid>
 
         CategoryId = categoryId;
     }
+    public void AssignBrand(Guid brandId)
+    {
+        if (brandId == Guid.Empty)
+            throw new ArgumentException("Invalid brand ID");
+
+        BrandId = brandId;
+    }
 
 
     public void RemoveImage(Guid imageId)
