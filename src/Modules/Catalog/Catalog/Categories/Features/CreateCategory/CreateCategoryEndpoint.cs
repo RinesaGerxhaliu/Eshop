@@ -1,32 +1,48 @@
-﻿namespace Catalog.Categories.Features.CreateCategory;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Carter;
 
-public record CreateCategoryRequest
+namespace Catalog.Categories.Features.CreateCategory
 {
-    public string Name { get; init; } = string.Empty;
-}
-
-public record CreateCategoryResponse(Guid Id);
-
-public class CreateCategoryEndpoint : ICarterModule
-{
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public record CreateCategoryRequest
     {
-        app.MapPost("/categories", async (
-            CreateCategoryRequest request,
-            ISender sender) =>
+        public string Name { get; init; } = string.Empty;
+    }
+
+    public record CreateCategoryResponse(Guid Id);
+
+    public class CreateCategoryEndpoint : ICarterModule
+    {
+        public void AddRoutes(IEndpointRouteBuilder app)
         {
-            var command = request.Adapt<CreateCategoryCommand>();
+            app.MapPost("/categories", async (
+                CreateCategoryRequest request,
+                ISender sender,
+                ClaimsPrincipal user) =>
+            {
+                foreach (var claim in user.Claims)
+                {
+                    Console.WriteLine($"CLAIM: {claim.Type} = {claim.Value}");
+                }
 
-            var result = await sender.Send(command);
+                if (!user.IsInRole("admin"))
+                {
+                    return Results.Forbid();
+                }
 
-            var response = result.Adapt<CreateCategoryResponse>();
+                var command = request.Adapt<CreateCategoryCommand>();
+                var result = await sender.Send(command);
+                var response = result.Adapt<CreateCategoryResponse>();
 
-            return Results.Created($"/categories/{response.Id}", response);
-        })
-        .WithName("Create Category")
-        .Produces<CreateCategoryResponse>(StatusCodes.Status201Created)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Create Category")
-        .WithDescription("Creates a new product category.");
+                return Results.Created($"/categories/{response.Id}", response);
+            })
+            .WithName("Create Category")
+            .Produces<CreateCategoryResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status403Forbidden) 
+            .WithSummary("Create Category")
+            .WithDescription("Creates a new product category, accessible only by admin.");
+        }
     }
 }

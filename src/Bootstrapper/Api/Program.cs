@@ -1,6 +1,8 @@
+using Api;
 using Api.Register;
 using Catalog.Auth.Modules;
 using Catalog.Data.Repositories;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -17,6 +19,8 @@ var authAssembly = typeof(AuthModule).Assembly;
 
 builder.Services.AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, authAssembly);
 builder.Services.AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly);
+builder.Services.AddScoped<IClaimsTransformation, KeycloakRolesClaimsTransformation>();
+
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
@@ -36,7 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             NameClaimType = "preferred_username",
-            RoleClaimType = "roles"
+            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
         };
     });
 
