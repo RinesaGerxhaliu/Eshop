@@ -6,6 +6,9 @@ import Login from './Components/Features/auth/Login';
 import Register from './Components/Features/auth/Register';
 import Homepage from './Views/Pages/Homepage';
 import { AuthProvider } from './contexts/AuthContext';
+import UserProfile from './Views/Pages/UserProfile';
+import ShoppingCartPage from './Views/Pages/ShoppingCart';
+
 
 function App() {
   return (
@@ -13,16 +16,17 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
-          {/* Render homepage at "/" */}
           <Route path="/" element={<Homepage />} />
 
-          {/* Or if you’d rather keep the "/homepage" URL: */}
           <Route path="/homepage" element={<Homepage />} />
           <Route path="/register" element={<Register />} />
-          {/* Login page */}
-          <Route path="/login" element={<Login />} />
 
-          {/* Catch‑all: redirect anything else to "/" */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/cart" element={<ShoppingCartPage />} />
+
+
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Footer />

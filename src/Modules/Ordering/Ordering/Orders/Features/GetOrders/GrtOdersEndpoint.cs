@@ -1,4 +1,5 @@
-﻿using Ordering.Orders.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using Ordering.Orders.Dtos;
 
 namespace Ordering.Orders.Features.GetOrders;
 
@@ -9,9 +10,9 @@ public class GetOrdersEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/orders", async ([AsParameters] PaginationRequest request, ISender sender) =>
+        app.MapGet("/orders", async ([AsParameters] PaginationRequest request, [FromQuery] Guid customerId, ISender sender) =>
         {
-            var result = await sender.Send(new GetOrdersQuery(request));
+            var result = await sender.Send(new GetOrdersQuery(request, customerId));
 
             GetOrdersResponse response = result.Adapt<GetOrdersResponse>();
 

@@ -1,0 +1,99 @@
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 50px;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to bottom, #fff0f6, #ffffff);
+  min-height: 80vh;
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.left-panel, .right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 40px;
+}
+
+.right-panel {
+  border-left: 4px solid #f2d7df;
+}
+
+.myaccount-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.myaccount {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 28px;
+  border-bottom: 4px solid #f2d7df;
+  text-align: center;
+}
+
+.myaccountt {
+  font-size: 38px;
+  margin-bottom: 40px;
+}
+
+button {
+  background-color: #d63384;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #c2185b;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.section-content {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.orders-section, .address-book-section {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.divider {
+  width: 80%;
+  height: 2px;
+  background-color: #f2d7df;
+  margin: 20px 0;
+}

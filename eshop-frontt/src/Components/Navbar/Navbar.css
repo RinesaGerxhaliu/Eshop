@@ -1,15 +1,15 @@
 .navbar {
-  background-color: #f8d7da; 
- 
+  background-color: #e5c5c8; 
   display: flex;
   justify-content: space-between;  
   align-items: center; 
+
 }
 
 .container {
   display: flex;
   justify-content: space-between;
-  width: 90%;
+ 
 }
 
 .left-links {
@@ -18,18 +18,27 @@
   margin-top: 14px;
 }
 
-.navbar-brand {
-  font-size: 2rem;
+.nav-link.logout-btn{
+font-size: 18px;
+font-family:'Times New Roman', Times, serif;
+}
+
+.navbar-brandd {
+  font-size: 23px;
   font-weight: bold;
   color: #000; 
   text-align: center;
   flex-grow: 1; 
+  margin-top: 11px;
+ text-decoration: none;
+ font-family: 'Times New Roman', Times, serif;
 }
 
 .right-links {
   display: flex;
-  gap: 20px;
+ 
   align-items: center;
+  margin-left: 30px;
 }
 
 .nav-link {
@@ -55,11 +64,11 @@
 .user-actions {
   display: flex;
   align-items: center;
-  gap: 8px; /* Small space between the icon and button */
+  gap: 20px; 
 }
 
 .user-icon {
-  font-size: 1.8rem;
+  font-size: 40px;
   color: #333;
   cursor: pointer;
 }
@@ -83,8 +92,16 @@
   transition: background-color 0.3s ease;
 }
 
+.nav-link.sign-in-btn{
+  margin-right: 20px;
+}
+
 .nav-link.sign-in:hover {
   background-color: #af7cab;
+}
+
+.user-iconn{
+  font-size: 27px;
 }
 
 .currency-select {

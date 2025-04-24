@@ -5,16 +5,37 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+  const [username, setUsername] = useState(localStorage.getItem('username') || '');
+  const [userId, setUserId] = useState(localStorage.getItem('userId') || ''); 
 
-  const login = (accessToken, refreshToken) => {
+
+  const login = (accessToken, refreshToken, userData) => {
+    console.log("Keycloak Full Response:", userData); 
+
+    const parsedToken = parseJwt(accessToken);
+    const usernameFromToken = parsedToken?.preferred_username || parsedToken?.sub;
+    const userIdFromToken = parsedToken?.sub;
+
+    console.log("Username:", usernameFromToken); 
+    console.log("User ID:", userIdFromToken); 
+
     localStorage.setItem('token', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('username', usernameFromToken);
+    localStorage.setItem('userId', userIdFromToken);
+
+    setUsername(usernameFromToken); 
+    setUserId(userIdFromToken);      
     setIsLoggedIn(true);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userId');
+    setUsername('');  
+    setUserId('');     
     setIsLoggedIn(false);
   };
 
@@ -57,59 +78,20 @@ export const AuthProvider = ({ children }) => {
         body: params
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        const data = await response.json();
+        login(data.access_token, data.refresh_token, username); 
+      } else {
         logout();
-        return;
       }
-
-      const data = await response.json();
-      console.log("Refreshed Token:", data.access_token);
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('refreshToken', data.refresh_token);
-      setIsLoggedIn(true);
-
     } catch (error) {
       console.error('Error refreshing token:', error);
       logout();
     }
   };
 
-  useEffect(() => {
-    const checkInitialTokens = () => {
-      const accessToken = localStorage.getItem('token');
-      const refreshToken = localStorage.getItem('refreshToken');
-      const currentTime = Date.now() / 1000;
-
-      if (!accessToken || !refreshToken) {
-        logout();
-        return;
-      }
-
-      const parsedAccessToken = parseJwt(accessToken);
-      const parsedRefreshToken = parseJwt(refreshToken);
-
-      if (!parsedAccessToken || parsedAccessToken.exp < currentTime) {
-        console.log("Access token expired at start.");
-      }
-
-      if (!parsedRefreshToken || parsedRefreshToken.exp < currentTime) {
-        console.log("Refresh token expired at start, logging out...");
-        logout();
-        return;
-      }
-    };
-
-    checkInitialTokens();
-
-    const interval = setInterval(() => {
-      refreshAccessToken();
-    }, 4 * 60 * 1000); // çdo 4 minuta
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, refreshAccessToken }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, refreshAccessToken, username, userId }}>
       {children}
     </AuthContext.Provider>
   );
