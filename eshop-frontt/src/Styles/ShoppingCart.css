@@ -1,61 +1,77 @@
 .shopping-cart-container {
-    max-width: 1000px;
-    margin: 60px auto;
-    padding: 2rem;
-    background-color: #fff0f5; /* light pastel pink */
-    border-radius: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    font-family: 'Poppins', sans-serif;
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 2rem;
+  background-color: #fff0f5; 
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif;
+}
+
+.shopping-cart-container h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #8b005d; 
+  margin-bottom: 2rem;
+}
+
+.shopping-cart-container p {
+  font-size: 1rem;
+  color: #333;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  background-color: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 1rem;
+  padding: 1rem; 
+  margin-bottom: 1rem; 
+  display: flex;
+  align-items: center; 
+  gap: 4rem; 
+}
+
+.cart-item-image-container {
+  flex-shrink: 0; 
+}
+
+.cart-item-image {
+  max-width: 150px; 
+  height: auto;
+  object-fit: cover;
+  border-radius: 1rem;
+}
+
+.cart-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem; 
+  justify-content: flex-start;
+}
+
+.cart-item-details p {
+  margin: 0; 
+}
+
+@media (max-width: 768px) {
+  .shopping-cart-container {
+    padding: 1rem;
+    margin: 30px 1rem;
   }
-  
-  .shopping-cart-container h1 {
-    text-align: center;
-    font-size: 2.5rem;
-    color: #8b005d; /* soft berry */
-    margin-bottom: 2rem;
-  }
-  
-  .shopping-cart-container p {
-    font-size: 1rem;
-    color: #333;
-  }
-  
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
+
   li {
-    background-color: #ffffff;
-    border: 1px solid #e6e6e6;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    transition: transform 0.2s ease;
+    flex-direction: column; 
+    align-items: center;
+    gap: 0.5rem; 
   }
-  
-  li:hover {
-    transform: scale(1.02);
-    border-color: #d18abf;
+
+  .cart-item-image {
+    max-width: 80px;
   }
-  
-  li p strong {
-    font-size: 1.2rem;
-    color: #5a004f;
-  }
-  
-  @media (max-width: 768px) {
-    .shopping-cart-container {
-      padding: 1rem;
-      margin: 30px 1rem;
-    }
-  
-    li {
-      padding: 1rem;
-    }
-  }
-  
+}

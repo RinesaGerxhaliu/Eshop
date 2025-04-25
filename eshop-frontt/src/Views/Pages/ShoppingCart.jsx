@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios'; 
 import '../../Styles/ShoppingCart.css';
 
 const ShoppingCartPage = () => {
@@ -29,6 +30,21 @@ const ShoppingCartPage = () => {
     const data = await response.json();
     localStorage.setItem("token", data.accessToken); 
     return data.accessToken;
+  };
+
+  // Method to fetch per shkak te fotos
+  const fetchProductDetails = async (productId) => {
+    try {
+      const response = await fetch(`https://localhost:5050/products/${productId}`);
+      if (!response.ok) {
+        throw new Error('Product not found');
+      }
+      const data = await response.json();
+      return data.product;
+    } catch (err) {
+      console.error("Error fetching product details:", err);
+      throw err;
+    }
   };
 
   // Function to get cart data
@@ -70,7 +86,22 @@ const ShoppingCartPage = () => {
       }
 
       const data = await response.json();
-      setCart(data.shoppingCart);
+
+      // Fetch product details (including imageUrl) for each item in the cart
+      const updatedItems = await Promise.all(data.shoppingCart.items.map(async (item) => {
+        try {
+          const product = await fetchProductDetails(item.productId);
+          return {
+            ...item,
+            imageUrl: product.imageUrl, 
+          };
+        } catch (error) {
+          console.error("Error fetching product image:", error);
+          return item; // Return item without image in case of error
+        }
+      }));
+
+      setCart({ items: updatedItems });
       setError('');
     } catch (err) {
       console.error("Error fetching shopping cart:", err);
@@ -82,7 +113,7 @@ const ShoppingCartPage = () => {
 
   useEffect(() => {
     getCart();
-  }, []);
+  }, []); // Fetch cart data on component mount
 
   return (
     <div className="shopping-cart-container">
@@ -97,15 +128,27 @@ const ShoppingCartPage = () => {
           <p>Your shopping cart is empty.</p>
         ) : (
           <ul>
-            {cart.items.map((item, idx) => (
-              <li key={idx} className="cart-item">
+          {cart.items.map((item, idx) => (
+            <li key={idx} className="cart-item">
+              <div className="cart-item-image-container">
+                {item.imageUrl && (
+                  <img
+                    src={`https://localhost:5050${item.imageUrl}`} 
+                    alt={item.productName}
+                    className="cart-item-image"
+                  />
+                )}
+              </div>
+              <div className="cart-item-details">
                 <p><strong>{item.productName}</strong></p>
                 <p>Price: €{item.price}</p>
                 <p>Quantity: {item.quantity}</p>
                 <p>Color: {item.color}</p>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </li>
+          ))}
+        </ul>
+        
         )
       )}
     </div>
