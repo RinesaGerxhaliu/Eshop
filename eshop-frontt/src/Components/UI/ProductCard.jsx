@@ -1,9 +1,11 @@
 // src/components/ProductCard.jsx
 import React from 'react';
+import { Link } from 'react-router-dom';
 import '../../Styles/Homepage.css';
 
-const ProductCard = ({ name, description, price, imageUrl }) => {
-  // If no imageUrl, you can show a placeholder
+const ProductCard = ({ id, name, description, price, imageUrl, reviews }) => {
+  console.log('ProductCard ID:', id); 
+
   const src = imageUrl
     ? `https://localhost:5050${imageUrl}`
     : '/Assets/placeholder.png';
@@ -14,11 +16,13 @@ const ProductCard = ({ name, description, price, imageUrl }) => {
         src={src}
         alt={name}
         className="product-image"
-        style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+        style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px' }}
       />
-      <h2 className="product-name">{name}</h2>
+      <h3 className="product-name">{name}</h3>
       <p className="product-description">{description}</p>
-      <p className="product-price">{price} €</p>
+      <p className="product-price">{price.toFixed(2)} €</p>
+
+      <Link to={`/products/${id}`} className="details">Details</Link>
     </div>
   );
 };
