@@ -1,0 +1,47 @@
+/* Sidebar Styles */
+.admin-sidebar {
+  width: 240px;
+  height: calc(100vh - 60px); 
+  background-color: #ddd6df; 
+  color: #333; 
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); 
+  position: fixed;
+  top: 78px; 
+  left: 0;
+  font-family: 'Poppins', sans-serif;
+  z-index: 999; 
+  overflow-y: auto; 
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  color: #c58b74; 
+  text-align: center;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.sidebar-menu li:hover {
+  background-color: #e9ecef; 
+  color: #c58b74; 
+}
+
+.sidebar-icon {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}

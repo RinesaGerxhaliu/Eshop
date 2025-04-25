@@ -6,26 +6,30 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
   const [username, setUsername] = useState(localStorage.getItem('username') || '');
-  const [userId, setUserId] = useState(localStorage.getItem('userId') || ''); 
-
+  const [userId, setUserId] = useState(localStorage.getItem('userId') || '');
+  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem('roles')) || []);
 
   const login = (accessToken, refreshToken, userData) => {
-    console.log("Keycloak Full Response:", userData); 
+    console.log("Keycloak Full Response:", userData);
 
     const parsedToken = parseJwt(accessToken);
     const usernameFromToken = parsedToken?.preferred_username || parsedToken?.sub;
     const userIdFromToken = parsedToken?.sub;
+    const rolesFromToken = parsedToken?.resource_access?.myclient?.roles || [];
 
-    console.log("Username:", usernameFromToken); 
-    console.log("User ID:", userIdFromToken); 
+    console.log("Username:", usernameFromToken);
+    console.log("User ID:", userIdFromToken);
+    console.log("Roles:", rolesFromToken);
 
     localStorage.setItem('token', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('username', usernameFromToken);
     localStorage.setItem('userId', userIdFromToken);
+    localStorage.setItem('roles', JSON.stringify(rolesFromToken));
 
-    setUsername(usernameFromToken); 
-    setUserId(userIdFromToken);      
+    setUsername(usernameFromToken);
+    setUserId(userIdFromToken);
+    setRoles(rolesFromToken);
     setIsLoggedIn(true);
   };
 
@@ -34,8 +38,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
     localStorage.removeItem('userId');
-    setUsername('');  
-    setUserId('');     
+    localStorage.removeItem('roles');
+
+    setUsername('');
+    setUserId('');
+    setRoles([]);
     setIsLoggedIn(false);
   };
 
@@ -91,7 +98,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, refreshAccessToken, username, userId }}>
+    <AuthContext.Provider value={{
+      isLoggedIn,
+      login,
+      logout,
+      refreshAccessToken,
+      username,
+      userId,
+      roles
+    }}>
       {children}
     </AuthContext.Provider>
   );

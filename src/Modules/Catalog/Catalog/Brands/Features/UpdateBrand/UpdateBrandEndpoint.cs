@@ -1,4 +1,5 @@
-﻿using Catalog.Brands.DTOs;
+﻿using System.Security.Claims;
+using Catalog.Brands.DTOs;
 
 namespace Catalog.Brands.Features.UpdateBrand
 {
@@ -6,8 +7,17 @@ namespace Catalog.Brands.Features.UpdateBrand
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("/brands/{id}", async (Guid id, UpdateBrandRequest request, ISender sender) =>
+            app.MapPut("/brands/{id}", async (
+                Guid id,
+                UpdateBrandRequest request,
+                ISender sender,
+                ClaimsPrincipal user) =>
             {
+                if (!user.IsInRole("admin"))
+                {
+                    return Results.Forbid(); 
+                }
+
                 var brandDto = new BrandDTO
                 {
                     Id = id,
@@ -26,8 +36,9 @@ namespace Catalog.Brands.Features.UpdateBrand
             .Produces<UpdateBrandResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status403Forbidden) 
             .WithSummary("Update Brand")
-            .WithDescription("Update an existing Brand.");
+            .WithDescription("Update an existing Brand. Only accessible by admin.");
         }
     }
 }

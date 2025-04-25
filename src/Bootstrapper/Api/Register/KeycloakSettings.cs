@@ -2,9 +2,9 @@
 {
     public class KeycloakSettings
     {
-        public string Authority { get; set; } = default!; // e.g. https://localhost:9090
-        public string Realm { get; set; } = default!; // your realm name
-        public string ClientId { get; set; } = default!;
-        public string ClientSecret { get; set; } = default!;
+        public string Authority { get; set; } = "http://localhost:9090/realms/myrealm";
+        public string ClientId { get; set; } = "myclient";         // duhet të ketë rol manage-users
+        public string ClientSecret { get; set; } = "VvZg6mZTpji9AQNRwwQLPalqWR015c7q";  // nga client configuration
+        public string Realm { get; set; } = "myrealm";
     }
 }
