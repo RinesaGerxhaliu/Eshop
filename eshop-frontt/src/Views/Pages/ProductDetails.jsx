@@ -132,10 +132,10 @@ const ProductDetails = () => {
           />
         </div>
 
-        <div className="product-info">
+        <div className="product-infoo">
           <h1>{product.name}</h1>
-          <p className="product-description">{product.description}</p>
-          <p className="product-price">{product.price.toFixed(2)} €</p>
+          <p className="product-descriptionn">{product.description}</p>
+          <p className="product-pricee">{product.price.toFixed(2)} €</p>
           <div className="product-rating">
             Review: ★★★★☆ ({product.reviews} Reviews){/*E boj me e marr prej reviews metodes*/}
           </div>

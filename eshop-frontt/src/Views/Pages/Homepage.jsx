@@ -48,50 +48,70 @@ const Homepage = () => {
         </section>
 
       <section className="product-section">
-        <h2>Popular Products</h2>
-      {errorMsg && (
-        <div style={{ color: 'red', marginBottom: '1rem' }}>
-          Error loading products: {errorMsg}
-        </div>
-      )}
-      <div className="product-grid">
-        {products.map(prod => (
-       <ProductCard
-       key={prod.id}
-       id={prod.id}
-       name={prod.name}
-       price={prod.price}
-       imageUrl={prod.imageUrl}
-       reviews={prod.reviews}
-     />
-     
-        ))}
-      </div>
-    </section>
-
-        <section className="services">
-          <div className="container">
-            <div className="service">
-              <img src="./Assets/cream.png" alt="cream" />
-              <h3>Bronzing</h3>
-              <p>Illuminate your skin with our expert bronzing treatments.</p>
-              <a href="#">Discover More</a>
+            <h2>Popular Products</h2>
+          {errorMsg && (
+            <div style={{ color: 'red', marginBottom: '1rem' }}>
+              Error loading products: {errorMsg}
             </div>
-            <div className="service">
-              <img src="./Assets/kos.png" alt="product" />
-              <h3>Wellness Products</h3>
-              <p>Enhance your well-being with our curated selection of products.</p>
-              <a href="#">Explore Now</a>
-            </div>
-            <div className="service">
-              <img src="./Assets/foundation.png" alt="Body Treatments" />
-              <h3>Body Care</h3>
-              <p>Revitalize your skin with our nourishing body treatments.</p>
-              <a href="#">Learn More</a>
+          )}
+          <div className="product-grid">
+            {products.map(prod => (
+          <ProductCard
+          key={prod.id}
+          id={prod.id}
+          name={prod.name}
+          price={prod.price}
+          imageUrl={prod.imageUrl}
+          reviews={prod.reviews}
+        />
+        
+            ))}
+          </div>
+      </section>
+        
+          {/* Benefit Section */}
+        <div className="benefit-container">
+          <div className="benefit-left">
+            <div className="photo-wrapper">
+              <img src="./Assets/benefit1.jpg" alt="Main Product" className="big-photo" />
+              <img src="./Assets/benefit2.jpg" alt="Small Product" className="small-photo" />
             </div>
           </div>
-        </section>
 
+          <div className="benefit-right">
+            <h2 className="benefit-title">Benefit Using Our Products</h2>
+            <div className="benefit-grid">
+              <div className="benefit-item">
+                <div className="icon">
+                  <i className="fa fa-leaf" style={{ color: '#f5c99a' }}></i>
+                </div>
+                <h3>100% Natural</h3>
+                <p>It is an advanced formula designed to support your well-being with natural ingredients.</p>
+              </div>
+              <div className="benefit-item">
+                <div className="icon">
+                  <i className="fa fa-shield-alt" style={{ color: '#f5c99a' }}></i>
+                </div>
+                <h3>No Side Effect</h3>
+                <p>Gentle on the skin without any harsh side effects.</p>
+              </div>
+              <div className="benefit-item">
+                <div className="icon">
+                  <i className="fa fa-smile" style={{ color: '#f5c99a' }}></i>
+                </div>
+                <h3>For all Skin Types</h3>
+                <p>Suitable for all skin types with nourishing ingredients.</p>
+              </div>
+              <div className="benefit-item">
+                <div className="icon">
+                  <i className="fas fa-sync-alt"></i>
+                </div>
+                <h3>Product Replacement</h3>
+                <p>Guaranteed satisfaction with easy replacement policy.</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <section className="lifestyle">
           <div className="container">
             <div className="lifestyle-content">

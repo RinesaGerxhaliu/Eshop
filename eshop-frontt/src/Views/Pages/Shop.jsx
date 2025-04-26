@@ -25,13 +25,14 @@ const Shop = () => {
         }
       })
       .catch(err => {
-        console.error(' Fetch error:', err);
+        console.error('Fetch error:', err);
         setErrorMsg(err.message);
       });
   }, []);
 
   return (
     <section className="product-section">
+      <h2 className="section-title">Popular Products</h2>
       {errorMsg && (
         <div style={{ color: 'red', marginBottom: '1rem' }}>
           Error loading products: {errorMsg}
@@ -39,15 +40,14 @@ const Shop = () => {
       )}
       <div className="product-grid">
         {products.map(prod => (
-       <ProductCard
-       key={prod.id}
-       id={prod.id}
-       name={prod.name}
-       price={prod.price}
-       imageUrl={prod.imageUrl}
-       reviews={prod.reviews}
-     />
-     
+          <ProductCard
+            key={prod.id}
+            id={prod.id}
+            name={prod.name}
+            price={prod.price}
+            imageUrl={prod.imageUrl}
+            reviews={prod.reviews}
+          />
         ))}
       </div>
     </section>
