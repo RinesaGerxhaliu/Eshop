@@ -1,3 +1,5 @@
+/* Cute script + friendly sans */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap');
 * {
     margin: 0;
     padding: 0;
@@ -38,16 +40,16 @@ body {
 }
 
 .hero-text h1 {
-    padding-left: -110px;
+    font-family: 'Pacifico', cursive;   /* playful script */
     font-size: 48px;
     font-weight: normal;
     margin-bottom: 20px;
 }
 
-.hero-text p {
-    margin-right: 40px;
+.hero-text p,
+.hero-text button {
+    font-family: 'Quicksand', sans-serif;  /* rounded, friendly sans */
     font-size: 18px;
-    margin-bottom: 20px;
 }
 
 .hero-text button {
@@ -55,8 +57,11 @@ body {
     background: none;
     padding: 10px 20px;
     font-size: 14px;
+    /* make the button text a bit bolder */
+    font-weight: 600;
     cursor: pointer;
 }
+
 
 .hero-image img {
     width: 100%;

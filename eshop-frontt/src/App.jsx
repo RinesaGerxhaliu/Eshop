@@ -6,6 +6,7 @@ import Login from './Components/Features/auth/Login';
 import Register from './Components/Features/auth/Register';
 import Homepage from './Views/Pages/Homepage';
 import { AuthProvider } from './contexts/AuthContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import UserProfile from './Views/Pages/UserProfile';
 import ShoppingCartPage from './Views/Pages/ShoppingCart';
 import Dashboard from './Views/Pages/AdminDashboard';
@@ -15,11 +16,13 @@ import ProductDetails from './Views/Pages/ProductDetails';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <CurrencyProvider>
+          <AppContent />
+        </CurrencyProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

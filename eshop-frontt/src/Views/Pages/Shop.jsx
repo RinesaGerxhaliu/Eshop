@@ -1,3 +1,4 @@
+// src/Views/Pages/Shop.jsx
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../Styles/Shop.css';
@@ -10,9 +11,7 @@ const Shop = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    fetch(`${API}/products?PageIndex=0&PageSize=8`, {
-      mode: 'cors'
-    })
+    fetch(`${API}/products?PageIndex=0&PageSize=8`, { mode: 'cors' })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -44,7 +43,8 @@ const Shop = () => {
             key={prod.id}
             id={prod.id}
             name={prod.name}
-            price={prod.price}
+            description={prod.description}
+            price={prod.price}           
             imageUrl={prod.imageUrl}
             reviews={prod.reviews}
           />

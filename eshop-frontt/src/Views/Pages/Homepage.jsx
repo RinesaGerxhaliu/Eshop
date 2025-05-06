@@ -38,12 +38,12 @@ const Homepage = () => {
       <div>
         <section
           className="hero"
-          style={{ backgroundImage: `url("/Assets/heroo.jpg")` }}
+          style={{ backgroundImage: `url("/Assets/Hero.png")` }}
         >
           <div className="hero-text">
-            <h1>Nature Your Skin</h1>
-            <p>Discover our natural body oils collection.</p>
-            <button>SHOP COLLECTION</button>
+            <h1>Skincare Essentials</h1>
+            <p>Explore products from top wellness brands.</p>
+            <button>EXPLORE TOP BRANDS</button>
           </div>
         </section>
 

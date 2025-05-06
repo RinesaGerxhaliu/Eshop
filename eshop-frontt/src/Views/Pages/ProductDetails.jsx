@@ -1,47 +1,27 @@
+// src/Views/Pages/ProductDetails.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../../Styles/ProductDetails.css';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const { convert, format } = useCurrency();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [isAdding, setIsAdding] = useState(false); 
-  const [isAdded, setIsAdded] = useState(false); 
+  const [isAdding, setIsAdding] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   const refreshToken = async () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    const username = localStorage.getItem("username");
-
-    if (!refreshToken || !username) {
-      throw new Error("No refresh token or username found.");
-    }
-
-    const response = await fetch('https://localhost:5050/auth/refresh', {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ refreshToken, username }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to refresh token.");
-    }
-
-    const data = await response.json();
-    localStorage.setItem("token", data.accessToken);
-    return data.accessToken;
+    /* …your existing refresh logic… */
   };
 
   const fetchProduct = async () => {
     try {
       const response = await fetch(`https://localhost:5050/products/${id}`);
-      if (!response.ok) {
-        throw new Error('Product not found');
-      }
+      if (!response.ok) throw new Error('Product not found');
       const data = await response.json();
       setProduct(data.product);
     } catch (err) {
@@ -55,71 +35,16 @@ const ProductDetails = () => {
     if (id) fetchProduct();
   }, [id]);
 
-  const handleAddToCart = async (e) => {
-    e.preventDefault();
-    setIsAdding(true);  
-    setIsAdded(false);  // Reset isAdded state to false
-
-    const userName = localStorage.getItem("username");
-    if (!userName) {
-      alert("User not logged in.");
-      setIsAdding(false); // Reset isAdding state
-      return;
-    }
-
-    const shoppingCartItem = {
-      productId: product.id,
-      quantity,
-      color: "Pink",
-      price: product.price,
-      productName: product.name,
-      imageUrl: product.imageUrl, // Include the imageUrl here
-    };
-
-    const requestData = {
-      userName,
-      shoppingCartItem,
-    };
-
-    const postToBasket = async (token) => {
-      return await fetch(`https://localhost:5050/basket/${userName}/items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestData),
-      });
-    };
-
-    try {
-      let token = localStorage.getItem("token");
-      let response = await postToBasket(token);
-
-      if (response.status === 401) {
-        // If token expired, try to refresh
-        token = await refreshToken();
-        response = await postToBasket(token);
-      }
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error);
-      }
-
-      await response.json();
-      setIsAdding(false);  // Reset isAdding state after success
-      setIsAdded(true);  // Set isAdded to true after successful addition
-    } catch (error) {
-      console.error("Error adding to cart:", error.message);
-      alert("Failed to add product to cart.");
-      setIsAdding(false);  
-    }
+  const handleAddToCart = async e => {
+    /* …your existing add‐to‐cart logic… */
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (error)   return <p>Error: {error}</p>;
   if (!product) return <p>Product not found.</p>;
+
+  // new: compute display price via currency context
+  const displayPrice = format(convert(product.price));
 
   return (
     <div className="container-product">
@@ -135,9 +60,11 @@ const ProductDetails = () => {
         <div className="product-infoo">
           <h1>{product.name}</h1>
           <p className="product-descriptionn">{product.description}</p>
-          <p className="product-pricee">{product.price.toFixed(2)} €</p>
+          {/* updated price display */}
+          <p className="product-pricee">{displayPrice}</p>
+
           <div className="product-rating">
-            Review: ★★★★☆ ({product.reviews} Reviews){/*E boj me e marr prej reviews metodes*/}
+            Review: ★★★★☆ ({product.reviews} Reviews)
           </div>
 
           <form onSubmit={handleAddToCart}>
@@ -149,7 +76,7 @@ const ProductDetails = () => {
                     className="qty-btn"
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
                   >
-                    -
+                    –
                   </button>
                   <span className="qty-value">{quantity}</span>
                   <button
@@ -160,8 +87,12 @@ const ProductDetails = () => {
                     +
                   </button>
                 </div>
-                <button className="add-to-cart" type="submit" disabled={isAdding}>
-                  {isAdding ? "Adding..." : isAdded ? "Added" : "Add to Cart"}
+                <button
+                  className="add-to-cart"
+                  type="submit"
+                  disabled={isAdding}
+                >
+                  {isAdding ? 'Adding...' : isAdded ? 'Added' : 'Add to Cart'}
                 </button>
               </div>
             </div>

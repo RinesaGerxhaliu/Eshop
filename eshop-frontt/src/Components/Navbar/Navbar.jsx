@@ -2,16 +2,23 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaShoppingBag } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCurrency } from "../../contexts/CurrencyContext";
 import "./Navbar.css";
 
 const Navbar = () => {
   const { isLoggedIn, logout, roles } = useAuth();
+  const { currency, rates, setCurrency } = useCurrency();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
+
+  // Fallback list shown until real rates arrive
+  const supported = ["EUR", "USD", "GBP"];
+  const codes = Object.keys(rates || {});
+  const options = codes.length > 1 ? codes : supported;
 
   return (
     <nav className="navbar-custom">
@@ -20,14 +27,16 @@ const Navbar = () => {
           <Link className="nav-link" to="/homepage">
             ABOUT US
           </Link>
-          <Link className="nav-link" to="/shop">SHOP</Link>
+          <Link className="nav-link" to="/shop">
+            SHOP
+          </Link>
           <Link className="nav-link" to="#">
             CONTACT
           </Link>
         </div>
 
         <Link className="navbar-brandd" to="/homepage">
-          Moujan Lusso
+          Trendora
         </Link>
 
         <div className="right-links">
@@ -61,8 +70,17 @@ const Navbar = () => {
               </Link>
             </div>
           )}
-          <select className="currency-select">
-            <option>EUR</option>
+
+          <select
+            className="currency-select"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+          >
+            {options.map((code) => (
+              <option key={code} value={code}>
+                {code}
+              </option>
+            ))}
           </select>
         </div>
       </div>

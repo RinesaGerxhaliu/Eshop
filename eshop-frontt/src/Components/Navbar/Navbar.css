@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 .navbar-custom {
   background-color: #ffffff;
   padding: 1rem 2rem;
@@ -28,7 +29,9 @@
   flex-grow: 1;
   margin-top: 11px;
   text-decoration: none;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Pacifico', cursive;
+  font-size: 23px;
+  font-weight: normal;
 }
 
 .right-links {
