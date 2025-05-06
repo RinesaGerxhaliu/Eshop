@@ -1,4 +1,4 @@
-﻿namespace Api.Register
+﻿namespace Api.Identity
 {
     public class KeycloakSettings
     {

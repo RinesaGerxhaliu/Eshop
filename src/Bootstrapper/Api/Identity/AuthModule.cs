@@ -1,4 +1,4 @@
-﻿namespace Catalog.Auth.Modules
+﻿namespace Api.Identity
 {
     public class AuthModule : ICarterModule
     {

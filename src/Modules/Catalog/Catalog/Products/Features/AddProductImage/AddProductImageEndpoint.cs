@@ -1,39 +1,36 @@
 ﻿namespace Catalog.Products.Features.AddProductImage
 {
-    public record AddProductImageRequest(IFormFile File);
+    public record AddProductImageRequest(IFormFile file);
     public record AddProductImageResponse(Guid ImageId, string ImageUrl);
-
     public class AddProductImageEndpoint : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/products/{id}/images", async (
+            app.MapPost("/products/{id}/image", async (
                     [FromRoute] Guid id,
                     [FromForm] AddProductImageRequest request,
                     ISender sender,
-                    IImageService images) =>
+                    IImageService images
+                ) =>
             {
-                if (request.File is null)
-                {
+                if (request.file == null || request.file.Length == 0)
                     return Results.BadRequest("File is required");
-                }
 
-                // Save the file and get its public URL
-                var url = await images.SaveAsync(request.File.OpenReadStream(), request.File.FileName);
-                // Execute the command
+                // persist & get URL
+                var url = await images.SaveAsync(request.file.OpenReadStream(), request.file.FileName);
                 var result = await sender.Send(new AddProductImageCommand(id, url));
-                // Manually build the response with both ID and URL
-                var response = new AddProductImageResponse(result.ImageId, url);
 
+                var response = new AddProductImageResponse(result.ImageId, url);
                 return Results.Created($"/products/{id}/images/{response.ImageId}", response);
             })
-                .DisableAntiforgery()                                      // no CSRF check on API file upload
-                .Accepts<AddProductImageRequest>("multipart/form-data")
-                .Produces<AddProductImageResponse>(StatusCodes.Status201Created)
-                .ProducesProblem(StatusCodes.Status400BadRequest)
-                .WithName("Add Product Image")
-                .WithSummary("Add Product Image")
-                .WithDescription("Uploads an image file and associates it with the specified product");
+            .DisableAntiforgery()                              // no CSRF check on API file upload
+            .Accepts<AddProductImageRequest>("multipart/form-data")
+            .WithMetadata(new ConsumesAttribute("multipart/form-data"))// for docs/OpenAPI
+            .Produces<AddProductImageResponse>(201)
+            .ProducesProblem(400)
+            .WithName("AddProductImage")
+            .WithSummary("Upload a product image")
+            .WithDescription("Uploads a single image file and attaches it to the product.");
         }
     }
 }

@@ -22,26 +22,14 @@ namespace Catalog.Products.Features.GetProducts
             // ← just added Include(p => p.Images) here
             var products = await dbContext.Products
                 .AsNoTracking()
-                .Include(p => p.Images)
+                .Include(p => p.Image)
                 .OrderBy(p => p.Name)
                 .Skip(pageSize * pageIndex)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
-            // unchanged: map to DTOs
+            // map to DTOs (including ImageUrl via your Mapster config)
             var productDtos = products.Adapt<List<ProductDTO>>();
-
-            // ← populate the ImageUrl on each DTO
-            for (var i = 0; i < products.Count; i++)
-            {
-                var firstUrl = products[i].Images
-                    .OrderBy(img => img.Id)
-                    .Select(img => img.ImageUrl)
-                    .FirstOrDefault();
-
-                // since ProductDTO.ImageUrl is init‑only, use a with‑expression
-                productDtos[i] = productDtos[i] with { ImageUrl = firstUrl };
-            }
 
             return new GetProductsResult(
                 new PaginatedResult<ProductDTO>(

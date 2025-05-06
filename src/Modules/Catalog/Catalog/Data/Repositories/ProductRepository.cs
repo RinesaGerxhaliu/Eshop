@@ -7,8 +7,9 @@
 
         public Task<Product?> GetByIdAsync(Guid id, CancellationToken ct) =>
             _dbContext.Products
-                .Include(p => p.Images)
+                .Include(p => p.Image)
                 .FirstOrDefaultAsync(p => p.Id == id, ct);
+
 
         public async Task SaveAsync(Product product, CancellationToken ct)
         {

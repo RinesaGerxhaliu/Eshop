@@ -13,13 +13,6 @@
 
             var dto = product.Adapt<ProductDTO>();
 
-            var firstImageUrl = product.Images
-                .OrderBy(img => img.Id)
-                .Select(img => img.ImageUrl)
-                .FirstOrDefault();
-
-            dto = dto with { ImageUrl = firstImageUrl };
-
             return new GetProductByIdResult(dto);
         }
     }

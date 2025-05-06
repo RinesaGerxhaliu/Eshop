@@ -18,8 +18,4 @@
     <ProjectReference Include="..\Catalog.Contracts\Catalog.Contracts.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Products\Features\AddProductImage\" />
-  </ItemGroup>
-
 </Project>

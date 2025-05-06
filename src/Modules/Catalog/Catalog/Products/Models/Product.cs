@@ -4,18 +4,16 @@ public class Product : Aggregate<Guid>
 {
     public string Name { get; private set; } = default!;
     public string Description { get; private set; } = default!;
-
-    private readonly List<ProductImage> _images = new();
-    public IReadOnlyCollection<ProductImage> Images => _images.AsReadOnly();
-
     public decimal Price { get; private set; }
 
     // Foreign Keys
     public Guid CategoryId { get; private set; }
     public Guid BrandId { get; private set; }
 
+    // One-to-one image navigation
+    public ProductImage? Image { get; private set; }
 
-    public static Product Create (Guid id, string name, string description, decimal price)
+    public static Product Create(Guid id, string name, string description, decimal price)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
@@ -33,7 +31,7 @@ public class Product : Aggregate<Guid>
         return product;
     }
 
-    public void Update (string name, string description, decimal price)
+    public void Update(string name, string description, decimal price)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
@@ -49,43 +47,20 @@ public class Product : Aggregate<Guid>
     public void AddImage(string imageUrl)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
-            throw new ArgumentException("Image URL cannot be empty.");
+            throw new ArgumentException("Image URL cannot be empty.", nameof(imageUrl));
 
-        var existingImage = _images.FirstOrDefault(img => img.ImageUrl == imageUrl);
-
-        if (existingImage is not null)
-        {
+        // if the same URL is already set, do nothing
+        if (Image is not null && Image.ImageUrl == imageUrl)
             return;
-        }
 
-        var image = new ProductImage(this.Id, imageUrl);
-        _images.Add(image);
+        Image = new ProductImage(this.Id, imageUrl);
     }
-
-    public void AssignCategory(Guid categoryId)
-    {
-        if (categoryId == Guid.Empty)
-            throw new ArgumentException("Invalid category ID");
-
-        CategoryId = categoryId;
-    }
-    public void AssignBrand(Guid brandId)
-    {
-        if (brandId == Guid.Empty)
-            throw new ArgumentException("Invalid brand ID");
-
-        BrandId = brandId;
-    }
-
 
     public void RemoveImage(Guid imageId)
     {
-        var image = _images.FirstOrDefault(img => img.Id == imageId);
-
-        if (image == null)
-        {
+        if (Image is null || Image.ProductId != imageId)
             throw new InvalidOperationException($"Image with ID {imageId} not found.");
-        }
-        _images.Remove(image);
+
+        Image = null;
     }
 }

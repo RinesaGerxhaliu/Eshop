@@ -1,13 +1,13 @@
 using Api;
-using Api.Register;
-using Catalog.Auth.Modules;
+using Api.Identity;
 using Catalog.Data.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+MapsterConfig.RegisterMappings();
 
 builder.Host.UseSerilog((context, config) =>
     config.ReadFrom.Configuration(context.Configuration));

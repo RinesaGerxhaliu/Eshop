@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 
-namespace Api
+namespace Api.Identity
 {
     public class KeycloakRolesClaimsTransformation : IClaimsTransformation
     {

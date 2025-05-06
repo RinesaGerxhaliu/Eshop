@@ -1,7 +1,12 @@
-﻿namespace Catalog.Products.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace Catalog.Products.Models
 {
-    public class ProductImage : Entity<Guid>
+    public class ProductImage
     {
+        [Key]
+        [ForeignKey(nameof(Product))]
         public Guid ProductId { get; private set; } = default!;
         public string ImageUrl { get; private set; } = default!;
 

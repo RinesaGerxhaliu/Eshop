@@ -20,18 +20,20 @@ namespace Catalog.Products.Features.AddProductImage
     internal class AddProductImageHandler(IProductRepository repository)
         : ICommandHandler<AddProductImageCommand, AddProductImageResult>
     {
-        private readonly IProductRepository _repository = repository;
 
         public async Task<AddProductImageResult> Handle(AddProductImageCommand cmd, CancellationToken ct)
         {
-            var product = await _repository.GetByIdAsync(cmd.ProductId, ct)
+            var product = await repository.GetByIdAsync(cmd.ProductId, ct)
                           ?? throw new KeyNotFoundException($"Product {cmd.ProductId} not found");
 
             product.AddImage(cmd.ImageUrl);
-            await _repository.SaveAsync(product, ct);
 
-            var newImage = product.Images.Last(img => img.ImageUrl == cmd.ImageUrl);
-            return new AddProductImageResult(newImage.Id);
+            await repository.SaveAsync(product, ct);
+
+            // single image: its ID == ProductId
+            var imageId = product.Image!.ProductId;
+
+            return new AddProductImageResult(imageId);
         }
     }
 }
