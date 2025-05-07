@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../../Styles/ProductDetails.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
+import axios from 'axios';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -20,7 +21,6 @@ const ProductDetails = () => {
   const [reviewError, setReviewError] = useState("");
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-  // Refresh token if expired
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
     const username = localStorage.getItem("username");
@@ -46,7 +46,6 @@ const ProductDetails = () => {
     return data.accessToken;
   };
 
-  // Fetch product data
   const fetchProduct = async () => {
     try {
       const response = await fetch(`https://localhost:5050/products/${id}`);
@@ -64,12 +63,53 @@ const ProductDetails = () => {
     if (id) fetchProduct();
   }, [id]);
 
-  // Handle add to cart
   const handleAddToCart = async (e) => {
     e.preventDefault();
     setIsAdding(true);
+    
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://localhost:5050/basket/${localStorage.getItem("username")}/items`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ShoppingCartItem: {
+            ProductId: product.id,
+            Quantity: quantity,
+            Color: "Red",  // Adjust based on user selection
+            Price: product.price,
+            ProductName: product.name,
+          },
+        }),
+      });
+  
+      if (response.status === 401) {
+        const newToken = await refreshToken();
+        localStorage.setItem("token", newToken);
+        
+        const retryResponse = await fetch(`https://localhost:5050/basket/${localStorage.getItem("username")}/items`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${newToken}`,
+          },
+          body: JSON.stringify({
+            ShoppingCartItem: {
+              ProductId: product.id,
+              Quantity: quantity,
+              Color: "Red",
+              Price: product.price,
+              ProductName: product.name,
+            },
+          }),
+        });
+  
+        if (!retryResponse.ok) throw new Error("Failed to add item to cart.");
+      }
+  
       setIsAdded(true);
     } catch (err) {
       console.error("Add to cart failed:", err);
@@ -77,6 +117,7 @@ const ProductDetails = () => {
       setIsAdding(false);
     }
   };
+  
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -105,8 +146,6 @@ const ProductDetails = () => {
       });
 
       if (response.status === 401) {
-        console.log("Token expired, refreshing...");
-
         token = await refreshToken();
         localStorage.setItem("token", token);
 
@@ -133,10 +172,8 @@ const ProductDetails = () => {
       setTimeout(() => {
         setIsReviewModalOpen(false);
         setReviewSuccess("");
-      }, 2000); // mbyllet pas 2 sekondave
-      setIsReviewModalOpen(false);
+      }, 2000); 
     } catch (err) {
-      console.error("Review submission error:", err);
       setReviewError(err.message || "An error occurred");
     }
   };
@@ -196,13 +233,8 @@ const ProductDetails = () => {
                     <button
                       className="add-to-cart"
                       type="submit"
-                      disabled={isAdding}
                     >
-                      {isAdding
-                        ? "Adding..."
-                        : isAdded
-                        ? "Added"
-                        : "Add to Cart"}
+                      {isAdding ? "Adding..." : isAdded ? "Added" : "Add to Cart"}
                     </button>
                   </div>
                 </div>
@@ -220,12 +252,8 @@ const ProductDetails = () => {
                   <div className="review-modal-content">
                     <h3>Leave a Review</h3>
 
-                    {reviewError && (
-                      <p className="text-danger">{reviewError}</p>
-                    )}
-                    {reviewSuccess && (
-                      <p className="text-success">{reviewSuccess}</p>
-                    )}
+                    {reviewError && <p className="text-danger">{reviewError}</p>}
+                    {reviewSuccess && <p className="text-success">{reviewSuccess}</p>}
 
                     <form onSubmit={handleReviewSubmit} className="review-form">
                       <div className="form-group">
@@ -235,9 +263,7 @@ const ProductDetails = () => {
                             <button
                               key={star}
                               type="button"
-                              className={`star-btn ${
-                                rating >= star ? "selected" : ""
-                              }`}
+                              className={`star-btn ${rating >= star ? "selected" : ""}`}
                               onClick={() => handleStarClick(star)}
                             >
                               ★
