@@ -1,9 +1,7 @@
-using Api;
-using Api.Identity;
-using Catalog.Data.Repositories;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Catalog.Data;
+using Catalog.Data.Seed;
+using Shared.Data;
+using Shared.Data.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +22,7 @@ builder.Services.AddScoped<IClaimsTransformation, KeycloakRolesClaimsTransformat
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
+builder.Services.AddScoped<IDataSeeder, CatalogDataSeeder>();
 
 builder.Services.Configure<KeycloakSettings>(
     builder.Configuration.GetSection("Keycloak"));
@@ -86,5 +85,7 @@ app.MapCarter();
 app.UseCatalogModule();
 app.UseBasketModule();
 app.UseOrderingModule();
+
+app.UseMigration<CatalogDbContext>();
 
 app.Run();

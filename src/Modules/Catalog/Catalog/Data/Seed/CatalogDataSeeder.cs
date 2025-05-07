@@ -4,11 +4,17 @@
     {
         public async  Task SeedAllAsync()
         {
-            if (!await dbContext.Products.AnyAsync()) {
 
-                await dbContext.Products.AddRangeAsync(InitialData.Products);
+            if (!await dbContext.Brands.AnyAsync())
+            {
+                await dbContext.Brands.AddRangeAsync(InitialData.Brands);
                 await dbContext.SaveChangesAsync();
+            }
 
+            if (!await dbContext.Categories.AnyAsync())
+            {
+                await dbContext.Categories.AddRangeAsync(InitialData.Categories);
+                await dbContext.SaveChangesAsync();
             }
         }
     }
