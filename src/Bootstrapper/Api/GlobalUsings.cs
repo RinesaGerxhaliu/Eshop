@@ -19,3 +19,7 @@ global using Catalog.Data.Repositories;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.IdentityModel.Tokens;
+global using Catalog.Data;
+global using Catalog.Data.Seed;
+global using Shared.Data;
+global using Shared.Data.Seed;

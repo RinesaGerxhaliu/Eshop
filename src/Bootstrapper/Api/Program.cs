@@ -1,8 +1,3 @@
-using Catalog.Data;
-using Catalog.Data.Seed;
-using Shared.Data;
-using Shared.Data.Seed;
-
 var builder = WebApplication.CreateBuilder(args);
 
 MapsterConfig.RegisterMappings();

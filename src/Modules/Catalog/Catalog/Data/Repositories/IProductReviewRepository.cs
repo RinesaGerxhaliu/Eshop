@@ -6,6 +6,7 @@ public interface IProductReviewRepository
     Task<ProductReview?> GetReviewById(Guid reviewId, CancellationToken cancellationToken);
     Task UpdateReview(ProductReview review, CancellationToken cancellationToken);
     Task DeleteReview(ProductReview review, CancellationToken cancellationToken);
+    Task<List<ProductReview>> GetReviewsByProductId(Guid productId, CancellationToken cancellationToken);
 
 }
 

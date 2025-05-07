@@ -29,11 +29,13 @@
             await _dbContext.SaveChangesAsync(ct);
         }
 
+        public async Task<List<ProductReview>> GetReviewsByProductId(Guid productId, CancellationToken ct)
+        {
+             return await _dbContext.ProductReviews
+                .Where(r => r.ProductId == productId)
+                .ToListAsync(ct);
+        }
 
-
-
-
-
-}
+    }
 
 
