@@ -1,12 +1,12 @@
-// src/Views/Pages/ProductDetails.jsx
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import '../../Styles/ProductDetails.css';
-import { useCurrency } from '../../contexts/CurrencyContext';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import "../../Styles/ProductDetails.css";
+import { useCurrency } from "../../contexts/CurrencyContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { convert, format } = useCurrency();
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,14 +14,43 @@ const ProductDetails = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
+  const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState(5);
+  const [reviewSuccess, setReviewSuccess] = useState("");
+  const [reviewError, setReviewError] = useState("");
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  // Refresh token if expired
   const refreshToken = async () => {
-    /* …your existing refresh logic… */
+    const refreshToken = localStorage.getItem("refreshToken");
+    const username = localStorage.getItem("username");
+
+    if (!refreshToken || !username) {
+      throw new Error("No refresh token or username found.");
+    }
+
+    const response = await fetch("https://localhost:5050/auth/refresh", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken, username }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh token.");
+    }
+
+    const data = await response.json();
+    localStorage.setItem("token", data.accessToken);
+    return data.accessToken;
   };
 
+  // Fetch product data
   const fetchProduct = async () => {
     try {
       const response = await fetch(`https://localhost:5050/products/${id}`);
-      if (!response.ok) throw new Error('Product not found');
+      if (!response.ok) throw new Error("Product not found");
       const data = await response.json();
       setProduct(data.product);
     } catch (err) {
@@ -35,69 +64,213 @@ const ProductDetails = () => {
     if (id) fetchProduct();
   }, [id]);
 
-  const handleAddToCart = async e => {
-    /* …your existing add‐to‐cart logic… */
+  // Handle add to cart
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    setIsAdding(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setIsAdded(true);
+    } catch (err) {
+      console.error("Add to cart failed:", err);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error)   return <p>Error: {error}</p>;
-  if (!product) return <p>Product not found.</p>;
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setReviewSuccess("");
+    setReviewError("");
 
-  // new: compute display price via currency context
-  const displayPrice = format(convert(product.price));
+    let token = localStorage.getItem("token");
+
+    if (!token) {
+      setReviewError("You must be logged in to leave a review.");
+      return;
+    }
+
+    try {
+      let response = await fetch("https://localhost:5050/products/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: id,
+          reviewText,
+          rating: parseInt(rating),
+        }),
+      });
+
+      if (response.status === 401) {
+        console.log("Token expired, refreshing...");
+
+        token = await refreshToken();
+        localStorage.setItem("token", token);
+
+        response = await fetch("https://localhost:5050/products/reviews", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: id,
+            reviewText,
+            rating: parseInt(rating),
+          }),
+        });
+      }
+
+      if (!response.ok) throw new Error("Failed to submit review");
+
+      setReviewSuccess("Review submitted successfully!");
+      setReviewText("");
+      setRating(5);
+
+      setTimeout(() => {
+        setIsReviewModalOpen(false);
+        setReviewSuccess("");
+      }, 2000); // mbyllet pas 2 sekondave
+      setIsReviewModalOpen(false);
+    } catch (err) {
+      console.error("Review submission error:", err);
+      setReviewError(err.message || "An error occurred");
+    }
+  };
+
+  const handleStarClick = (star) => {
+    setRating(star);
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="container-product">
       <section className="product-details">
-        <div className="product-images">
-          <img
-            src={`https://localhost:5050${product.imageUrl}`}
-            alt={product.name}
-            className="main-image"
-          />
-        </div>
-
-        <div className="product-infoo">
-          <h1>{product.name}</h1>
-          <p className="product-descriptionn">{product.description}</p>
-          {/* updated price display */}
-          <p className="product-pricee">{displayPrice}</p>
-
-          <div className="product-rating">
-            Review: ★★★★☆ ({product.reviews} Reviews)
-          </div>
-
-          <form onSubmit={handleAddToCart}>
-            <div className="product-options">
-              <div className="quantity-cart-row">
-                <div className="quantity">
-                  <button
-                    type="button"
-                    className="qty-btn"
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  >
-                    –
-                  </button>
-                  <span className="qty-value">{quantity}</span>
-                  <button
-                    type="button"
-                    className="qty-btn"
-                    onClick={() => setQuantity(q => q + 1)}
-                  >
-                    +
-                  </button>
-                </div>
-                <button
-                  className="add-to-cart"
-                  type="submit"
-                  disabled={isAdding}
-                >
-                  {isAdding ? 'Adding...' : isAdded ? 'Added' : 'Add to Cart'}
-                </button>
-              </div>
+        {product && (
+          <>
+            <div className="product-images">
+              <img
+                src={`https://localhost:5050${product.imageUrl}`}
+                alt={product.name}
+                className="main-image"
+              />
             </div>
-          </form>
-        </div>
+
+            <div className="product-infoo">
+              <h1>{product.name}</h1>
+              <p className="product-descriptionn">{product.description}</p>
+              <p className="product-pricee">
+                {product.price
+                  ? format(convert(product.price))
+                  : "Price not available"}
+              </p>
+              <div className="product-rating">
+                Review: ★★★★☆ ({product.reviews} Reviews)
+              </div>
+
+              <form onSubmit={handleAddToCart}>
+                <div className="product-options">
+                  <div className="quantity-cart-row">
+                    <div className="quantity">
+                      <button
+                        type="button"
+                        className="qty-btn"
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      >
+                        –
+                      </button>
+                      <span className="qty-value">{quantity}</span>
+                      <button
+                        type="button"
+                        className="qty-btn"
+                        onClick={() => setQuantity((q) => q + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      className="add-to-cart"
+                      type="submit"
+                      disabled={isAdding}
+                    >
+                      {isAdding
+                        ? "Adding..."
+                        : isAdded
+                        ? "Added"
+                        : "Add to Cart"}
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <button
+                className="add-to-cart"
+                onClick={() => setIsReviewModalOpen(true)}
+              >
+                Leave a Review
+              </button>
+
+              {isReviewModalOpen && (
+                <div className="review-modal open">
+                  <div className="review-modal-content">
+                    <h3>Leave a Review</h3>
+
+                    {reviewError && (
+                      <p className="text-danger">{reviewError}</p>
+                    )}
+                    {reviewSuccess && (
+                      <p className="text-success">{reviewSuccess}</p>
+                    )}
+
+                    <form onSubmit={handleReviewSubmit} className="review-form">
+                      <div className="form-group">
+                        <label>Rating:</label>
+                        <div className="star-rating">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              className={`star-btn ${
+                                rating >= star ? "selected" : ""
+                              }`}
+                              onClick={() => handleStarClick(star)}
+                            >
+                              ★
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Your Review:</label>
+                        <textarea
+                          rows="5"
+                          value={reviewText}
+                          onChange={(e) => setReviewText(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <button type="submit">Submit Review</button>
+                    </form>
+
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setIsReviewModalOpen(false)}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </section>
     </div>
   );

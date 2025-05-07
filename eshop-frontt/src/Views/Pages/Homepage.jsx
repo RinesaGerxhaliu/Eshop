@@ -60,6 +60,7 @@ const Homepage = () => {
           key={prod.id}
           id={prod.id}
           name={prod.name}
+          description={prod.description}
           price={prod.price}
           imageUrl={prod.imageUrl}
           reviews={prod.reviews}
