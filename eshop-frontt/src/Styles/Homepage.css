@@ -342,8 +342,9 @@ header p {
 }
 .product-section {
     padding: 60px 20px;
-    background-color: #fefefe;
+    background-color: #f9f9f9;
     text-align: center;
+    min-height: 100vh; 
   }
   
   .product-grid {
