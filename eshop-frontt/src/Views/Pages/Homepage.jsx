@@ -11,7 +11,7 @@ const Homepage = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    fetch(`${API}/products?PageIndex=0&PageSize=8`, {
+    fetch(`${API}/products?PageIndex=0&PageSize=12`, {
       mode: 'cors'
     })
       .then(res => {
@@ -43,7 +43,7 @@ const Homepage = () => {
           <div className="hero-text">
             <h1>Skincare Essentials</h1>
             <p>Explore products from top wellness brands.</p>
-            <button>EXPLORE TOP BRANDS</button>
+            <button className='explore'>EXPLORE TOP BRANDS</button>
           </div>
         </section>
 

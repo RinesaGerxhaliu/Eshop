@@ -1,0 +1,144 @@
+/* General Sidebar Styles */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    background: #cbb0be;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1100;
+    transition: background 0.2s ease-in-out;
+    line-height: 32px;
+    text-align: center;
+    padding: 0;
+  }
+  
+  .close-btn:hover {
+    background: #cbb0be;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 100%;
+    background: #f0f0f0;
+    padding: 20px;
+    transition: transform 0.3s ease-in-out;
+    border-right: 3px solid #e5e5e5;
+    z-index: 1000;
+    overflow-y: auto; /* Lejon scroll për sidebar të plotë */
+  }
+  .back-button-container {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+
+  
+  .sidebar-section {
+    margin-bottom: 20px;
+  }
+  
+  .sidebar-section h3 {
+    margin-top: 20px;
+    font-size: 20px;
+    color:  #a22063;
+    cursor: pointer;
+    border-bottom: 2px solid #e5e5e5;
+    padding: 5px 0;
+    background: transparent;
+  }
+  
+  .sidebar-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: #f0f0f0;
+    border: 0;
+    /* === Heq kufizimet që shkaktojnë scroll të brendshëm === */
+    max-height: none;
+    overflow-y: visible;
+  }
+  
+  .sidebar-section ul li {
+    padding: 5px 10px;
+    cursor: pointer;
+    background: #f0f0f0;
+    transition: background-color 0.3s ease;
+  }
+  
+  .sidebar-section ul li:hover {
+    background-color: #f8f8f8;
+  }
+  
+  .sidebar-section ul li:active {
+    background-color: #ffe6f2;
+  }
+  
+  .sidebar-section ul li a {
+    color: #333;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .back-btn {
+    background-color:#d6bcca;
+    border: none;
+    font-size: 18px;
+    color: #08010a;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    width: 80%;
+  }
+  
+  .back-btn:hover {
+    text-decoration: none;
+  }
+  
+  .toggle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   color: #c49db2;
+  }
+  
+  /* Sidebar visibility transitions */
+  .sidebar-overlay.visible {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .sidebar-overlay.hidden {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  /* Responsive sidebar */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 80%;
+    }
+  }
+  

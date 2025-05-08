@@ -10,7 +10,7 @@ const Shop = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    fetch(`${API}/products?PageIndex=0&PageSize=8`, { mode: "cors" })
+    fetch(`${API}/products?PageIndex=0&PageSize=12`, { mode: "cors" })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
