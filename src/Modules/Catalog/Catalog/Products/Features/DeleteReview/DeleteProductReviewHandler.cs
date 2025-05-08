@@ -1,11 +1,4 @@
-﻿using System.Security.Claims;
-using MediatR;
-using Mapster;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-
-namespace Catalog.Products.Features.DeleteReview;
+﻿namespace Catalog.Products.Features.DeleteReview;
 
 public record DeleteProductReviewCommand(Guid ReviewId, string ReviewerUserName) : ICommand<DeleteProductReviewResult>;
 

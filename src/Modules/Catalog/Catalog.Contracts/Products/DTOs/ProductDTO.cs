@@ -7,5 +7,7 @@
         public string Description { get; init; } = string.Empty;
         public decimal Price { get; init; }
         public string? ImageUrl { get; init; }
+        public Guid CategoryId { get; init; }
+        public Guid BrandId { get; init; }
     }
 }

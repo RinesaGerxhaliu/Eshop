@@ -5,7 +5,6 @@ global using Microsoft.EntityFrameworkCore;
 global using System.Reflection;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Catalog.Data;
-global using Catalog.Data.Seed;
 global using Shared.Data;
 global using Shared.Data.Seed;
 global using Catalog.Contracts.Products.DTOs;

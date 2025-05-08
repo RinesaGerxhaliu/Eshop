@@ -9,7 +9,11 @@
             _dbContext.Products
                 .Include(p => p.Image)
                 .FirstOrDefaultAsync(p => p.Id == id, ct);
-
+        public async Task AddAsync(Product product, CancellationToken ct)
+        {
+            await _dbContext.Products.AddAsync(product, ct);
+            await _dbContext.SaveChangesAsync(ct);
+        }
 
         public async Task SaveAsync(Product product, CancellationToken ct)
         {

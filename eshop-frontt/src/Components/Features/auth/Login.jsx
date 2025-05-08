@@ -32,7 +32,7 @@ function Login() {
     params.append('password', password);
 
     const clientId     = 'myclient';
-    const clientSecret = 'VvZg6mZTpji9AQNRwwQLPalqWR015c7q';
+    const clientSecret = 'l3CH5cLjdZloCLaLlsBYHqgwA6jUlDY2';
     const basic        = btoa(`${clientId}:${clientSecret}`);
 
     try {

@@ -1,9 +1,4 @@
-﻿using Carter;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Catalog.Categories.Features.GetProductsByCategory;
-using Catalog.Contracts.Products;
+﻿using Catalog.Categories.Features.GetProductsByCategory;
 
 public class GetProductsByCategoryEndpoint : ICarterModule
 {

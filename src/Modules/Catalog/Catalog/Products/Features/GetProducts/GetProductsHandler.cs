@@ -1,44 +1,58 @@
 ﻿using Shared.Pagination;
-using Microsoft.EntityFrameworkCore;    // ← for Include(...)
 
 namespace Catalog.Products.Features.GetProducts
 {
-    public record GetProductsQuery(PaginationRequest PaginationRequest)
-        : IQuery<GetProductsResult>;
+    public record GetProductsQuery(
+        PaginationRequest PaginationRequest,
+        Guid? CategoryId,
+        Guid? BrandId
+    ) : IQuery<GetProductsResult>;
 
     public record GetProductsResult(PaginatedResult<ProductDTO> Products);
 
-    internal class GetProductsHandler(CatalogDbContext dbContext)
+    internal class GetProductsHandler
         : IQueryHandler<GetProductsQuery, GetProductsResult>
     {
-        public async Task<GetProductsResult> Handle(GetProductsQuery query,
-            CancellationToken cancellationToken)
+        private readonly CatalogDbContext _db;
+
+        public GetProductsHandler(CatalogDbContext db) => _db = db;
+
+        public async Task<GetProductsResult> Handle(GetProductsQuery q, CancellationToken ct)
         {
-            var pageIndex = query.PaginationRequest.PageIndex;
-            var pageSize = query.PaginationRequest.PageSize;
-
-            var totalCount = await dbContext.Products.LongCountAsync(cancellationToken);
-
-            // ← just added Include(p => p.Images) here
-            var products = await dbContext.Products
+            // 1) start query
+            var query = _db.Products
                 .AsNoTracking()
                 .Include(p => p.Image)
+                .AsQueryable();
+
+            // 2) apply filters
+            if (q.CategoryId.HasValue)
+                query = query.Where(p => p.CategoryId == q.CategoryId.Value);
+            if (q.BrandId.HasValue)
+                query = query.Where(p => p.BrandId == q.BrandId.Value);
+
+            // 3) total count before paging
+            var total = await query.LongCountAsync(ct);
+
+            // 4) fetch the page
+            var entities = await query
                 .OrderBy(p => p.Name)
-                .Skip(pageSize * pageIndex)
-                .Take(pageSize)
-                .ToListAsync(cancellationToken);
+                .Skip(q.PaginationRequest.PageIndex * q.PaginationRequest.PageSize)
+                .Take(q.PaginationRequest.PageSize)
+                .ToListAsync(ct);
 
-            // map to DTOs (including ImageUrl via your Mapster config)
-            var productDtos = products.Adapt<List<ProductDTO>>();
+            // 5) map to DTO
+            var dtos = entities.Adapt<List<ProductDTO>>();
 
-            return new GetProductsResult(
-                new PaginatedResult<ProductDTO>(
-                    pageIndex,
-                    pageSize,
-                    totalCount,
-                    productDtos
-                )
+            // 6) return paginated result
+            var page = new PaginatedResult<ProductDTO>(
+                q.PaginationRequest.PageIndex,
+                q.PaginationRequest.PageSize,
+                total,
+                dtos
             );
+
+            return new GetProductsResult(page);
         }
     }
 }

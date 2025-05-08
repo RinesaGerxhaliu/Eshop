@@ -22,11 +22,11 @@ const AdminSidebar = () => {
           <FaChartBar className="sidebar-icon" />
           Dashboard
         </li>
-        <li onClick={() => navigate("/manage-users")}>
+        <li onClick={() => navigate("/admin-dashboard/manage-users")}>
           <FaUserCog className="sidebar-icon" />
           Manage Users
         </li>
-        <li onClick={() => navigate("/manage-products")}>
+        <li onClick={() => navigate("/admin-dashboard/manage-products")}>
           <FaBoxOpen className="sidebar-icon" />
           Manage Products
         </li>
