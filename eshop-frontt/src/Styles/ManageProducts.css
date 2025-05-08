@@ -1,0 +1,131 @@
+/* src/Styles/ManageProducts.css */
+
+/* Import a soft, modern font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+.mp-container {
+  font-family: 'Poppins', sans-serif;
+  padding: 24px;
+  background: #fff5f8;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #333;
+}
+
+.mp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.mp-header h1 {
+  font-weight: 600;
+  color: #d6336c;
+}
+
+.mp-btn {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background 0.2s ease, transform 0.1s ease;
+  margin: 0 4px;
+}
+
+.mp-btn:active {
+  transform: scale(0.97);
+}
+
+.mp-btn-primary {
+  background: #e83e8c;
+  color: #fff;
+}
+.mp-btn-primary:hover {
+  background: #d6336c;
+}
+
+.mp-btn-secondary {
+  background: #f8d7e9;
+  color: #d6336c;
+}
+.mp-btn-secondary:hover {
+  background: #f1c2da;
+}
+
+.mp-btn-action {
+  background: #f06595;
+  color: #fff;
+}
+.mp-btn-action:hover {
+  background: #d6336c;
+}
+
+.mp-btn-danger {
+  background: #ff6b81;
+  color: #fff;
+}
+.mp-btn-danger:hover {
+  background: #e55370;
+}
+
+.mp-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.mp-select {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border: 1px solid #f1c2da;
+  border-radius: 6px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.mp-table-wrap {
+  flex: 1;
+  overflow: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mp-table th,
+.mp-table td {
+  padding: 10px 6px;
+  text-align: left;
+  border-bottom: 1px solid #f1ecf1;
+}
+
+.mp-table thead {
+  background: #fde8f2;
+}
+
+.mp-table tr:hover {
+  background: #ffeef8;
+}
+
+.mp-image {
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.mp-no-image {
+  color: #bbb;
+}

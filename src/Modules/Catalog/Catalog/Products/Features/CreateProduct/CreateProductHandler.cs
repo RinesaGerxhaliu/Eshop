@@ -11,12 +11,15 @@
         {
             RuleFor(x => x.Product.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Product.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
-
+            RuleFor(x => x.Product.CategoryId)
+                .NotEqual(Guid.Empty).WithMessage("Category is required");
+            RuleFor(x => x.Product.BrandId)
+                .NotEqual(Guid.Empty).WithMessage("Brand is required");
         }
     }
 
     internal class CreateProductHandler
-        (CatalogDbContext dbContext)
+        (IProductRepository products)
         : ICommandHandler<CreateProductCommand, CreateProductResult>
     {
 
@@ -25,20 +28,21 @@
         {
             var product = CreateNewProduct(command.Product);
 
-            dbContext.Products.Add(product);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await products.AddAsync(product, cancellationToken);
 
             return new CreateProductResult(product.Id);
        
         }
 
-        private Product CreateNewProduct(ProductDTO productDto)
+        private Product CreateNewProduct(ProductDTO dto)
         {
             var product = Product.Create(
                 Guid.NewGuid(),
-                productDto.Name,
-                productDto.Description,
-                productDto.Price
+                dto.Name,
+                dto.Description,
+                dto.Price,
+                dto.CategoryId,
+                dto.BrandId
             );
 
             return product;

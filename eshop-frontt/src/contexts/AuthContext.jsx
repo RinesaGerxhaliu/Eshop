@@ -13,33 +13,31 @@ export const AuthProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("roles")) || []
   );
 
-  const login = (accessToken, refreshToken, userData = null) => {
-    if (userData) {
-      console.log("Keycloak Full Response:", userData);
-    }
-  
+  const login = (accessToken, refreshToken, userData) => {
+    console.log("Keycloak Full Response:", userData);
+
     const parsedToken = parseJwt(accessToken);
     const usernameFromToken =
       parsedToken?.preferred_username || parsedToken?.sub;
     const userIdFromToken = parsedToken?.sub;
     const rolesFromToken = parsedToken?.resource_access?.myclient?.roles || [];
-  
+
     console.log("Username:", usernameFromToken);
     console.log("User ID:", userIdFromToken);
     console.log("Roles:", rolesFromToken);
-  
+
     localStorage.setItem("token", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("username", usernameFromToken);
     localStorage.setItem("userId", userIdFromToken);
     localStorage.setItem("roles", JSON.stringify(rolesFromToken));
-  
+
     setUsername(usernameFromToken);
     setUserId(userIdFromToken);
     setRoles(rolesFromToken);
     setIsLoggedIn(true);
   };
-  
+
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
@@ -66,25 +64,25 @@ export const AuthProvider = ({ children }) => {
     if (!refreshToken) {
       logout();
       window.location.href = "/login";
-      return null;
+      return;
     }
-  
+
     const parsedRefreshToken = parseJwt(refreshToken);
     const currentTime = Date.now() / 1000;
-  
+
     if (!parsedRefreshToken || parsedRefreshToken.exp < currentTime) {
       console.log("Refresh token expired, logging out...");
       logout();
       window.location.href = "/login";
-      return null;
+      return;
     }
-  
+
     const params = new URLSearchParams();
     params.append("grant_type", "refresh_token");
     params.append("client_id", "myclient");
     params.append("refresh_token", refreshToken);
     params.append("client_secret", "VvZg6mZTpji9AQNRwwQLPalqWR015c7q");
-  
+
     try {
       const response = await fetch(
         "http://localhost:9090/realms/myrealm/protocol/openid-connect/token",
@@ -96,32 +94,20 @@ export const AuthProvider = ({ children }) => {
           body: params,
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
-        login(data.access_token, data.refresh_token); // ruan token në state dhe localStorage
-        return data.access_token; // <<< KTHE TOKENIN E RI
+        login(data.access_token, data.refresh_token, username);
       } else {
         logout();
         window.location.href = "/login";
-        return null;
       }
     } catch (error) {
       console.error("Error refreshing token:", error);
       logout();
       window.location.href = "/login";
-      return null;
     }
   };
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refreshAccessToken();
-    }, 60 * 1000); // çdo 60 sekonda
-  
-    return () => clearInterval(interval);
-  }, []);
-  
 
   return (
     <AuthContext.Provider

@@ -30,7 +30,7 @@ function AppContent() {
   const location = useLocation();
 
   // Determine if the current path is the admin dashboard route
-  const isAdminDashboard = location.pathname === '/admin-dashboard';
+  const isAdminDashboard = location.pathname.startsWith('/admin-dashboard');
 
   return (
     <>
@@ -44,19 +44,19 @@ function AppContent() {
         <Route path="/cart" element={<ShoppingCartPage />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/products/:id" element={<ProductDetails />} />
-        
+
         <Route
-          path="/admin-dashboard"
+          path="/admin-dashboard/*"
           element={
             <PrivateRoute roles={['admin']}>
               <Dashboard />
             </PrivateRoute>
           }
         />
-        
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      
+
       {!isAdminDashboard && <Footer />}
     </>
   );
