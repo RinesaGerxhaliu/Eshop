@@ -1,6 +1,3 @@
-/* src/Styles/ManageProducts.css */
-
-/* Import a soft, modern font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
 .mp-container {
@@ -46,6 +43,7 @@
   background: #e83e8c;
   color: #fff;
 }
+
 .mp-btn-primary:hover {
   background: #d6336c;
 }
@@ -54,6 +52,7 @@
   background: #f8d7e9;
   color: #d6336c;
 }
+
 .mp-btn-secondary:hover {
   background: #f1c2da;
 }
@@ -62,6 +61,7 @@
   background: #f06595;
   color: #fff;
 }
+
 .mp-btn-action:hover {
   background: #d6336c;
 }
@@ -70,6 +70,7 @@
   background: #ff6b81;
   color: #fff;
 }
+
 .mp-btn-danger:hover {
   background: #e55370;
 }
@@ -128,4 +129,24 @@
 
 .mp-no-image {
   color: #bbb;
+}
+
+.mp-success {
+  position: fixed;
+  top: 20px;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e91e63;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 1100;
+  opacity: 0.95;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
