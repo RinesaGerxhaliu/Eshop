@@ -8,13 +8,14 @@ const API = "https://localhost:5050";
 const Sidebar = ({ onClose }) => {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [activeView, setActiveView] = useState("main"); // "main", "categories", "brands"
+  const [activeView, setActiveView] = useState("main");
   const sidebarRef = useRef(null);
 
   useEffect(() => {
     fetch(`${API}/categories`)
       .then((res) => res.json())
-      .then((data) => setCategories(data.categories || []));
+      .then((data) => setCategories(data.categories || []))
+      .catch((err) => console.error("Fetch categories error:", err));
 
     fetch(`${API}/brands`)
       .then((res) => res.json())
@@ -35,17 +36,26 @@ const Sidebar = ({ onClose }) => {
   return (
     <div className="sidebar-overlay">
       <div className="sidebar" ref={sidebarRef}>
-        <button className="close-btn" onClick={onClose}>×</button>
+        <button className="close-btn" onClick={onClose}>
+          ×
+        </button>
 
         {activeView === "main" && (
           <>
+            <h3 className="toggle-header">View All</h3>
             <div className="sidebar-section">
-              <h3 className="toggle-header" onClick={() => setActiveView("categories")}>
+              <h3
+                className="toggle-header"
+                onClick={() => setActiveView("categories")}
+              >
                 Categories
               </h3>
             </div>
             <div className="sidebar-section">
-              <h3 className="toggle-header" onClick={() => setActiveView("brands")}>
+              <h3
+                className="toggle-header"
+                onClick={() => setActiveView("brands")}
+              >
                 Brands
               </h3>
             </div>
@@ -54,14 +64,18 @@ const Sidebar = ({ onClose }) => {
 
         {activeView === "categories" && (
           <>
-            <button className="back-btn" onClick={() => setActiveView("main")}>← Back</button>
+            <button className="back-btn" onClick={() => setActiveView("main")}>
+              ← Back
+            </button>
             <div className="sidebar-section">
               <h3 className="toggle-header">All Categories</h3>
               <ul>
                 {categories.length > 0 ? (
                   categories.map((cat) => (
                     <li key={cat.id}>
-                      <Link to={`/products/filter/category/${cat.id}`}>{cat.name}</Link>
+                      <Link to={`/products/filter/category/${cat.id}`}>
+                        {cat.name}
+                      </Link>
                     </li>
                   ))
                 ) : (
@@ -74,14 +88,18 @@ const Sidebar = ({ onClose }) => {
 
         {activeView === "brands" && (
           <>
-            <button className="back-btn" onClick={() => setActiveView("main")}>← Back</button>
+            <button className="back-btn" onClick={() => setActiveView("main")}>
+              ← Back
+            </button>
             <div className="sidebar-section">
               <h3 className="toggle-header">All Brands</h3>
               <ul>
                 {brands.length > 0 ? (
                   brands.map((brand) => (
                     <li key={brand.id}>
-                      <Link to={`/products/filter/brand/${brand.id}`}>{brand.name}</Link>
+                      <Link to={`/products/filter/brand/${brand.id}`}>
+                        {brand.name}
+                      </Link>
                     </li>
                   ))
                 ) : (

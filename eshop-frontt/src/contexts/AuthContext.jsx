@@ -63,26 +63,26 @@ export const AuthProvider = ({ children }) => {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) {
       logout();
-      window.location.href = "/login";
+      window.location.replace("/login");  // Use replace instead of href for a cleaner redirect
       return;
     }
-
+  
     const parsedRefreshToken = parseJwt(refreshToken);
     const currentTime = Date.now() / 1000;
-
+  
     if (!parsedRefreshToken || parsedRefreshToken.exp < currentTime) {
       console.log("Refresh token expired, logging out...");
       logout();
-      window.location.href = "/login";
+      window.location.replace("/login");  // Use replace instead of href
       return;
     }
-
+  
     const params = new URLSearchParams();
     params.append("grant_type", "refresh_token");
     params.append("client_id", "myclient");
     params.append("refresh_token", refreshToken);
     params.append("client_secret", "VvZg6mZTpji9AQNRwwQLPalqWR015c7q");
-
+  
     try {
       const response = await fetch(
         "http://localhost:9090/realms/myrealm/protocol/openid-connect/token",
@@ -94,20 +94,21 @@ export const AuthProvider = ({ children }) => {
           body: params,
         }
       );
-
+  
       if (response.ok) {
         const data = await response.json();
         login(data.access_token, data.refresh_token, username);
       } else {
         logout();
-        window.location.href = "/login";
+        window.location.replace("/login");  // Ensure the redirect happens here as well
       }
     } catch (error) {
       console.error("Error refreshing token:", error);
       logout();
-      window.location.href = "/login";
+      window.location.replace("/login");  // Ensure the redirect happens here as well
     }
   };
+  
 
   return (
     <AuthContext.Provider
