@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../../Styles/ProductDetails.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
+import ProductReviews from "./ProductReviews";
 import axios from 'axios';
 
 const ProductDetails = () => {
@@ -298,6 +299,9 @@ const ProductDetails = () => {
           </>
         )}
       </section>
+      <div className="reviews-container">
+  <ProductReviews productId={id} />
+</div>
     </div>
   );
 };

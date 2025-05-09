@@ -1,7 +1,7 @@
 .container-product {
     background-color: #ffffff;
     padding: 50px 20px;
-    display: flex;
+    display: block;
     justify-content: center;
   }
   
@@ -299,3 +299,7 @@
   .star-btn:focus {
     outline: none;
   }
+
+  .reviews-section {
+    margin-top: 40px; /* Add some space between product and reviews */
+}

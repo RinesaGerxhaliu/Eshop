@@ -1,8 +1,9 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Security.Claims;
 
 namespace Catalog.Products.Features.AddReview;
 
-public record CreateProductReviewRequest(Guid ProductId, string ReviewText, int Rating);
+public record CreateProductReviewRequest(Guid ProductId, string ReviewText, int Rating, Guid ReviewerUserId);
 
 public record CreateProductReviewResponse(Guid Id);
 
@@ -12,19 +13,27 @@ public class CreateProductReviewEndpoint : ICarterModule
     {
         app.MapPost("/products/reviews", async (CreateProductReviewRequest request, ISender sender, ClaimsPrincipal user) =>
         {
-            // Merr preferred_username prej JWT claim-it
-            var userName = user.FindFirst("preferred_username")?.Value;
+            // Retrieve the user ID from the JWT claims
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrWhiteSpace(userName))
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                return Results.Problem("Unauthorized: User name not found.", statusCode: StatusCodes.Status401Unauthorized);
+                return Results.Problem("Unauthorized: User ID not found.", statusCode: StatusCodes.Status401Unauthorized);
             }
 
+            // Convert the userId to Guid
+            if (!Guid.TryParse(userId, out var reviewerUserId))
+            {
+                return Results.Problem("Invalid User ID.", statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            // Now create the command with the ReviewerUserId
             var command = new CreateProductReviewCommand(
                 request.ProductId,
+                reviewerUserId, // <-- This is the ReviewerUserId
                 request.ReviewText,
                 request.Rating,
-                userName
+                user.FindFirst("preferred_username")?.Value
             );
 
             var result = await sender.Send(command);

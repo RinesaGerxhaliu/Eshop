@@ -1,0 +1,21 @@
+/* DeleteReviewModal.css */
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-footer .btn {
+  background-color: rgba(163, 6, 84, 0.336);
+  color: #000;
+  border: 1px solid rgba(229, 192, 203, 0.7);
+  border-radius: 3px;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  cursor: pointer;
+  font-weight: 500;
+  width: 45%;
+}
+
+.modal-footer .btn:hover {
+  background-color: rgba(163, 6, 84, 0.5); /* Optional: Add hover effect */
+}

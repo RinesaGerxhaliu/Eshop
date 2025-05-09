@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     params.append("grant_type", "refresh_token");
     params.append("client_id", "myclient");
     params.append("refresh_token", refreshToken);
-    params.append("client_secret", "VvZg6mZTpji9AQNRwwQLPalqWR015c7q");
+    params.append("client_secret", "2074z6OvXFRgqjFCdSPAtNQ7F92Wpn2L");
   
     try {
       const response = await fetch(

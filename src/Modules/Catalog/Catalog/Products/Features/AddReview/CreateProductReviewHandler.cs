@@ -1,6 +1,6 @@
 ﻿namespace Catalog.Products.Features.AddReview;
 
-public record CreateProductReviewCommand(Guid ProductId, string ReviewText, int Rating, string ReviewerUserName)
+public record CreateProductReviewCommand(Guid ProductId, Guid ReviewerUserId, string ReviewText, int Rating, string ReviewerUserName)
     : ICommand<CreateProductReviewResponse>;
 
 internal class CreateProductReviewHandler(IProductReviewRepository repository)
@@ -20,6 +20,7 @@ internal class CreateProductReviewHandler(IProductReviewRepository repository)
         var productReview = ProductReview.Create(
             Guid.NewGuid(),
             command.ProductId,
+            command.ReviewerUserId,
             command.ReviewerUserName,
             command.ReviewText,
             command.Rating

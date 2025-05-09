@@ -1,4 +1,4 @@
-﻿using Catalog.Products.Features.DeleteReview;
+﻿namespace Catalog.Products.Features.DeleteReview;
 
 public class DeleteProductReviewEndpoint : ICarterModule
 {
@@ -20,4 +20,3 @@ public class DeleteProductReviewEndpoint : ICarterModule
         .RequireAuthorization();
     }
 }
-

@@ -6,8 +6,10 @@ public class ProductReview : Entity<Guid>
     public string ReviewerUserName { get; private set; } = default!;
     public string ReviewText { get; private set; } = default!;
     public int Rating { get; private set; }
+    public Guid ReviewerUserId { get; set; }
+    public DateTime CreatedAt { get; private set; }
 
-    public static ProductReview Create(Guid id, Guid productId, string reviewerUserName, string reviewText, int rating)
+    public static ProductReview Create(Guid id, Guid productId, Guid reviewerUserId, string reviewerUserName, string reviewText, int rating)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(reviewerUserName, nameof(reviewerUserName));
         ArgumentException.ThrowIfNullOrWhiteSpace(reviewText, nameof(reviewText));
@@ -19,11 +21,14 @@ public class ProductReview : Entity<Guid>
         {
             Id = id,
             ProductId = productId,
+            ReviewerUserId = reviewerUserId,
             ReviewerUserName = reviewerUserName,
             ReviewText = reviewText,
-            Rating = rating
+            Rating = rating,
+            CreatedAt = DateTime.UtcNow
         };
     }
+
 
     public void UpdateReview(string newReviewText, int newRating)
     {
@@ -35,5 +40,4 @@ public class ProductReview : Entity<Guid>
         ReviewText = newReviewText;
         Rating = newRating;
     }
-
 }

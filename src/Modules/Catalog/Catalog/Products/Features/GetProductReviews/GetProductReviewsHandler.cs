@@ -28,8 +28,12 @@ namespace Catalog.Products.Features.GetProductReviews
                 ProductId = r.ProductId,
                 ReviewText = r.ReviewText,
                 Rating = r.Rating,
-                ReviewerUserName = r.ReviewerUserName
+                ReviewerUserName = r.ReviewerUserName,
+                ReviewerUserId = r.ReviewerUserId,
+                CreatedAt = r.CreatedAt 
             }).ToList();
+
+
         }
     }
 }
