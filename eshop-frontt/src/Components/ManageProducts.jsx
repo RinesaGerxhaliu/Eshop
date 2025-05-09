@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import "../Styles/ManageProducts.css";
 import AddProduct from "./UI/AddProduct";
+import EditProduct from "./UI/EditProduct";
 
 const BASE = "https://localhost:5050";
 const PAGE_SIZE = 8;
@@ -16,6 +17,8 @@ export default function ManageProducts() {
   const [totalCount, setTotalCount] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);    // ← track edit modal
+  const [editingProduct, setEditingProduct] = useState(null);
 
   useEffect(() => {
     if (!successMsg) return;
@@ -90,6 +93,32 @@ export default function ManageProducts() {
     menuPortal: base => ({ ...base, zIndex: 9999 }),
   };
 
+  const loadProducts = async () => {
+    const params = new URLSearchParams({
+      PageIndex: pageIndex,
+      PageSize:  PAGE_SIZE,
+      ...(filterCat && { CategoryId: filterCat }),
+      ...(filterBrd && { BrandId:   filterBrd   }),
+    });
+    const url = `${BASE}/products?${params}`;
+    try {
+      const data = await fetchJson(url);
+      const page = data.products;
+      setProducts(Array.isArray(page?.data) ? page.data : []);
+      setTotalCount(typeof page?.totalCount === "number"
+        ? page.totalCount
+        : (Array.isArray(page?.data) ? page.data.length : 0)
+      );
+    } catch {
+      setProducts([]);
+      setTotalCount(0);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, [pageIndex, filterCat, filterBrd]);
+
   return (
     <>
       <AddProduct
@@ -110,6 +139,21 @@ export default function ManageProducts() {
           {successMsg}
         </div>
       )}
+
+      <EditProduct
+        isOpen={showEditModal}
+        product={editingProduct}
+        categories={categories}
+        brands={brands}
+        onEdit={() => {
+          loadProducts();  
+          setPageIndex(0);
+          setShowEditModal(false);
+          setSuccessMsg("Product updated successfully!");
+        }}
+        onError={msg => setSuccessMsg(msg)}
+        onClose={() => setShowEditModal(false)}
+      />
 
 
       <div className="mp-container">
@@ -207,8 +251,14 @@ export default function ManageProducts() {
                     <td>
                       <button
                         className="mp-btn mp-btn-action"
-                        onClick={() => window.location.href = `/admin-dashboard/manage-products/${p.id}/edit`}
-                      >Edit</button>
+                        onClick={() => {
+                          setEditingProduct(p);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+
                       <button
                         className="mp-btn mp-btn-danger"
                         onClick={() => handleDelete(p.id)}

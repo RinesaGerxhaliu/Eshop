@@ -1,13 +1,15 @@
+// src/Components/UI/EditProduct.jsx
 import React, { useEffect, useState } from 'react';
 import '../../Styles/AddProduct.css';
 
 const BASE = "https://localhost:5050";
 
-export default function AddProduct({
+export default function EditProduct({
     isOpen,
+    product = null,          // the product object to edit, or null
     categories = [],
     brands = [],
-    onAdd,
+    onEdit,                  // callback after successful edit
     onClose,
     onError,
 }) {
@@ -21,19 +23,25 @@ export default function AddProduct({
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
 
+    // When modal opens or product changes, populate the form
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && product) {
             setForm({
-                name: '',
-                price: '',
-                description: '',
-                categoryId: '',
-                brandId: '',
+                name: product.name || '',
+                price: product.price?.toString() || '',
+                description: product.description || '',
+                categoryId: product.categoryId || '',
+                brandId: product.brandId || '',
             });
+            setPreviewUrl(
+                product.imageUrl
+                    ? `${BASE}${product.imageUrl.startsWith('/') ? '' : '/'}${product.imageUrl}`
+                    : ''
+            );
+            // if your API returns an image URL
             setImageFile(null);
-            setPreviewUrl('');
         }
-    }, [isOpen]);
+    }, [isOpen, product]);
 
     const handleChange = e => {
         let { name, value } = e.target;
@@ -47,51 +55,48 @@ export default function AddProduct({
     const handleFileChange = e => {
         const file = e.target.files?.[0];
         if (!file) return;
-
         if (!file.type.startsWith('image/')) {
-            alert('Please select a valid image file (jpg, png, etc.)');
-            return;
+            return alert('Please select a valid image file (jpg, png, etc.)');
         }
-
         setImageFile(file);
-        const objectUrl = URL.createObjectURL(file);
-        setPreviewUrl(objectUrl);
+        setPreviewUrl(URL.createObjectURL(file));
     };
 
     const handleSubmit = async e => {
         e.preventDefault();
-        if (!form.name || !form.price) {
-            return alert('Name & price are required');
-        }
+        // basic validation
         if (!form.name || !form.price || !form.categoryId || !form.brandId) {
             return onError('Name, price, category & brand are required');
         }
 
         try {
-            const createRes = await fetch(`${BASE}/products`, {
-                method: "POST",
+            // 1) Update product fields
+            const updateRes = await fetch(`${BASE}/products`, {
+                method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    product: {
-                        name: form.name,
-                        price: parseFloat(form.price),
-                        description: form.description || null,
-                        categoryId: form.categoryId || null,
-                        brandId: form.brandId || null
+                    Product: {
+                        Id: product.id,
+                        Name: form.name,
+                        Price: parseFloat(form.price),
+                        Description: form.description || null,
+                        CategoryId: form.categoryId,
+                        BrandId: form.brandId
                     }
                 })
+
             });
-            if (!createRes.ok) {
-                const text = await createRes.text();
+            if (!updateRes.ok) {
+                const text = await updateRes.text();
                 throw new Error(text);
             }
-            const { id: newProductId } = await createRes.json();
 
+            // 2) If user selected a new image, upload it
             if (imageFile) {
                 const fd = new FormData();
                 fd.append("file", imageFile);
                 const imgRes = await fetch(
-                    `${BASE}/products/${newProductId}/image`,
+                    `${BASE}/products/${product.id}/image`,
                     { method: "POST", body: fd }
                 );
                 if (!imgRes.ok) {
@@ -99,32 +104,30 @@ export default function AddProduct({
                 }
             }
 
-            onAdd();
+            onEdit();    // inform parent
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Failed to save product: " + err.message);
-
+            alert("Failed to update product: " + err.message);
         }
-
     };
 
+    if (!isOpen || !product) return null;
 
-    if (!isOpen) return null;
+
 
     return (
         <div className="review-modal open" onClick={onClose}>
             <div className="review-modal-content" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>Add New Product</h2>
+                    <h2>Edit Product</h2>
                 </div>
-
 
                 <form onSubmit={handleSubmit} className="add-product-form">
                     {/* IMAGE UPLOAD */}
                     <div className="upload-container">
                         <label htmlFor="imageUpload" className="upload-button">
-                            {imageFile ? 'Change Image' : 'Upload Image'}
+                            {imageFile ? 'Change Image' : previewUrl ? 'Replace Image' : 'Upload Image'}
                         </label>
                         <input
                             id="imageUpload"
@@ -136,7 +139,13 @@ export default function AddProduct({
                         {previewUrl && (
                             <div className="preview-wrapper">
                                 <img
-                                    src={previewUrl}
+                                    src={
+                                        // allow absolute API URLs (http/https) or blob URLs
+                                        previewUrl.startsWith('http') ||
+                                            previewUrl.startsWith('blob:')
+                                            ? previewUrl
+                                            : `${BASE}${previewUrl.startsWith('/') ? '' : '/'}${previewUrl}`
+                                    }
                                     alt="Preview"
                                     className="preview-image"
                                 />
@@ -212,7 +221,7 @@ export default function AddProduct({
                     {/* ACTION BUTTONS */}
                     <div className="form-actions">
                         <button type="button" onClick={onClose}>Cancel</button>
-                        <button type="submit">Save</button>
+                        <button type="submit">Save Changes</button>
                     </div>
                 </form>
             </div>

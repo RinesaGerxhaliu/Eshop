@@ -12,6 +12,11 @@ public class UpdateProductCommandValidator : AbstractValidator<UpdateProductComm
         RuleFor(x => x.Product.Id).NotEmpty().WithMessage("Id is required");
         RuleFor(x => x.Product.Name).NotEmpty().WithMessage("Name is required");
         RuleFor(x => x.Product.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
+        // ← new rules:
+        RuleFor(x => x.Product.CategoryId)
+            .NotEmpty().WithMessage("Category is required");
+        RuleFor(x => x.Product.BrandId)
+            .NotEmpty().WithMessage("Brand is required");
     }
 
 }
@@ -48,7 +53,9 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Upda
         product.Update(
             productDTO.Name,
             productDTO.Description,
-            productDTO.Price
+            productDTO.Price,
+            productDTO.CategoryId,
+            productDTO.BrandId
         );
     }
 }
