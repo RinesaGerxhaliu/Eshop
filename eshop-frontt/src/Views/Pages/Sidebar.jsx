@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../../Styles/sidebar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -10,6 +10,7 @@ const Sidebar = ({ onClose }) => {
   const [brands, setBrands] = useState([]);
   const [activeView, setActiveView] = useState("main");
   const sidebarRef = useRef(null);
+   const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${API}/categories`)
@@ -51,12 +52,29 @@ const Sidebar = ({ onClose }) => {
                 Categories
               </h3>
             </div>
+           
             <div className="sidebar-section">
               <h3
                 className="toggle-header"
                 onClick={() => setActiveView("brands")}
               >
                 Brands
+              </h3>
+            </div>
+            <div className="sidebar-section">
+              <h3
+                className="toggle-header"
+                onClick={() => setActiveView("price")}
+              >
+                Sort By Price
+              </h3>
+            </div>
+            <div className="sidebar-section">
+              <h3
+                className="toggle-header"
+                onClick={() => navigate("/profile")}
+              >
+                User Profile
               </h3>
             </div>
           </>
@@ -109,6 +127,24 @@ const Sidebar = ({ onClose }) => {
             </div>
           </>
         )}
+        {activeView === "price" && (
+  <>
+    <button className="back-btn" onClick={() => setActiveView("main")}>
+      ← Back
+    </button>
+    <div className="sidebar-section">
+      <h3 className="toggle-header">Sort by Price</h3>
+      <ul>
+        <li>
+          <Link to="/products/sorted/by-price">Price: Low to High</Link>
+        </li>
+        <li>
+          <Link to="/products/sorted/by-price-descending">Price: High to Low</Link>
+        </li>
+      </ul>
+    </div>
+  </>
+)}
       </div>
     </div>
   );

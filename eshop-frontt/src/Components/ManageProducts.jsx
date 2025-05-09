@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import "../Styles/ManageProducts.css";
 import AddProduct from "./UI/AddProduct";
+import EditProduct from "./UI/EditProduct";
+import { useCurrency } from "../contexts/CurrencyContext";
 
 const BASE = "https://localhost:5050";
 const PAGE_SIZE = 8;
@@ -16,6 +18,11 @@ export default function ManageProducts() {
   const [totalCount, setTotalCount] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [sortAsc, setSortAsc] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const { convert, format } = useCurrency();
 
   useEffect(() => {
     if (!successMsg) return;
@@ -47,37 +54,30 @@ export default function ManageProducts() {
       .catch(() => setBrands([]));
   }, []);
 
-  useEffect(() => {
-    const params = {
-      PageIndex: pageIndex,
-      PageSize: PAGE_SIZE,
-      ...(filterCat && { CategoryId: filterCat }),
-      ...(filterBrd && { BrandId: filterBrd }),
-    };
-    const url = `${BASE}/products?${new URLSearchParams(params)}`;
 
-    fetchJson(url)
-      .then(data => {
-        const page = data.products;
-        const items = Array.isArray(page?.data) ? page.data : [];
-        setProducts(items);
-        setTotalCount(typeof page?.totalCount === "number"
-          ? page.totalCount
-          : items.length
-        );
-      })
-      .catch(() => {
-        setProducts([]);
-        setTotalCount(0);
-      });
-  }, [pageIndex, filterCat, filterBrd]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this product?")) return;
-    await fetchJson(`${BASE}/products/${id}`, { method: "DELETE" });
-    setProducts(prev => prev.filter(p => p.id !== id));
-    setTotalCount(prev => prev - 1);
+
+    try {
+      const { isSuccessful } = await fetchJson(
+        `${BASE}/products/${id}`,
+        { method: "DELETE" }
+      );
+
+      if (isSuccessful) {
+        setSuccessMsg("Product deleted successfully!");
+        loadProducts();
+      } else {
+        setSuccessMsg("Product deletion failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      setSuccessMsg("Failed to delete product: " + err.message);
+    }
   };
+
+
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -88,6 +88,69 @@ export default function ManageProducts() {
 
   const selectStyles = {
     menuPortal: base => ({ ...base, zIndex: 9999 }),
+  };
+
+  const loadProducts = async () => {
+    const params = new URLSearchParams({
+      PageIndex: pageIndex,
+      PageSize: PAGE_SIZE,
+      ...(filterCat && { CategoryId: filterCat }),
+      ...(filterBrd && { BrandId: filterBrd }),
+    });
+    const url = `${BASE}/products?${params}`;
+
+    try {
+      const { products: page } = await fetchJson(url);
+
+      const items = Array.isArray(page?.data)
+        ? page.data
+        : Array.isArray(page?.items)
+          ? page.items
+          : [];
+
+      const count = typeof page?.count === 'number'
+        ? page.count
+        : typeof page?.totalItems === 'number'
+          ? page.totalItems
+          : items.length;
+
+      setProducts(items);
+      setTotalCount(count);
+    } catch (err) {
+      console.error("Failed loading products:", err);
+      setProducts([]);
+      setTotalCount(0);
+    }
+  };
+
+
+  useEffect(() => {
+    loadProducts();
+  }, [pageIndex, filterCat, filterBrd]);
+
+  const sortedProducts = React.useMemo(() => {
+    return [...safeProducts].sort((a, b) => {
+      return sortAsc
+        ? a.price - b.price
+        : b.price - a.price;
+    });
+  }, [safeProducts, sortAsc]);
+
+  const handleDeleteConfirmed = async () => {
+    const id = deleteTarget.id;
+    setDeleteTarget(null);
+    try {
+      const { isSuccessful } = await fetchJson(`${BASE}/products/${id}`, { method: "DELETE" });
+      if (isSuccessful) {
+        setSuccessMsg("Product deleted successfully!");
+        loadProducts();
+      } else {
+        setSuccessMsg("Product deletion failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      setSuccessMsg("Failed to delete product: " + err.message);
+    }
   };
 
   return (
@@ -111,6 +174,21 @@ export default function ManageProducts() {
         </div>
       )}
 
+      <EditProduct
+        isOpen={showEditModal}
+        product={editingProduct}
+        categories={categories}
+        brands={brands}
+        onEdit={() => {
+          loadProducts();
+          setPageIndex(0);
+          setShowEditModal(false);
+          setSuccessMsg("Product updated successfully!");
+        }}
+        onError={msg => setSuccessMsg(msg)}
+        onClose={() => setShowEditModal(false)}
+      />
+
 
       <div className="mp-container">
         <header className="mp-header">
@@ -123,6 +201,15 @@ export default function ManageProducts() {
           </button>
         </header>
         <div className="mp-filters">
+          <button
+            className="mp-btn mp-btn-secondary"
+            onClick={() => {
+              setSortAsc(sa => !sa);
+              setPageIndex(0);
+            }}
+          >
+            Sort: {sortAsc ? 'Low → High' : 'High → Low'}
+          </button>
           <div className="mp-select-wrapper">
             <Select
               options={categoryOptions}
@@ -155,7 +242,7 @@ export default function ManageProducts() {
 
           <button
             className="mp-btn mp-btn-secondary"
-            onClick={() => { setFilterCat(""); setFilterBrd(""); setPageIndex(0); }}
+            onClick={() => { setFilterCat(""); setFilterBrd(""); setSortAsc(true); setPageIndex(0); }}
           >
             Reset
           </button>
@@ -170,13 +257,13 @@ export default function ManageProducts() {
               </tr>
             </thead>
             <tbody>
-              {safeProducts.length > 0 ? safeProducts.map(p => {
+              {sortedProducts.length > 0 ? sortedProducts.map(p => {
                 const cat = categories.find(c => c.id === p.categoryId)?.name;
                 const brd = brands.find(b => b.id === p.brandId)?.name;
                 return (
                   <tr key={p.id}>
                     <td>{p.name}</td>
-                    <td>${p.price.toFixed(2)}</td>
+                    <td>{format(convert(p.price))}</td>
                     <td>{cat || "–"}</td>
                     <td>{brd || "–"}</td>
                     <td>
@@ -207,12 +294,20 @@ export default function ManageProducts() {
                     <td>
                       <button
                         className="mp-btn mp-btn-action"
-                        onClick={() => window.location.href = `/admin-dashboard/manage-products/${p.id}/edit`}
-                      >Edit</button>
+                        onClick={() => {
+                          setEditingProduct(p);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+
                       <button
                         className="mp-btn mp-btn-danger"
-                        onClick={() => handleDelete(p.id)}
-                      >Delete</button>
+                        onClick={() => setDeleteTarget(p)}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );
@@ -242,6 +337,25 @@ export default function ManageProducts() {
               onClick={() => setPageIndex(i => Math.min(i + 1, totalPages - 1))}
               disabled={pageIndex + 1 >= totalPages}
             >Next →</button>
+          </div>
+        )}
+
+        {deleteTarget && (
+          <div className="review-modal open" onClick={() => setDeleteTarget(null)}>
+            <div className="review-modal-content" onClick={e => e.stopPropagation()}>
+              <h2>Confirm Delete</h2>
+              <p>Are you sure you want to delete “{deleteTarget.name}”?</p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button
+                  className="mp-btn mp-btn-secondary"
+                  onClick={() => setDeleteTarget(null)}
+                >Cancel</button>
+                <button
+                  className="mp-btn mp-btn-danger"
+                  onClick={handleDeleteConfirmed}
+                >Delete</button>
+              </div>
+            </div>
           </div>
         )}
       </div>

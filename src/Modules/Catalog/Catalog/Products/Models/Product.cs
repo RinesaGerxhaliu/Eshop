@@ -46,17 +46,26 @@ public class Product : Aggregate<Guid>
         return product;
     }
 
-    public void Update(string name, string description, decimal price)
+    public void Update(string name, string description, decimal price, Guid categoryId, Guid brandId)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
 
+        if (categoryId == Guid.Empty)
+            throw new ArgumentException("CategoryId must not be empty", nameof(categoryId));
+        if (brandId == Guid.Empty)
+            throw new ArgumentException("BrandId must not be empty", nameof(brandId));
+
+        var oldPrice = Price;
+
         Name = name;
         Description = description;
         Price = price;
+        CategoryId = categoryId;
+        BrandId = brandId;
 
-        AddDomainEvent(new ProductPriceChangedEvent(this));
-
+        if (oldPrice != price)
+            AddDomainEvent(new ProductPriceChangedEvent(this));
     }
 
     public void AddImage(string imageUrl)
