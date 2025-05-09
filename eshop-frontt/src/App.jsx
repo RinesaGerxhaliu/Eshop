@@ -13,8 +13,9 @@ import Dashboard from './Views/Pages/AdminDashboard';
 import PrivateRoute from './Components/PrivateRoute';
 import Shop from './Views/Pages/Shop';
 import ProductDetails from './Views/Pages/ProductDetails';
-import Sidebar from './Views/Pages/Sidebar'; // Import Sidebar
-import FilteredProducts from './Views/Pages/FilteredProducts'
+import Sidebar from './Views/Pages/Sidebar'; 
+import FilteredProducts from './Views/Pages/FilteredProducts';
+import ProductSearchResults from './Components/UI/ProductSearchResults '
 
 function App() {
   return (
@@ -27,13 +28,13 @@ function App() {
 }
 
 function AppContent() {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Manage sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false); 
   const location = useLocation();
 
   const isAdminDashboard = location.pathname.startsWith('/admin-dashboard');
   return (
     <>
-      <Navbar onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} /> {/* Pass callback to Navbar */}
+      <Navbar onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} /> 
       
       <Routes>
         <Route path="/" element={<Homepage />} />
@@ -45,6 +46,7 @@ function AppContent() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/filter/:filterType/:filterId" element={<FilteredProducts />} />
+        <Route  path="/products" element={<ProductSearchResults />} />
         
         <Route
            path="/admin-dashboard/*"
@@ -60,7 +62,6 @@ function AppContent() {
 
       {!isAdminDashboard && <Footer />}
       
-      {/* Render Sidebar conditionally */}
       {sidebarOpen && <Sidebar onClose={() => setSidebarOpen(false)} />}
     </>
   );
