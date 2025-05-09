@@ -9,6 +9,7 @@ import Homepage from './Views/Pages/Homepage';
 import { AuthProvider } from './contexts/AuthContext';
 import UserProfile from './Views/Pages/UserProfile';
 import ShoppingCartPage from './Views/Pages/ShoppingCart';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import Dashboard from './Views/Pages/AdminDashboard';
 import PrivateRoute from './Components/PrivateRoute';
 import Shop from './Views/Pages/Shop';
@@ -19,17 +20,20 @@ import ProductSearchResults from './Components/UI/ProductSearchResults '
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <CurrencyProvider>
+          <AppContent />
+        </CurrencyProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false); 
   const location = useLocation();
+  const [sortByPrice, setSortByPrice] = useState(null);
 
   const isAdminDashboard = location.pathname.startsWith('/admin-dashboard');
   return (
@@ -46,6 +50,9 @@ function AppContent() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/filter/:filterType/:filterId" element={<FilteredProducts />} />
+        <Route path="/products/sorted/by-price" element={<FilteredProducts />} />
+        <Route path="/products/sorted/by-price-descending" element={<FilteredProducts />} />
+
         <Route  path="/products" element={<ProductSearchResults />} />
         
         <Route
@@ -57,12 +64,13 @@ function AppContent() {
           }
         />
         
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       {!isAdminDashboard && <Footer />}
       
-      {sidebarOpen && <Sidebar onClose={() => setSidebarOpen(false)} />}
+      {sidebarOpen && <Sidebar onClose={() => setSidebarOpen(false)} setSortByPrice={setSortByPrice} />} {/* Pass the setSortByPrice function here */}
     </>
   );
 }

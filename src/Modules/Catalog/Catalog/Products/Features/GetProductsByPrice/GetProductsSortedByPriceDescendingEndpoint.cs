@@ -9,11 +9,9 @@ public class GetProductsSortedByPriceDescendingEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        // Endpoint to get products sorted by price in descending order
         app.MapGet("/products/sorted/by-price-descending", async (ISender sender) =>
         {
-            // Create the query for sorted products by descending price
-            var query = new GetProductsSortedByPriceQuery();
+            var query = new GetProductsSortedByPriceDescendingQuery();
             var result = await sender.Send(query);
 
             return Results.Ok(result); // Return the result

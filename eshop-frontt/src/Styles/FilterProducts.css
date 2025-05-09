@@ -15,6 +15,58 @@
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
     gap: 20px;
   }
+.sort-button-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.sort-button {
+  background-color: #d8b4a2;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sort-button:hover {
+  background-color: #c79e87;
+}
+
+.sort-options {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  margin-top: 10px;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sort-options button {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sort-options button:hover {
+  background-color: #f2f2f2;
+}
+
+.product-section {
+  padding: 40px;
+  background-color: #f9f9f9;
+}
+
   
   .product-card {
     background-color: #fff;
