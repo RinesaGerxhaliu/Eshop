@@ -1,15 +1,15 @@
-// src/Components/UI/EditProduct.jsx
 import React, { useEffect, useState } from 'react';
 import '../../Styles/AddProduct.css';
+import { useCurrency } from "../../contexts/CurrencyContext";
 
 const BASE = "https://localhost:5050";
 
 export default function EditProduct({
     isOpen,
-    product = null,          // the product object to edit, or null
+    product = null,
     categories = [],
     brands = [],
-    onEdit,                  // callback after successful edit
+    onEdit,
     onClose,
     onError,
 }) {
@@ -22,13 +22,16 @@ export default function EditProduct({
     });
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
+    const { convert, format } = useCurrency();
 
-    // When modal opens or product changes, populate the form
     useEffect(() => {
         if (isOpen && product) {
             setForm({
                 name: product.name || '',
-                price: product.price?.toString() || '',
+                
+                price: product.price != null
+                    ? format(convert(product.price))
+                    : '',
                 description: product.description || '',
                 categoryId: product.categoryId || '',
                 brandId: product.brandId || '',
@@ -38,15 +41,13 @@ export default function EditProduct({
                     ? `${BASE}${product.imageUrl.startsWith('/') ? '' : '/'}${product.imageUrl}`
                     : ''
             );
-            // if your API returns an image URL
             setImageFile(null);
         }
-    }, [isOpen, product]);
+    }, [isOpen, product, convert, format]);
 
     const handleChange = e => {
         let { name, value } = e.target;
         if (name === 'price') {
-            // allow comma as decimal sep:
             value = value.replace(',', '.');
         }
         setForm(f => ({ ...f, [name]: value }));
@@ -56,7 +57,7 @@ export default function EditProduct({
         const file = e.target.files?.[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) {
-            return alert('Please select a valid image file (jpg, png, etc.)');
+            return onError('Please select a valid image file (jpg, png, etc.)');
         }
         setImageFile(file);
         setPreviewUrl(URL.createObjectURL(file));
@@ -64,13 +65,19 @@ export default function EditProduct({
 
     const handleSubmit = async e => {
         e.preventDefault();
-        // basic validation
+        
         if (!form.name || !form.price || !form.categoryId || !form.brandId) {
             return onError('Name, price, category & brand are required');
         }
 
         try {
-            // 1) Update product fields
+            let raw = form.price
+                .replace(/[^0-9\.,]/g, '')
+                .replace(',', '.');          
+            const conversionRate = convert(1);    
+            const basePrice = parseFloat(raw) / conversionRate;
+
+            
             const updateRes = await fetch(`${BASE}/products`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -78,20 +85,18 @@ export default function EditProduct({
                     Product: {
                         Id: product.id,
                         Name: form.name,
-                        Price: parseFloat(form.price),
+                        Price: basePrice,
                         Description: form.description || null,
                         CategoryId: form.categoryId,
                         BrandId: form.brandId
                     }
                 })
-
             });
             if (!updateRes.ok) {
                 const text = await updateRes.text();
                 throw new Error(text);
             }
 
-            // 2) If user selected a new image, upload it
             if (imageFile) {
                 const fd = new FormData();
                 fd.append("file", imageFile);
@@ -104,11 +109,11 @@ export default function EditProduct({
                 }
             }
 
-            onEdit();    // inform parent
+            onEdit();
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Failed to update product: " + err.message);
+            onError(`Failed to update product: ${err.message}`);
         }
     };
 
@@ -140,7 +145,6 @@ export default function EditProduct({
                             <div className="preview-wrapper">
                                 <img
                                     src={
-                                        // allow absolute API URLs (http/https) or blob URLs
                                         previewUrl.startsWith('http') ||
                                             previewUrl.startsWith('blob:')
                                             ? previewUrl
@@ -170,7 +174,7 @@ export default function EditProduct({
                             name="price"
                             type="text"
                             inputMode="decimal"
-                            placeholder="e.g. 19.99 or 19,99"
+                            placeholder={format(convert(1)).replace(/\d/g, '') + '0.00'}
                             value={form.price}
                             onChange={handleChange}
                             required

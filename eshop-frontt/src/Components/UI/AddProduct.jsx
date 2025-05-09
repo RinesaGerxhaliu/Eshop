@@ -38,7 +38,6 @@ export default function AddProduct({
     const handleChange = e => {
         let { name, value } = e.target;
         if (name === 'price') {
-            // allow comma as decimal sep:
             value = value.replace(',', '.');
         }
         setForm(f => ({ ...f, [name]: value }));
@@ -49,8 +48,7 @@ export default function AddProduct({
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
-            alert('Please select a valid image file (jpg, png, etc.)');
-            return;
+            return onError('Please select a valid image file (jpg, png, etc.)');
         }
 
         setImageFile(file);
@@ -60,9 +58,6 @@ export default function AddProduct({
 
     const handleSubmit = async e => {
         e.preventDefault();
-        if (!form.name || !form.price) {
-            return alert('Name & price are required');
-        }
         if (!form.name || !form.price || !form.categoryId || !form.brandId) {
             return onError('Name, price, category & brand are required');
         }
@@ -103,8 +98,7 @@ export default function AddProduct({
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Failed to save product: " + err.message);
-
+            onError(`Failed to create product: ${err.message}`);
         }
 
     };

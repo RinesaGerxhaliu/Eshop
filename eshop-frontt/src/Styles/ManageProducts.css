@@ -11,29 +11,21 @@
 }
 
 .mp-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  flex-wrap: nowrap;
 }
 
-.mp-header h1 {
-  font-weight: 600;
-  color: #d6336c;
+.mp-header h1,
+.mp-header .mp-btn {
+  flex: 0 0 auto;
 }
 
 .mp-btn {
-  display: inline-block;
-  white-space: nowrap;
-  padding: 4px 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: background 0.2s ease, transform 0.1s ease;
-  margin: 0 4px;
+  width: auto !important;
+  max-width: none !important;
+  padding: 2px 8px;
+  font-size: 0.75rem;
 }
+
 
 .mp-btn:active {
   transform: scale(0.97);
@@ -149,4 +141,81 @@
   opacity: 0.95;
   pointer-events: none;
   transition: opacity 0.3s ease;
+}
+
+.mp-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.mp-pagination .mp-btn {
+  flex: 0 0 auto;
+}
+
+.mp-table td .mp-btn+.mp-btn {
+  margin-left: 12px;
+}
+
+.mp-table td .mp-btn-action,
+.mp-table td .mp-btn-danger {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+}
+
+.mp-pagination .mp-btn-secondary {
+  font-size: 1rem;
+  padding: 8px 12px;
+}
+
+.mp-pagination>span {
+  display: inline-block !important;
+  margin: 8px 12px 0 !important;
+}
+
+.mp-pagination>span {
+  display: inline-block !important;
+  margin: 16px 24px 0 !important;
+}
+
+
+.mp-pagination>button {
+  margin-top: 8px !important;
+}
+
+
+.mp-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+
+.mp-header .mp-btn-primary {
+  font-size: 1rem;
+  padding: 8px 16px;
+  min-width: auto;
+}
+
+.mp-filters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mp-filters>button {
+  margin-top: 7px;
+}
+
+.mp-filters>.mp-btn-secondary {
+  font-size: 0.9rem;
+  padding: 7px 15px;
 }
