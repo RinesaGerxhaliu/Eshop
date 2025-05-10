@@ -5,8 +5,7 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import DeleteReviewModal from './DeleteReviewModal';
 import EditReview from './EditReview';
 import axios from 'axios';
-import '../../Styles/ProductReviews.css';  // Import the CSS file
-
+import '../../Styles/ProductReviews.css';
 const API = 'https://localhost:5050';
 
 const ProductReviews = () => {
@@ -83,56 +82,46 @@ const ProductReviews = () => {
         {visibleReviews.map((review) => {
           const isAuthor = review.reviewerUserId === currentUserId;
           return (
-            <li key={review.id} className="mb-3" style={{ position: 'relative' }}>
+            <li key={review.id} className="mb-3">
               <div className="review-text-block">
-                <span className="reviewer-name">
-                  {review.reviewerUserName}
-                </span>
-                <div className="review-stars">
-                  {[...Array(5)].map((_, i) => (
-                    <span
-                      key={i}
-                      className={`star ${i < review.rating ? 'filled' : ''}`}
-                    >
-                      ★
-                    </span>
-                  ))}
+                <div className="review-content">
+                  <span className="reviewer-name">{review.reviewerUserName}</span>
+
+                  <div className="review-stars">
+                    {[...Array(5)].map((_, i) => (
+                      <span
+                        key={i}
+                        className={`star ${i < review.rating ? 'filled' : ''}`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="review-text">{review.reviewText}</div>
                 </div>
 
-                {editingReviewId === review.id ? (
-                  <EditReview
-                    review={review}
-                    onSave={(updatedReview) => {
-                      handleReviewUpdate(updatedReview);
-                      setEditingReviewId(null);
-                    }}
-                    onCancel={() => setEditingReviewId(null)}
-                  />
-                ) : (
-                  <div>{review.reviewText}</div>
-                )}
-
                 {isAuthor && (
-  <div className="review-actions">
-    <FaEdit
-      size={20}
-      color="#6c757d"
-      style={{ cursor: 'pointer' }}
-      title="Edit Review"
-      onClick={() => setEditingReviewId(review.id)}
-    />
-    <FaTrashAlt
-      size={20}
-      color="#6c757d"
-      style={{ cursor: 'pointer' }}
-      title="Delete Review"
-      onClick={() => {
-        setReviewToDelete(review.id);
-        setShowModal(true);
-      }}
-    />
-  </div>
-)}
+                  <div className="review-actions">
+                    <FaEdit
+                      size={20}
+                      color="#6c757d"
+                      style={{ cursor: 'pointer' }}
+                      title="Edit Review"
+                      onClick={() => setEditingReviewId(review.id)}
+                    />
+                    <FaTrashAlt
+                      size={20}
+                      color="#6c757d"
+                      style={{ cursor: 'pointer' }}
+                      title="Delete Review"
+                      onClick={() => {
+                        setReviewToDelete(review.id);
+                        setShowModal(true);
+                      }}
+                    />
+                  </div>
+                )}
 
               </div>
             </li>

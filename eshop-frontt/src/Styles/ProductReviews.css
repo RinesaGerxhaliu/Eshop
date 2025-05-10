@@ -24,15 +24,31 @@
   color: rgba(185, 9, 62, 0.7);
 }
 
+/* Replace your existing .review-text-block and .review-actions rules with: */
+
 .review-text-block {
-  position: relative;
-  padding-right: 40px; /* pak hapësirë për butonat në qoshe */
+  display: flex;
+  justify-content: space-between; /* pushes actions to the far right */
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+
+
+.review-content {
+  display: flex;
+  flex-direction: column;  /* stack name, stars, text vertically */
+  gap: 4px;                /* small space between them */
+  flex: 1;                 /* take up remaining row space */
+}
+
+.review-stars {
+  display: flex;
+}
+
+/* your existing .review-actions stays as-is */
 .review-actions {
-  position: absolute;
-  top: 5px;
-  right: 5px;
   display: flex;
   gap: 8px;
 }
@@ -44,9 +60,7 @@
   font-style: italic;
 }
 
-.review-stars {
-  display: flex;
-}
+
 
 .star {
   color: #ccc;
