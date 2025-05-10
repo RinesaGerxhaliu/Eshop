@@ -1,0 +1,65 @@
+.userlist-container {
+    font-family: 'Poppins', sans-serif;
+    padding: 24px;
+    background: #fff5f8;
+    color: #333;
+  }
+  
+  .userlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-left: 20px;
+  }
+  
+  .userlist-table-wrap {
+    overflow-x: auto;
+  }
+  
+  .userlist-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+  
+  .userlist-table th, .userlist-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .userlist-table th {
+    background-color: #f0d6e2;
+    font-weight: 600;
+  }
+  
+  .userlist-btn {
+    padding: 6px 7px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .userlist-btn-action {
+    background-color: #ff69b4;
+    color: white;
+  }
+  
+  .userlist-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 999;
+  }
+  
+  .userlist-loading, .userlist-error {
+    padding: 16px;
+    font-size: 18px;
+  }
+  
