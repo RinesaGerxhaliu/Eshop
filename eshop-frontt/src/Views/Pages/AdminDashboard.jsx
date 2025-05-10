@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import AdminSidebar   from '../../Components/Layout/AdminSidebar';
 import ChartComponent from '../../Components/ChartComponent';
 import ManageProducts from '../../Components/ManageProducts';  // ← make sure this path matches!
+import ManageUsers from '../../Components/ManageUsers';  // Shtoni këtë
 
 const AdminDashboard = () => {
   return (
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
 
           {/* Manage Products at /admin/products */}
           <Route path="manage-products" element={<ManageProducts />} />
+          <Route path="manage-users" element={<ManageUsers />} />  {/* Shtoni këtë rruge */}
         </Routes>
       </div>
     </div>
