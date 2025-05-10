@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
@@ -65,12 +65,18 @@ const ProductReviews = () => {
     setReviews((prevReviews) => [newReview, ...prevReviews]);
   };
 
+  const currentlyEditingReview = reviews.find((r) => r.id === editingReviewId);
+
   if (loading) return <p>Loading reviews...</p>;
   if (errorMsg) return <p>Error: {errorMsg}</p>;
   if (reviews.length === 0) return <p>No reviews yet.</p>;
 
   const sortedReviews = [...reviews].sort((a, b) => b.id - a.id);
   const visibleReviews = showAll ? sortedReviews : sortedReviews.slice(0, 5);
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+    return new Date(date).toLocaleDateString('en-US', options);
+  };
 
   return (
     <div>
@@ -81,6 +87,7 @@ const ProductReviews = () => {
       <ul>
         {visibleReviews.map((review) => {
           const isAuthor = review.reviewerUserId === currentUserId;
+          const isEditing = editingReviewId === review.id;
           return (
             <li key={review.id} className="mb-3">
               <div className="review-text-block">
@@ -97,10 +104,22 @@ const ProductReviews = () => {
                       </span>
                     ))}
                   </div>
-
-                  <div className="review-text">{review.reviewText}</div>
+                  {isEditing ? (
+                    <EditReview
+                      review={review}
+                      onSave={(updated) => {
+                        handleReviewUpdate(updated);
+                        setEditingReviewId(null);
+                      }}
+                      onCancel={() => setEditingReviewId(null)}
+                    />
+                  ) : (
+                    <div className="review-text">{review.reviewText}</div>
+                  )}
+                  <div className="review-created-at">
+                    {`Reviewed on: ${formatDate(review.createdAt)}`}
+                  </div>
                 </div>
-
                 {isAuthor && (
                   <div className="review-actions">
                     <FaEdit

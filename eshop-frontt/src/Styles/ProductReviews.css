@@ -1,4 +1,3 @@
-/* ProductReviews.css */
 .edit-review-box {
   width: 100%;
   padding: 10px;
@@ -6,15 +5,72 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   margin-top: 10px;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-review-box form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.edit-review-box input[type="number"] {
+  width: 55%;
+  padding: 8px 10px;
+  height: 38px;
+  font-size: 1rem;
+}
+
+.edit-review-box textarea {
+  width: 100%;
+  min-height: 70px;
+  resize: vertical;
+  padding: 8px;
+  font-size: 1rem;
 }
 
 .edit-review-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 10px;
-  margin-top: 10px;
+  flex: 1;
 }
+
+.edit-review-actions button {
+  font-size: 1rem;
+  padding: 8px 16px;
+  min-width: 100px;
+  flex: 1;
+  margin-top: -2px;
+}
+
+.edit-review-actions button {
+  flex: 1;
+  margin-top: -2px;
+  min-width: 100px;
+  padding: 8px 16px;
+  margin-top: 10px; /* Adjusts vertical spacing */
+  font-size: 1rem;
+  background-color: rgba(163, 6, 84, 0.336);
+  color: #000;
+  border: 1px solid rgba(229, 192, 203, 0.7);
+  border-radius: 3px;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.edit-review-actions button:hover {
+  border: 1px solid rgba(138, 0, 41, 0.7);
+  background-color: rgba(245, 245, 245, 0.5);
+  transform: scale(1.02);
+}
+
 
 
 .product-reviews-title {
@@ -24,43 +80,50 @@
   color: rgba(185, 9, 62, 0.7);
 }
 
-/* Replace your existing .review-text-block and .review-actions rules with: */
-
 .review-text-block {
   display: flex;
-  justify-content: space-between; /* pushes actions to the far right */
+  justify-content: space-between;
+  /* pushes actions to the far right */
   align-items: flex-start;
   width: 100%;
   box-sizing: border-box;
 }
 
-
-
 .review-content {
   display: flex;
-  flex-direction: column;  /* stack name, stars, text vertically */
-  gap: 4px;                /* small space between them */
-  flex: 1;                 /* take up remaining row space */
+  flex-direction: column;
+  /* stack name, stars, text vertically */
+  gap: 4px;
+  /* small space between them */
+  flex: 1;
+  /* take up remaining row space */
 }
 
 .review-stars {
   display: flex;
+  font-size: 1.2rem;
+  /* Maintain star size */
+  margin-bottom: 5px;
+  /* Adjust bottom margin to make space for buttons */
 }
 
-/* your existing .review-actions stays as-is */
+.review-content.editing .review-stars {
+  height: 20px;
+  /* Adjust this value as necessary */
+  margin-bottom: 0;
+  /* Remove extra space */
+}
+
 .review-actions {
   display: flex;
   gap: 8px;
 }
-
 
 .reviewer-name {
   font-size: 1.2rem;
   font-weight: bold;
   font-style: italic;
 }
-
-
 
 .star {
   color: #ccc;

@@ -41,23 +41,25 @@ const EditReview = ({ review, onSave, onCancel }) => {
         rows={3}
         className="form-control mb-2"
       />
-      <input
-        type="number"
-        min="1"
-        max="5"
-        value={editedRating}
-        onChange={(e) => setEditedRating(Number(e.target.value))}
-        className="form-control mb-2"
-      />
-      {error && <div className="text-danger mb-2">{error}</div>}
-      <div className="edit-review-actions">
-        <button onClick={onCancel} className="btn btn-secondary">
-          Cancel
-        </button>
-        <button onClick={handleSave} className="btn btn-primary" disabled={loading}>
-          {loading ? 'Saving...' : 'Save'}
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        <input
+          type="number"
+          min="1"
+          max="5"
+          value={editedRating}
+          onChange={(e) => setEditedRating(Number(e.target.value))}
+          className="form-control mb-2"
+        />
+        <div className="edit-review-actions" style={{ flex: 1, display: 'flex' }}>
+          <button onClick={onCancel} className="btn btn-secondary" style={{ flex: 1 }}>
+            Cancel
+          </button>
+          <button onClick={handleSave} className="btn btn-primary" disabled={loading} style={{ flex: 1 }}>
+            {loading ? 'Saving...' : 'Save'}
+          </button>
+        </div>
       </div>
+      {error && <div className="text-danger mb-2">{error}</div>}
     </div>
   );
 };
