@@ -121,6 +121,14 @@ function Register() {
           >
             Already have an account? Sign in
           </a>
+          <br />
+              <a
+                href="#"
+                onClick={() => navigate('/homapage')}
+                className="link-textt"
+              >
+                Go to Home
+              </a>
         </form>
       </div>
       <div className="login-image"></div>

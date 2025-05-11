@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
-import { FaSort } from "react-icons/fa"; // ikona për sortim
+import { FaSort } from "react-icons/fa";
 import "../../Styles/FilterProducts.css";
 
 const API = "https://localhost:5050";
@@ -11,47 +11,49 @@ const FilteredProducts = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [showSortOptions, setShowSortOptions] = useState(false);
+  const [sortOrder, setSortOrder] = useState(null);
+
+  const fetchProducts = async () => {
+    try {
+      let url = "";
+
+      if (filterType === "category") {
+        url = `${API}/products/by-category/${filterId}`;
+      } else if (filterType === "brand") {
+        url = `${API}/products/by-brand/${filterId}`;
+      }
+
+      if (!url) return;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch products");
+
+      let data = await response.json();
+      if (!Array.isArray(data)) data = [];
+
+      if (sortOrder === "low") {
+        data.sort((a, b) => a.price - b.price);
+      } else if (sortOrder === "high") {
+        data.sort((a, b) => b.price - a.price);
+      }
+
+      setProducts(data);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setProducts([]);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        let response;
-        const path = location.pathname;
-
-        if (path.endsWith("/sorted/by-price")) {
-          response = await fetch(`${API}/products/sorted/by-price`);
-        } else if (path.endsWith("/sorted/by-price-descending")) {
-          response = await fetch(`${API}/products/sorted/by-price-descending`);
-        } else if (path.includes("/products/filter")) {
-          if (filterType === "category") {
-            response = await fetch(`${API}/products/by-category/${filterId}`);
-          } else if (filterType === "brand") {
-            response = await fetch(`${API}/products/by-brand/${filterId}`);
-          }
-        }
-
-        if (response && response.ok) {
-          const data = await response.json();
-          setProducts(data || []);
-        }
-      } catch (err) {
-        console.error("Error fetching products:", err);
-      }
-    };
-
     fetchProducts();
-  }, [filterType, filterId, location.pathname]);
+  }, [filterType, filterId, sortOrder]);
 
   const handleSortClick = () => {
     setShowSortOptions(!showSortOptions);
   };
 
   const handleSortOption = (option) => {
-    if (option === "low") {
-      navigate("/products/sorted/by-price");
-    } else if (option === "high") {
-      navigate("/products/sorted/by-price-descending");
-    }
+    setSortOrder(option);
     setShowSortOptions(false);
   };
 
@@ -64,12 +66,8 @@ const FilteredProducts = () => {
         </button>
         {showSortOptions && (
           <div className="sort-options">
-            <button onClick={() => handleSortOption("low")}>
-              Price: Low to High
-            </button>
-            <button onClick={() => handleSortOption("high")}>
-              Price: High to Low
-            </button>
+            <button onClick={() => handleSortOption("low")}>Price: Low to High</button>
+            <button onClick={() => handleSortOption("high")}>Price: High to Low</button>
           </div>
         )}
       </div>

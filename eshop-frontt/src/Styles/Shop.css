@@ -8,6 +8,9 @@
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 20px;
 }
+.sort-button-container{
+margin-top: 35px !important;
+}
 
 .product-card {
   background-color: #fff;

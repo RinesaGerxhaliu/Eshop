@@ -1,8 +1,18 @@
 .login-page {
   display: flex;
-  height: 88vh;
+  height: 100vh;
+  overflow: hidden;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+
+html, body {
+  height: 100%;
+}
 .login-form {
   flex: 1;
   padding: 40px 60px;
@@ -64,7 +74,12 @@
   margin-bottom: 10px;
   text-decoration: none;
 }
-
+.link-textt {
+  color: #666565;
+  font-size: 14px ;
+  margin-bottom: 10px;
+  text-decoration: underline  !important; 
+}
 .login-image {
   flex: 1;
   background-image: url('../images/makeupp.jpg');

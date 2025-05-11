@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './Components/Navbar/Navbar';
@@ -11,10 +10,10 @@ import UserProfile from './Views/Pages/UserProfile';
 import ShoppingCartPage from './Views/Pages/ShoppingCart';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import Dashboard from './Views/Pages/AdminDashboard';
-import PrivateRoute from './Components/PrivateRoute';
+import PrivateRoute from './Components/PrivateRoute'; // përdor vetëm këtë
 import Shop from './Views/Pages/Shop';
 import ProductDetails from './Views/Pages/ProductDetails';
-import Sidebar from './Views/Pages/Sidebar'; 
+import Sidebar from './Views/Pages/Sidebar';
 import FilteredProducts from './Views/Pages/FilteredProducts';
 import ProductSearchResults from './Components/UI/ProductSearchResults '
 
@@ -31,15 +30,20 @@ function App() {
 }
 
 function AppContent() {
-  const [sidebarOpen, setSidebarOpen] = useState(false); 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const [sortByPrice, setSortByPrice] = useState(null);
 
   const isAdminDashboard = location.pathname.startsWith('/admin-dashboard');
+  const hideNavbarRoutes = ['/login', '/register'];
+  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+
   return (
     <>
-      <Navbar onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} /> 
-      
+      {!shouldHideNavbar && (
+        <Navbar onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} />
+      )}
+
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/homepage" element={<Homepage />} />
@@ -52,25 +56,26 @@ function AppContent() {
         <Route path="/products/filter/:filterType/:filterId" element={<FilteredProducts />} />
         <Route path="/products/sorted/by-price" element={<FilteredProducts />} />
         <Route path="/products/sorted/by-price-descending" element={<FilteredProducts />} />
-
-        <Route  path="/products" element={<ProductSearchResults />} />
-        
+        <Route path="/products" element={<ProductSearchResults />} />
         <Route
-           path="/admin-dashboard/*"
+          path="/admin-dashboard/*"
           element={
             <PrivateRoute roles={['admin']}>
               <Dashboard />
             </PrivateRoute>
           }
         />
-        
-        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {!isAdminDashboard && <Footer />}
-      
-      {sidebarOpen && <Sidebar onClose={() => setSidebarOpen(false)} setSortByPrice={setSortByPrice} />} {/* Pass the setSortByPrice function here */}
+      {!isAdminDashboard && !shouldHideNavbar && <Footer />}
+
+      {sidebarOpen && (
+        <Sidebar
+          onClose={() => setSidebarOpen(false)}
+          setSortByPrice={setSortByPrice}
+        />
+      )}
     </>
   );
 }

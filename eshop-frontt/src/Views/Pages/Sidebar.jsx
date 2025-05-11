@@ -61,14 +61,7 @@ const Sidebar = ({ onClose }) => {
                 Brands
               </h3>
             </div>
-            <div className="sidebar-section">
-              <h3
-                className="toggle-header"
-                onClick={() => setActiveView("price")}
-              >
-                Sort By Price
-              </h3>
-            </div>
+           
             <div className="sidebar-section">
               <h3
                 className="toggle-header"
@@ -127,24 +120,7 @@ const Sidebar = ({ onClose }) => {
             </div>
           </>
         )}
-        {activeView === "price" && (
-  <>
-    <button className="back-btn" onClick={() => setActiveView("main")}>
-      ← Back
-    </button>
-    <div className="sidebar-section">
-      <h3 className="toggle-header">Sort by Price</h3>
-      <ul>
-        <li>
-          <Link to="/products/sorted/by-price">Price: Low to High</Link>
-        </li>
-        <li>
-          <Link to="/products/sorted/by-price-descending">Price: High to Low</Link>
-        </li>
-      </ul>
-    </div>
-  </>
-)}
+      
       </div>
     </div>
   );

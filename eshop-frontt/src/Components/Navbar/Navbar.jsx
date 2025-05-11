@@ -26,6 +26,14 @@ const Navbar = () => {
     }
   };
 
+  const handleCartClick = () => {
+    if (isLoggedIn) {
+      navigate("/cart"); // Navigate to the cart if logged in
+    } else {
+      navigate("/cart"); // Redirect to login if not logged in
+    }
+  };
+
   const supported = ["EUR", "USD", "GBP"];
   const codes = Object.keys(rates || {});
   const options = codes.length > 1 ? codes : supported;
@@ -77,8 +85,10 @@ const Navbar = () => {
               <div className="user-actions">
                 <FaShoppingBag
                   className="user-icon"
-                  onClick={() => navigate("/cart")}
-                  style={{ cursor: "pointer" }}
+                  onClick={handleCartClick} // Cart icon click handler
+                  style={{
+                    cursor: "pointer",
+                  }}
                 />
                 <FaUserCircle
                   className="user-icon"
@@ -96,7 +106,14 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="user-actions">
-                <FaShoppingBag className="user-iconn" />
+                <FaShoppingBag
+                  className="user-iconn"
+                  onClick={handleCartClick} // Redirect to login if not logged in
+                  style={{
+                    cursor: "pointer",
+                  }}
+                  title="Please sign in to view your cart"
+                />
                 <FaUserCircle className="user-iconn" />
                 <Link className="nav-link sign-in-btn" to="/login">
                   SIGN IN
