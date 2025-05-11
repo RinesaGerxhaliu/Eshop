@@ -1,0 +1,194 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+.mr-container {
+  font-family: 'Poppins', sans-serif;
+  padding: 24px;
+  background: #fff5f8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #333;
+}
+
+.mr-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.mr-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.mr-success {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e91e63;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 1100;
+  opacity: 0.95;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mr-filters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.mr-select-wrapper {
+  min-width: 200px;
+}
+
+.mr-btn {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mr-btn-secondary {
+  background: #f8d7e9;
+  color: #d6336c;
+}
+
+.mr-btn-secondary:hover {
+  background: #f1c2da;
+}
+
+.mr-btn-danger {
+  background: #ff6b81;
+  color: #fff;
+}
+
+.mr-btn-danger:hover {
+  background: #e55370;
+}
+
+.mr-table-wrap {
+  flex: 1;
+  overflow-x: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mr-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mr-table th,
+.mr-table td {
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid #f1ecf1;
+}
+
+.mr-table thead {
+  background: #fde8f2;
+}
+
+.mr-table tr:hover {
+  background: #ffeef8;
+}
+
+.mr-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.mr-pagination .mr-btn {
+  flex: 0 0 auto;
+}
+
+.mr-pagination span {
+  display: inline-block;
+  margin: 0 12px;
+  font-weight: 500;
+}
+
+.mr-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.mr-modal.open {
+  display: flex;
+}
+
+.mr-modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 6px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mr-modal-content h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+.mr-modal-content p {
+  margin: 12px 0;
+  font-size: 1rem;
+}
+
+.mr-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.mr-btn {
+  width: auto !important;
+  max-width: none !important;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+}
+
+.mr-filters > .mr-btn-secondary {
+  font-size: 0.9rem;
+  padding: 7px 15px;
+  min-width: auto;
+  margin-top: 7px;
+}
+
+.mr-pagination .mr-btn-secondary {
+  font-size: 1rem;
+  padding: 8px 12px;
+  min-width: auto;
+  margin-top: 8px;
+}

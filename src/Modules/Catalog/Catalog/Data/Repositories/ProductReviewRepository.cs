@@ -1,14 +1,14 @@
-﻿namespace Catalog.Data.Repositories;
+﻿using Shared.Pagination;
+
+namespace Catalog.Data.Repositories;
     public class ProductReviewRepository : IProductReviewRepository
     {
         private readonly CatalogDbContext _dbContext;
 
         public ProductReviewRepository(CatalogDbContext dbContext) => _dbContext = dbContext;
 
-        // Method to create a review for a product
         public async Task CreateReview(ProductReview review, CancellationToken ct)
         {
-            // Add the review to the DbContext
             await _dbContext.ProductReviews.AddAsync(review, ct);
             await _dbContext.SaveChangesAsync(ct);
         }
@@ -36,6 +36,34 @@
                 .ToListAsync(ct);
         }
 
+    public async Task<PaginatedResult<ProductReview>> GetAllReviewsAsync(
+    PaginationRequest pagination,
+    Guid? productId,
+    CancellationToken ct)
+    {
+        var query = _dbContext.ProductReviews
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (productId.HasValue)
+            query = query.Where(r => r.ProductId == productId.Value);
+
+        var total = await query.LongCountAsync(ct);
+
+        var items = await query
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip(pagination.PageIndex * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .ToListAsync(ct);
+
+        return new PaginatedResult<ProductReview>(
+            pagination.PageIndex,
+            pagination.PageSize,
+            total,
+            items
+        );
     }
+
+}
 
 

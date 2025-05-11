@@ -1,7 +1,6 @@
-﻿using MediatR;
-using Catalog.Contracts.Review.DTOs;
+﻿using Catalog.Contracts.Review.DTOs;
 
-namespace Catalog.Products.Features.GetProductReviews
+namespace Catalog.Products.Features.GetProductReviews.GetAllReviews
 {
     internal class GetProductReviewsHandler : IRequestHandler<GetProductReviewsQuery, List<ReviewDTO>>
     {
@@ -18,10 +17,9 @@ namespace Catalog.Products.Features.GetProductReviews
 
             if (reviews is null || !reviews.Any())
             {
-                return new List<ReviewDTO>(); // Return empty list if no reviews are found
+                return new List<ReviewDTO>();
             }
 
-            // Map ProductReview entities to ReviewDTOs
             return reviews.Select(r => new ReviewDTO
             {
                 Id = r.Id,
@@ -30,7 +28,7 @@ namespace Catalog.Products.Features.GetProductReviews
                 Rating = r.Rating,
                 ReviewerUserName = r.ReviewerUserName,
                 ReviewerUserId = r.ReviewerUserId,
-                CreatedAt = r.CreatedAt 
+                CreatedAt = r.CreatedAt
             }).ToList();
 
 

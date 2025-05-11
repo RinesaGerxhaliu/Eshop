@@ -1,9 +1,5 @@
-﻿using Carter;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Catalog.Products.Features.GetProductReviews;
-using Catalog.Contracts.Review.DTOs;
+﻿using Catalog.Contracts.Review.DTOs;
+using Catalog.Products.Features.GetProductReviews.GetAllReviews;
 
 public class GetProductReviewsEndpoint : ICarterModule
 {
