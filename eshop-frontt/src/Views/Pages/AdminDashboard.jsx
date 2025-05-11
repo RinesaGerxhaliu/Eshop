@@ -7,6 +7,7 @@ import ChartComponent from '../../Components/ChartComponent';
 import ManageProducts from '../../Components/ManageProducts';  // ← make sure this path matches!
 import ManageUsers from '../../Components/ManageUsers'; 
 import ManageReviews from '../../Components/ManageReviews'; // Shtoni këtë
+import ManageBrands from '../../Components/ManageBrands'; // Shtoni këtë
 
 const AdminDashboard = () => {
   return (
@@ -29,6 +30,7 @@ const AdminDashboard = () => {
           <Route path="manage-products" element={<ManageProducts />} />
           <Route path="manage-users" element={<ManageUsers />} />  {/* Shtoni këtë rruge */}
           <Route path="manage-reviews" element={<ManageReviews />} />
+          <Route path="manage-brands" element={<ManageBrands />} />
         </Routes>
       </div>
     </div>
