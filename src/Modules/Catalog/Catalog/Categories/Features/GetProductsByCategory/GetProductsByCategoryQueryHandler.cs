@@ -1,9 +1,4 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Catalog.Contracts.Products;
-using Catalog.Data;
-
-namespace Catalog.Categories.Features.GetProductsByCategory;
+﻿namespace Catalog.Categories.Features.GetProductsByCategory;
 
 internal class GetProductsByCategoryQueryHandler(CatalogDbContext dbContext)
     : IRequestHandler<GetProductsByCategoryQuery, List<ProductDTO>>

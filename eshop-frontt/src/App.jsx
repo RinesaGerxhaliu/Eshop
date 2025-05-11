@@ -10,7 +10,7 @@ import UserProfile from './Views/Pages/UserProfile';
 import ShoppingCartPage from './Views/Pages/ShoppingCart';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import Dashboard from './Views/Pages/AdminDashboard';
-import PrivateRoute from './Components/PrivateRoute'; // përdor vetëm këtë
+import PrivateRoute from './Components/PrivateRoute'; 
 import Shop from './Views/Pages/Shop';
 import ProductDetails from './Views/Pages/ProductDetails';
 import Sidebar from './Views/Pages/Sidebar';

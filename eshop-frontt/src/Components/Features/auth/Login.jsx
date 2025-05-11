@@ -4,11 +4,11 @@ import { useAuth } from '../../../contexts/AuthContext';
 import '../../../assets/styles/login.css';
 
 function Login() {
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors]     = useState({});
-  const navigate                = useNavigate();
-  const { login }               = useAuth();
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const validate = () => {
     const newErrors = {};
@@ -31,17 +31,17 @@ function Login() {
     params.append('username', email);
     params.append('password', password);
 
-    const clientId     = 'myclient';
-    const clientSecret = '2074z6OvXFRgqjFCdSPAtNQ7F92Wpn2L';
-    const basic        = btoa(`${clientId}:${clientSecret}`);
+    const clientId = 'myclient';
+    const clientSecret = 'VvZg6mZTpji9AQNRwwQLPalqWR015c7q';
+    const basic = btoa(`${clientId}:${clientSecret}`);
 
     try {
       const response = await fetch(
         'http://localhost:9090/realms/myrealm/protocol/openid-connect/token',
         {
-          method:  'POST',
+          method: 'POST',
           headers: {
-            'Content-Type':  'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': `Basic ${basic}`,
           },
           body: params.toString(),
@@ -65,55 +65,73 @@ function Login() {
     }
   };
 
+  // Funksioni për kthimin në homepage
+  const handleGoHome = () => {
+    navigate('/homepage');
+  };
+
   return (
     <div className="login-page">
       <div className="login-form">
-        <h2>Sign in</h2>
-        <form onSubmit={handleLogin}>
-          {errors.general && <div className="error-message">{errors.general}</div>}
+        <div className="login-form-inner">
+          <h2>Sign in</h2>
+          <form onSubmit={handleLogin}>
+            {errors.general && <div className="error-message">{errors.general}</div>}
 
-          <label>Email Address *</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="Enter email"
-          />
-          {errors.email && <div className="error-message">{errors.email}</div>}
+            <label>Email Address *</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Enter email"
+            />
+            {errors.email && <div className="error-message">{errors.email}</div>}
 
-          <label>Password *</label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="Enter password"
-          />
-          {errors.password && <div className="error-message">{errors.password}</div>}
+            <label>Password *</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Enter password"
+            />
+            {errors.password && <div className="error-message">{errors.password}</div>}
 
-          <button type="submit">Sign in</button>
+            <button type="submit">Sign in</button>
 
-          <div className="login-links" style={{ textAlign: 'center', marginTop: '10px' }}>
-            <a
-              href="#"
-              onClick={() => navigate('/forgot-password')}
-              className="link-text"
-            >
-              Forgot Password?
-            </a>
-            <br />
-            <a
-              href="#"
-              onClick={() => navigate('/register')}
-              className="link-text"
-            >
-              Don't have an account yet? Create Account
-            </a>
-          </div>
-        </form>
+            <div className="login-links" style={{ textAlign: 'center', marginTop: '10px' }}>
+              <a
+                href="#"
+                onClick={() => navigate('/forgot-password')}
+                className="link-text"
+              >
+                Forgot Password?
+              </a>
+              <br />
+              <a
+                href="#"
+                onClick={() => navigate('/register')}
+                className="link-text"
+              >
+                Don't have an account yet? Create Account
+              </a>
+              <br />
+              <a
+                href="#"
+                onClick={() => navigate('/homapage')}
+                className="link-textt"
+              >
+                Go to Home
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
+
       <div className="login-image"></div>
+
+     
     </div>
   );
 }
 
-export default Login; 
+export default Login;

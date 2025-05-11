@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../../Styles/ProductDetails.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
-import ProductReviews from "./ProductReviews";
-import axios from 'axios';
+import ProductReviews from "./ProductReviews"; // kjo mund të hiqet për admin
+import { useAuth } from "../../contexts/AuthContext"; // për të marrë rolet
+import axios from "axios";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { convert, format } = useCurrency();
+  const { roles } = useAuth(); // Përdorim rolet për të kontrolluar nëse është admin
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,50 +69,60 @@ const ProductDetails = () => {
   const handleAddToCart = async (e) => {
     e.preventDefault();
     setIsAdding(true);
-    
+
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://localhost:5050/basket/${localStorage.getItem("username")}/items`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ShoppingCartItem: {
-            ProductId: product.id,
-            Quantity: quantity,
-            Color: "Red",  // Adjust based on user selection
-            Price: product.price,
-            ProductName: product.name,
-          },
-        }),
-      });
-  
-      if (response.status === 401) {
-        const newToken = await refreshToken();
-        localStorage.setItem("token", newToken);
-        
-        const retryResponse = await fetch(`https://localhost:5050/basket/${localStorage.getItem("username")}/items`, {
+      const response = await fetch(
+        `https://localhost:5050/basket/${localStorage.getItem(
+          "username"
+        )}/items`,
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${newToken}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             ShoppingCartItem: {
               ProductId: product.id,
               Quantity: quantity,
-              Color: "Red",
+              Color: "Red", // Adjust based on user selection
               Price: product.price,
               ProductName: product.name,
             },
           }),
-        });
-  
+        }
+      );
+
+      if (response.status === 401) {
+        const newToken = await refreshToken();
+        localStorage.setItem("token", newToken);
+
+        const retryResponse = await fetch(
+          `https://localhost:5050/basket/${localStorage.getItem(
+            "username"
+          )}/items`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${newToken}`,
+            },
+            body: JSON.stringify({
+              ShoppingCartItem: {
+                ProductId: product.id,
+                Quantity: quantity,
+                Color: "Red",
+                Price: product.price,
+                ProductName: product.name,
+              },
+            }),
+          }
+        );
+
         if (!retryResponse.ok) throw new Error("Failed to add item to cart.");
       }
-  
+
       setIsAdded(true);
     } catch (err) {
       console.error("Add to cart failed:", err);
@@ -118,7 +130,6 @@ const ProductDetails = () => {
       setIsAdding(false);
     }
   };
-  
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -173,7 +184,7 @@ const ProductDetails = () => {
       setTimeout(() => {
         setIsReviewModalOpen(false);
         setReviewSuccess("");
-      }, 2000); 
+      }, 2000);
     } catch (err) {
       setReviewError(err.message || "An error occurred");
     }
@@ -185,6 +196,8 @@ const ProductDetails = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
+
+  const isAdmin = roles.some((role) => role.toLowerCase() === "admin");
 
   return (
     <div className="container-product">
@@ -211,50 +224,59 @@ const ProductDetails = () => {
                 Review: ★★★★☆ ({product.reviews} Reviews)
               </div>
 
-              <form onSubmit={handleAddToCart}>
-                <div className="product-options">
-                  <div className="quantity-cart-row">
-                    <div className="quantity">
-                      <button
-                        type="button"
-                        className="qty-btn"
-                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      >
-                        –
-                      </button>
-                      <span className="qty-value">{quantity}</span>
-                      <button
-                        type="button"
-                        className="qty-btn"
-                        onClick={() => setQuantity((q) => q + 1)}
-                      >
-                        +
+              {!isAdmin && (
+                <form onSubmit={handleAddToCart}>
+                  <div className="product-options">
+                    <div className="quantity-cart-row">
+                      <div className="quantity">
+                        <button
+                          type="button"
+                          className="qty-btn"
+                          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        >
+                          –
+                        </button>
+                        <span className="qty-value">{quantity}</span>
+                        <button
+                          type="button"
+                          className="qty-btn"
+                          onClick={() => setQuantity((q) => q + 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <button className="add-to-cart" type="submit">
+                        {isAdding
+                          ? "Adding..."
+                          : isAdded
+                          ? "Added"
+                          : "Add to Cart"}
                       </button>
                     </div>
-                    <button
-                      className="add-to-cart"
-                      type="submit"
-                    >
-                      {isAdding ? "Adding..." : isAdded ? "Added" : "Add to Cart"}
-                    </button>
                   </div>
-                </div>
-              </form>
+                </form>
+              )}
 
-              <button
-                className="add-to-cart"
-                onClick={() => setIsReviewModalOpen(true)}
-              >
-                Leave a Review
-              </button>
+              {!isAdmin && (
+                <button
+                  className="add-to-cart"
+                  onClick={() => setIsReviewModalOpen(true)}
+                >
+                  Leave a Review
+                </button>
+              )}
 
               {isReviewModalOpen && (
                 <div className="review-modal open">
                   <div className="review-modal-content">
                     <h3>Leave a Review</h3>
 
-                    {reviewError && <p className="text-danger">{reviewError}</p>}
-                    {reviewSuccess && <p className="text-success">{reviewSuccess}</p>}
+                    {reviewError && (
+                      <p className="text-danger">{reviewError}</p>
+                    )}
+                    {reviewSuccess && (
+                      <p className="text-success">{reviewSuccess}</p>
+                    )}
 
                     <form onSubmit={handleReviewSubmit} className="review-form">
                       <div className="form-group">
@@ -264,7 +286,9 @@ const ProductDetails = () => {
                             <button
                               key={star}
                               type="button"
-                              className={`star-btn ${rating >= star ? "selected" : ""}`}
+                              className={`star-btn ${
+                                rating >= star ? "selected" : ""
+                              }`}
                               onClick={() => handleStarClick(star)}
                             >
                               ★
@@ -299,9 +323,11 @@ const ProductDetails = () => {
           </>
         )}
       </section>
-      <div className="reviews-container">
-  <ProductReviews productId={id} />
-</div>
+      {!isAdmin && (
+        <div className="reviews-container">
+          <ProductReviews productId={id} />
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { FaSort } from "react-icons/fa";
 import "../../Styles/FilterProducts.css";
 
@@ -7,8 +7,6 @@ const API = "https://localhost:5050";
 
 const FilteredProducts = () => {
   const { filterType, filterId } = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [sortOrder, setSortOrder] = useState(null);
@@ -21,6 +19,8 @@ const FilteredProducts = () => {
         url = `${API}/products/by-category/${filterId}`;
       } else if (filterType === "brand") {
         url = `${API}/products/by-brand/${filterId}`;
+      } else {
+        url = `${API}/products`;
       }
 
       if (!url) return;
@@ -35,6 +35,8 @@ const FilteredProducts = () => {
         data.sort((a, b) => a.price - b.price);
       } else if (sortOrder === "high") {
         data.sort((a, b) => b.price - a.price);
+      } else if (sortOrder === "az") {
+        data.sort((a, b) => a.name.localeCompare(b.name));
       }
 
       setProducts(data);
@@ -66,8 +68,15 @@ const FilteredProducts = () => {
         </button>
         {showSortOptions && (
           <div className="sort-options">
-            <button onClick={() => handleSortOption("low")}>Price: Low to High</button>
-            <button onClick={() => handleSortOption("high")}>Price: High to Low</button>
+            <button onClick={() => handleSortOption("low")}>
+              Price: Low to High
+            </button>
+            <button onClick={() => handleSortOption("high")}>
+              Price: High to Low
+            </button>
+            <button onClick={() => handleSortOption("az")}>
+              Products: A-Z
+            </button>
           </div>
         )}
       </div>

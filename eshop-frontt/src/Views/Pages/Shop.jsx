@@ -32,8 +32,9 @@ const Shop = () => {
   }, []);
 
   const sortedProducts = [...products].sort((a, b) => {
-    if (sortOrder === "low") return a.price - b.price;
-    if (sortOrder === "high") return b.price - a.price;
+    if (sortOrder === "low") return a.price - b.price; 
+    if (sortOrder === "high") return b.price - a.price; 
+    if (sortOrder === "az") return a.name.localeCompare(b.name);
     return 0;
   });
 
@@ -54,6 +55,7 @@ const Shop = () => {
           <div className="sort-options">
             <button onClick={() => handleSortOption("low")}>Price: Low to High</button>
             <button onClick={() => handleSortOption("high")}>Price: High to Low</button>
+            <button onClick={() => handleSortOption("az")}>Products: A-Z</button> 
           </div>
         )}
       </div>

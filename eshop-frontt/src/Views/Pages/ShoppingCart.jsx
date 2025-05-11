@@ -7,11 +7,10 @@ const ShoppingCartPage = () => {
   const { refreshAccessToken } = useAuth();
   const [cart, setCart] = useState({ items: [] });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Track loading state for cart data
-  const [imagesLoaded, setImagesLoaded] = useState(false); // Track image loading state
+  const [isLoading, setIsLoading] = useState(true); 
+  const [imagesLoaded, setImagesLoaded] = useState(false); 
   const navigate = useNavigate();
 
-  // Fetch product details (including image) for each item
   const fetchProductDetails = async (productId) => {
     try {
       const response = await fetch(
@@ -28,7 +27,6 @@ const ShoppingCartPage = () => {
     }
   };
 
-  // Fetch the shopping cart data
   const getCart = async () => {
     try {
       const username = localStorage.getItem("username");
@@ -156,7 +154,6 @@ const ShoppingCartPage = () => {
           {cart.items.map((item, idx) => (
             <li key={idx} className="cart-item">
               <div className="cart-item-image-container">
-                {/* Show placeholder if image is not loaded */}
                 {!item.imageUrl || !imagesLoaded ? (
                   <div className="image-placeholder">Loading Image...</div>
                 ) : (

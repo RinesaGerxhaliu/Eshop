@@ -10,18 +10,25 @@
         public async Task<List<ProductDTO>> Handle(GetProductsBySearchQuery q, CancellationToken ct)
         {
             var keyword = q.Query.ToLower();
+            var query = _db.Products.AsNoTracking().Include(p => p.Image)
+                .Where(p => p.Name.ToLower().Contains(keyword));  // Këtu përdorim Contains
 
-            var results = await _db.Products
-                .AsNoTracking()
-                .Include(p => p.Image) // Include image if needed
-                .Where(p => p.Name.ToLower().StartsWith(keyword)) // Use StartsWith instead of Contains
-                .OrderBy(p => p.Name)
-                .ToListAsync(ct);
+            if (q.CategoryId.HasValue)
+                query = query.Where(p => p.CategoryId == q.CategoryId);
 
-            Console.WriteLine($"Results count: {results.Count}"); // Debug to see how many products were found
+            if (q.MinPrice.HasValue)
+                query = query.Where(p => p.Price >= q.MinPrice);
 
-            // Map the results to DTO
+            if (q.MaxPrice.HasValue)
+                query = query.Where(p => p.Price <= q.MaxPrice);
+
+            if (q.BrandId.HasValue)
+                query = query.Where(p => p.BrandId == q.BrandId);
+
+            var results = await query.OrderBy(p => p.Name).ToListAsync(ct);
+
             return results.Adapt<List<ProductDTO>>();
         }
+
     }
 }
