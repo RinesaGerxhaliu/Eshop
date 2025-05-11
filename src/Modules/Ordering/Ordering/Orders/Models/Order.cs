@@ -9,6 +9,10 @@ public class Order : Aggregate<Guid>
     public Guid CustomerId { get; private set; } = default!;
     public string OrderName { get; private set; } = default!;
     public decimal TotalPrice => Items.Sum(x => x.Price * x.Quantity);
+    public string CurrencyCode { get; private set; } = "EUR";
+    public decimal ExchangeRate { get; private set; } = 1m;
+    public decimal TotalInCurrency { get; private set; }    
+
 
     public static Order Create(Guid id, Guid customerId, string orderName)
     {
@@ -22,6 +26,18 @@ public class Order : Aggregate<Guid>
         order.AddDomainEvent(new OrderCreatedEvent(order));
 
         return order;
+    }
+
+    public void ApplyCurrency(string currencyCode, decimal rate)
+    {
+        if (string.IsNullOrWhiteSpace(currencyCode))
+            throw new ArgumentNullException(nameof(currencyCode));
+        if (rate <= 0)
+            throw new ArgumentOutOfRangeException(nameof(rate));
+
+        CurrencyCode = currencyCode;
+        ExchangeRate = rate;
+        TotalInCurrency = Math.Round(TotalPrice * rate, 2);
     }
 
     public void Add(Guid productId, int quantity, decimal price)

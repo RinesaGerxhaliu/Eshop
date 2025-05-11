@@ -2,7 +2,6 @@
 global using Shared.Contracts.CQRS;
 global using Shared.Pagination;
 global using Ordering.Orders.Models;
-global using Ordering.Orders.ValueObjects;
 global using Ordering.Orders.Events;
 global using Ordering.Data;
 global using Ordering.Orders.Dtos;

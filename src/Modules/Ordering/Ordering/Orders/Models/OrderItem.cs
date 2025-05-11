@@ -13,4 +13,14 @@ public class OrderItem : Entity<Guid>
     public Guid ProductId { get; private set; } = default!;
     public int Quantity { get; internal set; } = default!;
     public decimal Price { get; private set; } = default!;
+
+    public decimal LineTotalInEur => Price * Quantity;
+    public decimal LineTotalInCurrency { get; private set; }
+    public decimal UnitPriceInCurrency { get; private set; }
+
+    internal void ApplyExchangeRate(decimal rate)
+    {
+        UnitPriceInCurrency = Math.Round(Price * rate, 2);
+        LineTotalInCurrency = Math.Round(UnitPriceInCurrency * Quantity, 2);
+    }
 }
