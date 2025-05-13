@@ -1,6 +1,6 @@
 ﻿namespace Ordering.Shippings.Models
 {
-    public class ShippingAddress : Entity<Guid>
+    public record ShippingAddress
     {
         public string Street { get; init; } = default!;
         public string City { get; init; } = default!;

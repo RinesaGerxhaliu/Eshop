@@ -8,18 +8,17 @@
 
   <ItemGroup>
     <Compile Remove="Products\Features\GetProductByCategory\**" />
+    <Compile Remove="Reviews\**" />
     <EmbeddedResource Remove="Products\Features\GetProductByCategory\**" />
+    <EmbeddedResource Remove="Reviews\**" />
     <None Remove="Products\Features\GetProductByCategory\**" />
+    <None Remove="Reviews\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj" />
     <ProjectReference Include="..\..\..\Shared\Shared\Shared.csproj" />
     <ProjectReference Include="..\Catalog.Contracts\Catalog.Contracts.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Reviews\Models\" />
   </ItemGroup>
 
 </Project>

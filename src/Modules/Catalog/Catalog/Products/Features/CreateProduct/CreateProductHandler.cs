@@ -42,7 +42,8 @@
                 dto.Description,
                 dto.Price,
                 dto.CategoryId,
-                dto.BrandId
+                dto.BrandId,
+                dto.SubcategoryId
             );
 
             return product;

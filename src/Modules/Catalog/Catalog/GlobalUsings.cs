@@ -26,3 +26,5 @@ global using Catalog.Data.Repositories;
 global using Catalog.Products.Services;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Hosting;
+global using Catalog.Wishlists.Models;
+global using Catalog.Inventories.Models;

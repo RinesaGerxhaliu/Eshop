@@ -9,5 +9,7 @@
         public string? ImageUrl { get; init; }
         public Guid CategoryId { get; init; }
         public Guid BrandId { get; init; }
+
+        public Guid? SubcategoryId { get; init; }
     }
 }

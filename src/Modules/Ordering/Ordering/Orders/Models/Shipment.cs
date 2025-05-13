@@ -15,7 +15,6 @@ namespace Ordering.Orders.Models
     {
         public Guid OrderId { get; private set; }
         public string CustomerId { get; private set; } = default!;
-        public Guid ShippingAddressId { get; private set; }
         public ShippingAddress Address { get; private set; }
         public Guid ShippingMethodId { get; private set; }
         public ShipmentStatus Status { get; private set; }
@@ -41,7 +40,6 @@ namespace Ordering.Orders.Models
                 Id = shipmentId,
                 OrderId = orderId,
                 CustomerId = customerId,
-                ShippingAddressId = address.Id,
                 Address = address,
                 ShippingMethodId = method.Id,
                 Status = ShipmentStatus.Pending,

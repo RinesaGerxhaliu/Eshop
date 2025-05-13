@@ -16,13 +16,21 @@ public class Product : Aggregate<Guid>
     // One-to-one image navigation
     public ProductImage? Image { get; private set; }
 
+    public Guid? SubcategoryId { get; private set; }
+
+    public Subcategory? Subcategory { get; private set; }
+
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? LastModifiedAt { get; protected set; }
+
     public static Product Create(
     Guid id,
     string name,
     string description,
     decimal price,
     Guid categoryId,
-    Guid brandId)
+    Guid brandId,
+    Guid? subcategoryId)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
@@ -38,15 +46,19 @@ public class Product : Aggregate<Guid>
             Description = description,
             Price = price,
             CategoryId = categoryId,
-            BrandId = brandId
+            BrandId = brandId,
+            SubcategoryId = subcategoryId,
+            CreatedAt = DateTime.UtcNow
         };
+
 
         product.AddDomainEvent(new ProductCreatedEvent(product));
 
         return product;
     }
 
-    public void Update(string name, string description, decimal price, Guid categoryId, Guid brandId)
+    public void Update(string name, string description, decimal price, Guid categoryId, Guid brandId,
+        Guid? subcategoryId)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
@@ -63,6 +75,8 @@ public class Product : Aggregate<Guid>
         Price = price;
         CategoryId = categoryId;
         BrandId = brandId;
+        SubcategoryId = subcategoryId;
+        LastModifiedAt = DateTime.UtcNow;
 
         if (oldPrice != price)
             AddDomainEvent(new ProductPriceChangedEvent(this));

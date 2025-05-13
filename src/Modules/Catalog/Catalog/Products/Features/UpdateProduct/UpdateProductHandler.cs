@@ -55,7 +55,8 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Upda
             productDTO.Description,
             productDTO.Price,
             productDTO.CategoryId,
-            productDTO.BrandId
+            productDTO.BrandId,
+            productDTO.SubcategoryId
         );
     }
 }
