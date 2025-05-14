@@ -66,70 +66,87 @@ const ProductDetails = () => {
     if (id) fetchProduct();
   }, [id]);
 
+  const checkIfCartExists = async (username, token) => {
+  const response = await fetch(`https://localhost:5050/basket/${username}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.ok;
+};
+
+
   const handleAddToCart = async (e) => {
-    e.preventDefault();
-    setIsAdding(true);
+  e.preventDefault();
+  setIsAdding(true);
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `https://localhost:5050/basket/${localStorage.getItem(
-          "username"
-        )}/items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            ShoppingCartItem: {
-              ProductId: product.id,
-              Quantity: quantity,
-              Color: "Red", // Adjust based on user selection
-              Price: product.price,
-              ProductName: product.name,
-            },
-          }),
-        }
-      );
+  try {
+    let token = localStorage.getItem("token");
+    const username = localStorage.getItem("username");
 
-      if (response.status === 401) {
-        const newToken = await refreshToken();
-        localStorage.setItem("token", newToken);
-
-        const retryResponse = await fetch(
-          `https://localhost:5050/basket/${localStorage.getItem(
-            "username"
-          )}/items`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${newToken}`,
-            },
-            body: JSON.stringify({
-              ShoppingCartItem: {
-                ProductId: product.id,
-                Quantity: quantity,
-                Color: "Red",
-                Price: product.price,
-                ProductName: product.name,
-              },
-            }),
-          }
-        );
-
-        if (!retryResponse.ok) throw new Error("Failed to add item to cart.");
-      }
-
-      setIsAdded(true);
-    } catch (err) {
-      console.error("Add to cart failed:", err);
-    } finally {
-      setIsAdding(false);
+    if (!username || !token) {
+      throw new Error("Not logged in.");
     }
-  };
+
+    const cartExists = await checkIfCartExists(username, token);
+
+    const itemPayload = {
+      ProductId: product.id,
+      Quantity: quantity,
+      Color: "",
+      Price: product.price,
+      ProductName: product.name,
+    };
+
+    const url = cartExists
+      ? `https://localhost:5050/basket/${username}/items`
+      : `https://localhost:5050/basket`;
+
+    const body = cartExists
+      ? JSON.stringify({ userName: username, ShoppingCartItem: itemPayload })
+      : JSON.stringify({
+          shoppingCart: {
+            items: [itemPayload],
+          },
+        });
+
+    let response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body,
+    });
+
+    // Handle token expiry
+    if (response.status === 401) {
+      token = await refreshToken();
+      localStorage.setItem("token", token);
+
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body,
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error("Failed to add item to cart.");
+    }
+
+    setIsAdded(true);
+  } catch (err) {
+    console.error("Add to cart failed:", err);
+  } finally {
+    setIsAdding(false);
+  }
+};
+
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
