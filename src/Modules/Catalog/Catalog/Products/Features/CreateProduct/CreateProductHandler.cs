@@ -43,7 +43,7 @@
                 dto.Price,
                 dto.CategoryId,
                 dto.BrandId,
-                dto.SubcategoryId
+                dto.SubcategoryId == Guid.Empty ? null : dto.SubcategoryId
             );
 
             return product;

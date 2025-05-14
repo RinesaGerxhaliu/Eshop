@@ -15,9 +15,9 @@ const FilteredProducts = () => {
     try {
       let url = "";
 
-      if (filterType === "category") {
+      if (filterType === "by-category") {
         url = `${API}/products/by-category/${filterId}`;
-      } else if (filterType === "brand") {
+      } else if (filterType === "by-brand") {
         url = `${API}/products/by-brand/${filterId}`;
       } else {
         url = `${API}/products`;

@@ -47,30 +47,35 @@ const Homepage = () => {
           </div>
         </section>
 
-      <section className="product-section">
-            <h2>Popular Products</h2>
-          {errorMsg && (
-            <div style={{ color: 'red', marginBottom: '1rem' }}>
-              Error loading products: {errorMsg}
-            </div>
-          )}
-          <div className="product-grid">
-            {products.map(prod => (
-          <ProductCard
-          key={prod.id}
-          id={prod.id}
-          name={prod.name}
-          description={prod.description}
-          price={prod.price}
-          imageUrl={prod.imageUrl}
-          reviews={prod.reviews}
-        />
-        
-            ))}
-          </div>
-      </section>
-        
-          {/* Benefit Section */}
+        {/* 
+<section className="product-section">
+  <h2>Popular Products</h2>
+
+  {errorMsg && (
+    <div style={{ color: 'red', marginBottom: '1rem' }}>
+      Error loading products: {errorMsg}
+    </div>
+  )}
+
+  <div className="product-grid">
+    {products.map(prod => (
+      <ProductCard
+        key={prod.id}
+        id={prod.id}
+        name={prod.name}
+        description={prod.description}
+        price={prod.price}
+        imageUrl={prod.imageUrl}
+        reviews={prod.reviews}
+      />
+    ))}
+  </div>
+</section>
+*/}
+
+
+
+        {/* Benefit Section */}
         <div className="benefit-container">
           <div className="benefit-left">
             <div className="photo-wrapper">
@@ -80,20 +85,20 @@ const Homepage = () => {
           </div>
 
           <div className="benefit-right">
-            <h2 className="benefit-title">Benefit Using Our Products</h2>
+            <h2 className="benefit-title">Benefits of using our products</h2>
             <div className="benefit-grid">
               <div className="benefit-item">
                 <div className="icon">
                   <i className="fa fa-leaf" style={{ color: '#f5c99a' }}></i>
                 </div>
                 <h3>100% Natural</h3>
-                <p>It is an advanced formula designed to support your well-being with natural ingredients.</p>
+                <p>Our products offer advanced formulas designed to support your well-being with natural ingredients.</p>
               </div>
               <div className="benefit-item">
                 <div className="icon">
                   <i className="fa fa-shield-alt" style={{ color: '#f5c99a' }}></i>
                 </div>
-                <h3>No Side Effect</h3>
+                <h3>No Side Effects</h3>
                 <p>Gentle on the skin without any harsh side effects.</p>
               </div>
               <div className="benefit-item">
@@ -101,7 +106,7 @@ const Homepage = () => {
                   <i className="fa fa-smile" style={{ color: '#f5c99a' }}></i>
                 </div>
                 <h3>For all Skin Types</h3>
-                <p>Suitable for all skin types with nourishing ingredients.</p>
+                <p>Products suitable across a range of skin types.</p>
               </div>
               <div className="benefit-item">
                 <div className="icon">
@@ -143,6 +148,7 @@ const Homepage = () => {
           </div>
         </section>
 
+      {/*
         <section className="review" id="review">
           <div className="review-box">
             <h2 className="heading">
@@ -196,6 +202,7 @@ const Homepage = () => {
             </div>
           </div>
         </section>
+        */}
       </div>
     </>
   );
