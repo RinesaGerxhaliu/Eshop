@@ -23,6 +23,8 @@ const ProductDetails = () => {
   const [reviewSuccess, setReviewSuccess] = useState("");
   const [reviewError, setReviewError] = useState("");
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [refreshReviewsKey, setRefreshReviewsKey] = useState(0);
+
 
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -120,7 +122,6 @@ const ProductDetails = () => {
       body,
     });
 
-    // Handle token expiry
     if (response.status === 401) {
       token = await refreshToken();
       localStorage.setItem("token", token);
@@ -201,7 +202,9 @@ const ProductDetails = () => {
       setTimeout(() => {
         setIsReviewModalOpen(false);
         setReviewSuccess("");
-      }, 2000);
+        setRefreshReviewsKey(prev => prev + 1); 
+      }, 2);
+      
     } catch (err) {
       setReviewError(err.message || "An error occurred");
     }
@@ -210,11 +213,13 @@ const ProductDetails = () => {
   const handleStarClick = (star) => {
     setRating(star);
   };
+  
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   const isAdmin = roles.some((role) => role.toLowerCase() === "admin");
+  
 
   return (
     <div className="container-product">
@@ -342,7 +347,8 @@ const ProductDetails = () => {
       </section>
       {!isAdmin && (
         <div className="reviews-container">
-          <ProductReviews productId={id} />
+          <ProductReviews key={refreshReviewsKey} productId={id} />
+
         </div>
       )}
     </div>

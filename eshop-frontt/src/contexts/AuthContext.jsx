@@ -1,30 +1,30 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
+
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-  const [username, setUsername] = useState(
-    localStorage.getItem("username") || ""
-  );
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
   const [userId, setUserId] = useState(localStorage.getItem("userId") || "");
-  const [roles, setRoles] = useState(
-    JSON.parse(localStorage.getItem("roles")) || []
-  );
+  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem("roles")) || []);
+
+  const parseJwt = (token) => {
+    try {
+      return JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
+      return null;
+    }
+  };
 
   const login = (accessToken, refreshToken, userData) => {
-    console.log("Keycloak Full Response:", userData);
-
     const parsedToken = parseJwt(accessToken);
-    const usernameFromToken =
-      parsedToken?.preferred_username || parsedToken?.sub;
+    const usernameFromToken = parsedToken?.preferred_username || parsedToken?.sub;
     const userIdFromToken = parsedToken?.sub;
     const rolesFromToken = parsedToken?.resource_access?.myclient?.roles || [];
-
-    console.log("Username:", usernameFromToken);
-    console.log("User ID:", userIdFromToken);
-    console.log("Roles:", rolesFromToken);
 
     localStorage.setItem("token", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
@@ -49,40 +49,32 @@ export const AuthProvider = ({ children }) => {
     setUserId("");
     setRoles([]);
     setIsLoggedIn(false);
+
+    navigate("/login");
   };
 
-  const parseJwt = (token) => {
-    try {
-      return JSON.parse(atob(token.split(".")[1]));
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const refreshAccessToken = async () => {
+  const refreshAccessToken = useCallback(async () => {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) {
       logout();
-      window.location.replace("/login");  // Use replace instead of href for a cleaner redirect
       return;
     }
-  
+
     const parsedRefreshToken = parseJwt(refreshToken);
     const currentTime = Date.now() / 1000;
-  
+
     if (!parsedRefreshToken || parsedRefreshToken.exp < currentTime) {
       console.log("Refresh token expired, logging out...");
       logout();
-      window.location.replace("/login");  // Use replace instead of href
       return;
     }
-  
+
     const params = new URLSearchParams();
     params.append("grant_type", "refresh_token");
     params.append("client_id", "myclient");
     params.append("refresh_token", refreshToken);
     params.append("client_secret", "2074z6OvXFRgqjFCdSPAtNQ7F92Wpn2L");
-  
+
     try {
       const response = await fetch(
         "http://localhost:9090/realms/myrealm/protocol/openid-connect/token",
@@ -94,21 +86,50 @@ export const AuthProvider = ({ children }) => {
           body: params,
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
         login(data.access_token, data.refresh_token, username);
       } else {
-        logout();
-        window.location.replace("/login");  // Ensure the redirect happens here as well
+        const errorText = await response.text();
+        console.error("Failed to refresh token:", errorText);
       }
     } catch (error) {
-      console.error("Error refreshing token:", error);
-      logout();
-      window.location.replace("/login");  // Ensure the redirect happens here as well
+      console.error("Error during token refresh:", error);
     }
-  };
-  
+  }, [username]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!token || !refreshToken) return;
+
+    const parsedToken = parseJwt(token);
+    const parsedRefreshToken = parseJwt(refreshToken);
+
+    if (!parsedToken || !parsedRefreshToken) return;
+
+    const tokenExpiresIn = parsedToken.exp - Date.now() / 1000;
+    const refreshExpiresIn = parsedRefreshToken.exp - Date.now() / 1000;
+
+    const refreshTime = (tokenExpiresIn - 60) * 1000; 
+    const logoutTime = (refreshExpiresIn - 10) * 1000; 
+
+    const refreshTimeout = setTimeout(() => {
+      refreshAccessToken();
+    }, refreshTime);
+
+    const logoutTimeout = setTimeout(() => {
+      console.log("Refresh token expired. Logging out...");
+      logout();
+    }, logoutTime);
+
+    return () => {
+      clearTimeout(refreshTimeout);
+      clearTimeout(logoutTimeout);
+    };
+  }, [refreshAccessToken]);
 
   return (
     <AuthContext.Provider

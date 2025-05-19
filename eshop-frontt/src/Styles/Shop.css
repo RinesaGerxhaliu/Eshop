@@ -1,3 +1,4 @@
+
 .product-section {
   padding: 40px;
   background-color: #f9f9f9;
@@ -11,6 +12,51 @@
 .sort-button-container{
 margin-top: 35px !important;
 }
+.pagination {
+  max-width: 400px;
+  margin: 24px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  background: #fff5f8;
+  padding: 10px 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(232, 62, 140, 0.3);
+  z-index: 500;
+  gap: 6px; 
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 10px;
+  gap: 10px;
+}
+
+.pagination-info {
+  font-size: 0.85rem;
+  color: #333;
+  user-select: none;
+}
+
+.pagination button:disabled {
+  background-color: #f8d7e9;
+  color: #d6336c;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #d6336c;
+}
+
+.pagination span {
+  font-size: 0.85rem;
+  color: #333;
+  user-select: none;
+}
+
 
 .product-card {
   background-color: #fff;

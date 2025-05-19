@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import DeleteReviewModal from './DeleteReviewModal';
-import EditReview from './EditReview';
-import axios from 'axios';
-import '../../Styles/ProductReviews.css';
-const API = 'https://localhost:5050';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import DeleteReviewModal from "./DeleteReviewModal";
+import EditReview from "./EditReview";
+import axios from "axios";
+import "../../Styles/ProductReviews.css";
+const API = "https://localhost:5050";
 
 const ProductReviews = () => {
   const { id } = useParams();
   const [reviews, setReviews] = useState([]);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -26,20 +26,21 @@ const ProductReviews = () => {
   };
 
   const handleReviewDelete = (reviewId) => {
-    setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
-    setShowModal(false);
+    setReviews((prevReviews) =>
+      prevReviews.filter((review) => review.id !== reviewId)
+    );
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decoded = JSON.parse(atob(token.split('.')[1]));
+        const decoded = JSON.parse(atob(token.split(".")[1]));
         const userId = decoded.sub;
         setCurrentUserId(userId);
-        localStorage.setItem('userId', userId);
+        localStorage.setItem("userId", userId);
       } catch (err) {
-        console.error('❌ Error decoding token:', err);
+        console.error("❌ Error decoding token:", err);
         setCurrentUserId(null);
       }
     }
@@ -47,7 +48,7 @@ const ProductReviews = () => {
 
   useEffect(() => {
     fetch(`${API}/products/${id}/reviews`, {
-      mode: 'cors',
+      mode: "cors",
     })
       .then((res) => {
         if (res.status === 204) return [];
@@ -74,15 +75,20 @@ const ProductReviews = () => {
   const sortedReviews = [...reviews].sort((a, b) => b.id - a.id);
   const visibleReviews = showAll ? sortedReviews : sortedReviews.slice(0, 5);
   const formatDate = (date) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
-    return new Date(date).toLocaleDateString('en-US', options);
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    };
+    return new Date(date).toLocaleDateString("en-US", options);
   };
 
   return (
     <div>
-      <h3 className="product-reviews-title">
-        Product Reviews
-      </h3>
+      <h3 className="product-reviews-title">Product Reviews</h3>
 
       <ul>
         {visibleReviews.map((review) => {
@@ -92,13 +98,15 @@ const ProductReviews = () => {
             <li key={review.id} className="mb-3">
               <div className="review-text-block">
                 <div className="review-content">
-                  <span className="reviewer-name">{review.reviewerUserName}</span>
+                  <span className="reviewer-name">
+                    {review.reviewerUserName}
+                  </span>
 
                   <div className="review-stars">
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={i}
-                        className={`star ${i < review.rating ? 'filled' : ''}`}
+                        className={`star ${i < review.rating ? "filled" : ""}`}
                       >
                         ★
                       </span>
@@ -125,14 +133,14 @@ const ProductReviews = () => {
                     <FaEdit
                       size={20}
                       color="#6c757d"
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       title="Edit Review"
                       onClick={() => setEditingReviewId(review.id)}
                     />
                     <FaTrashAlt
                       size={20}
                       color="#6c757d"
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       title="Delete Review"
                       onClick={() => {
                         setReviewToDelete(review.id);
@@ -141,7 +149,6 @@ const ProductReviews = () => {
                     />
                   </div>
                 )}
-
               </div>
             </li>
           );
@@ -152,9 +159,9 @@ const ProductReviews = () => {
         <div
           className="load-more-btn"
           onClick={() => setShowAll((prev) => !prev)}
-          title={showAll ? 'Show Less' : 'Show More'}
+          title={showAll ? "Show Less" : "Show More"}
         >
-          {showAll ? 'Show Less' : 'Load More'}
+          {showAll ? "Show Less" : "Load More"}
         </div>
       )}
 
@@ -162,7 +169,7 @@ const ProductReviews = () => {
         showModal={showModal}
         setShowModal={setShowModal}
         reviewId={reviewToDelete}
-        onDelete={handleReviewDelete}
+        onDeleteSuccess={handleReviewDelete}
       />
     </div>
   );
