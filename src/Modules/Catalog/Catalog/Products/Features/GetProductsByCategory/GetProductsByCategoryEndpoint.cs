@@ -1,4 +1,4 @@
-﻿using Catalog.Categories.Features.GetProductsByCategory;
+﻿using Catalog.Products.Features.GetProductsByCategory;
 
 public class GetProductsByCategoryEndpoint : ICarterModule
 {

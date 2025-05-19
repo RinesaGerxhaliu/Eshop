@@ -1,4 +1,4 @@
-﻿namespace Catalog.Categories.Features.GetProductsByCategory;
+﻿namespace Catalog.Products.Features.GetProductsByCategory;
 
 internal class GetProductsByCategoryQueryHandler(CatalogDbContext dbContext)
     : IRequestHandler<GetProductsByCategoryQuery, List<ProductDTO>>

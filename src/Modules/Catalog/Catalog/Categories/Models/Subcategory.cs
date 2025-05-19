@@ -12,10 +12,19 @@
             CategoryId = categoryId;
         }
 
-        internal void Update(string newName)
+        internal void Update(
+        string newName,
+        Guid newCategoryId)
         {
-            Name = newName ?? throw new ArgumentNullException(nameof(newName));
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new ArgumentNullException(nameof(newName));
+            if (newCategoryId == Guid.Empty)
+                throw new ArgumentException("CategoryId must be a valid GUID", nameof(newCategoryId));
+
+            Name = newName;
+            CategoryId = newCategoryId;
         }
+
     }
 
 }
