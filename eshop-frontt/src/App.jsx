@@ -20,11 +20,9 @@ import ProductSearchResults from './Components/UI/ProductSearchResults '
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <CurrencyProvider>
-          <AppContent />
-        </CurrencyProvider>
-      </AuthProvider>
+      <CurrencyProvider>
+        <AppContent />
+      </CurrencyProvider>
     </Router>
   );
 }
@@ -33,13 +31,12 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const [sortByPrice, setSortByPrice] = useState(null);
-
   const isAdminDashboard = location.pathname.startsWith('/admin-dashboard');
   const hideNavbarRoutes = ['/login', '/register'];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
-    <>
+    <AuthProvider> 
       {!shouldHideNavbar && (
         <Navbar onSidebarToggle={() => setSidebarOpen(!sidebarOpen)} />
       )}
@@ -76,8 +73,9 @@ function AppContent() {
           setSortByPrice={setSortByPrice}
         />
       )}
-    </>
+    </AuthProvider>
   );
 }
+
 
 export default App;

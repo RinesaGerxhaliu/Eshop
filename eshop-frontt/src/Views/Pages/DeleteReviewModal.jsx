@@ -1,30 +1,35 @@
-import React, { useState } from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import '../../Styles/DeleteReviewModal.css'
+import React, { useState } from "react";
+import { Modal, Button } from "react-bootstrap";
+import "../../Styles/DeleteReviewModal.css";
 
-const DeleteReviewModal = ({ showModal, setShowModal, reviewId, productId }) => {
-  const [errorMsg, setErrorMsg] = useState('');
+const DeleteReviewModal = ({
+  showModal,
+  setShowModal,
+  reviewId,
+  productId,
+  onDeleteSuccess,
+}) => {
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleDelete = () => {
     fetch(`https://localhost:5050/products/reviews/${reviewId}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
       .then((res) => {
         if (res.ok) {
-          // If deleted successfully, close the modal and perform any other logic
           setShowModal(false);
-          alert('Review deleted successfully!');
-          // Optionally, you can trigger a fetch to update the reviews in ProductReviews
+          setErrorMsg("Review deleted successfully!");
+          if (onDeleteSuccess) onDeleteSuccess(reviewId);
         } else {
-          setErrorMsg('Failed to delete the review.');
+          setErrorMsg("Failed to delete the review.");
         }
       })
       .catch((err) => {
-        setErrorMsg('An error occurred. Please try again.');
-        console.error('❌ Error deleting review:', err);
+        setErrorMsg("An error occurred. Please try again.");
+        console.error("❌ Error deleting review:", err);
       });
   };
 
@@ -35,16 +40,10 @@ const DeleteReviewModal = ({ showModal, setShowModal, reviewId, productId }) => 
       </Modal.Header>
       <Modal.Body>Are you sure you want to delete this review?</Modal.Body>
       <Modal.Footer>
-        <Button 
-          variant="secondary" 
-          onClick={() => setShowModal(false)}
-        >
+        <Button variant="secondary" onClick={() => setShowModal(false)}>
           Cancel
         </Button>
-        <Button 
-          variant="danger" 
-          onClick={handleDelete}
-        >
+        <Button variant="danger" onClick={handleDelete}>
           Delete
         </Button>
       </Modal.Footer>

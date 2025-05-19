@@ -12,32 +12,43 @@ const Shop = () => {
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [sortOrder, setSortOrder] = useState(null);
 
+  const [pageIndex, setPageIndex] = useState(0);
+  const PAGE_SIZE = 8;
+  const [totalCount, setTotalCount] = useState(0);
+
   useEffect(() => {
-    fetch(`${API}/products?PageIndex=0&PageSize=12`, { mode: "cors" })
+    const params = new URLSearchParams({
+      PageIndex: pageIndex,
+      PageSize: PAGE_SIZE,
+    });
+
+    fetch(`${API}/products?${params.toString()}`, { mode: "cors" })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        if (data.products?.data) {
-          setProducts(data.products.data);
-        } else {
-          throw new Error("Unexpected response shape");
-        }
+        const items = data.products?.data || [];
+        setProducts(items);
+
+        const count =
+          data.products?.count ?? data.products?.totalItems ?? items.length;
+        setTotalCount(count);
       })
       .catch((err) => {
         console.error("Fetch error:", err);
         setErrorMsg(err.message);
       });
-  }, []);
+  }, [pageIndex]);
 
   const sortedProducts = [...products].sort((a, b) => {
-    if (sortOrder === "low") return a.price - b.price; 
-    if (sortOrder === "high") return b.price - a.price; 
+    if (sortOrder === "low") return a.price - b.price;
+    if (sortOrder === "high") return b.price - a.price;
     if (sortOrder === "az") return a.name.localeCompare(b.name);
     return 0;
   });
 
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   const handleSortClick = () => setShowSortOptions(!showSortOptions);
   const handleSortOption = (option) => {
     setSortOrder(option);
@@ -53,9 +64,15 @@ const Shop = () => {
         </button>
         {showSortOptions && (
           <div className="sort-options">
-            <button onClick={() => handleSortOption("low")}>Price: Low to High</button>
-            <button onClick={() => handleSortOption("high")}>Price: High to Low</button>
-            <button onClick={() => handleSortOption("az")}>Products: A-Z</button> 
+            <button onClick={() => handleSortOption("low")}>
+              Price: Low to High
+            </button>
+            <button onClick={() => handleSortOption("high")}>
+              Price: High to Low
+            </button>
+            <button onClick={() => handleSortOption("az")}>
+              Products: A-Z
+            </button>
           </div>
         )}
       </div>
@@ -78,6 +95,26 @@ const Shop = () => {
             reviews={prod.reviews}
           />
         ))}
+      </div>
+      <div className="pagination">
+        <div className="pagination-buttons">
+          <button
+            onClick={() => setPageIndex((i) => Math.max(i - 1, 0))}
+            disabled={pageIndex === 0}
+          >
+            ← Prev
+          </button>
+
+          <button
+            onClick={() => setPageIndex((i) => Math.min(i + 1, totalPages - 1))}
+            disabled={pageIndex + 1 >= totalPages}
+          >
+            Next →
+          </button>
+        </div>
+        <div className="pagination-info">
+          Page {pageIndex + 1} of {totalPages}
+        </div>
       </div>
     </section>
   );
