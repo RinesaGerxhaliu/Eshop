@@ -1,3 +1,5 @@
+using Catalog.Wishlists.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 MapsterConfig.RegisterMappings();
@@ -17,6 +19,7 @@ builder.Services.AddScoped<IClaimsTransformation, KeycloakRolesClaimsTransformat
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
+builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
 builder.Services.AddScoped<IDataSeeder, CatalogDataSeeder>();
 
 builder.Services.Configure<KeycloakSettings>(
