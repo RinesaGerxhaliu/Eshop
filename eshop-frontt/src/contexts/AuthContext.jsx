@@ -44,13 +44,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("username");
     localStorage.removeItem("userId");
     localStorage.removeItem("roles");
-
+  
     setUsername("");
     setUserId("");
     setRoles([]);
     setIsLoggedIn(false);
-
-    navigate("/login");
+  
+    setTimeout(() => {
+      navigate("/login");
+    }, 70); 
   };
 
   const refreshAccessToken = useCallback(async () => {
@@ -73,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     params.append("grant_type", "refresh_token");
     params.append("client_id", "myclient");
     params.append("refresh_token", refreshToken);
-    params.append("client_secret", "2074z6OvXFRgqjFCdSPAtNQ7F92Wpn2L");
+  
 
     try {
       const response = await fetch(

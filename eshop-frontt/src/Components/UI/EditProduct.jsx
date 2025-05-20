@@ -18,22 +18,26 @@ export default function EditProduct({
         price: '',
         description: '',
         categoryId: '',
+        subcategoryId: '',
         brandId: '',
     });
+    const [subcategories, setSubcategories] = useState([]);
+    const [loadingSubcategories, setLoadingSubcategories] = useState(false);
+    const [subcategoriesError, setSubcategoriesError] = useState(null);
+
     const [imageFile, setImageFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const { convert, format } = useCurrency();
 
+    // Kur hapet modal ose ndryshon produkti, vendos të dhënat në form
     useEffect(() => {
         if (isOpen && product) {
             setForm({
                 name: product.name || '',
-                
-                price: product.price != null
-                    ? format(convert(product.price))
-                    : '',
+                price: product.price != null ? format(convert(product.price)) : '',
                 description: product.description || '',
                 categoryId: product.categoryId || '',
+                subcategoryId: product.subcategoryId || '',
                 brandId: product.brandId || '',
             });
             setPreviewUrl(
@@ -44,6 +48,34 @@ export default function EditProduct({
             setImageFile(null);
         }
     }, [isOpen, product, convert, format]);
+
+    // Kur ndryshon categoryId, ngarko nënkategoritë e tij
+    useEffect(() => {
+        if (form.categoryId) {
+            setLoadingSubcategories(true);
+            setSubcategoriesError(null);
+            setSubcategories([]);
+            setForm(f => ({ ...f, subcategoryId: '' })); // pastro subcategoryId
+
+            fetch(`${BASE}/categories/${form.categoryId}/subcategories`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to load subcategories');
+                    return res.json();
+                })
+                .then(data => {
+                    setSubcategories(data.subcategories?.data || []);
+                    setLoadingSubcategories(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setSubcategoriesError('Error loading subcategories');
+                    setLoadingSubcategories(false);
+                });
+        } else {
+            setSubcategories([]);
+            setForm(f => ({ ...f, subcategoryId: '' }));
+        }
+    }, [form.categoryId]);
 
     const handleChange = e => {
         let { name, value } = e.target;
@@ -65,19 +97,18 @@ export default function EditProduct({
 
     const handleSubmit = async e => {
         e.preventDefault();
-        
-        if (!form.name || !form.price || !form.categoryId || !form.brandId) {
-            return onError('Name, price, category & brand are required');
+
+        if (!form.name || !form.price || !form.categoryId || !form.subcategoryId || !form.brandId) {
+            return onError('Name, price, category, subcategory & brand are required');
         }
 
         try {
             let raw = form.price
                 .replace(/[^0-9\.,]/g, '')
-                .replace(',', '.');          
-            const conversionRate = convert(1);    
+                .replace(',', '.');
+            const conversionRate = convert(1);
             const basePrice = parseFloat(raw) / conversionRate;
 
-            
             const updateRes = await fetch(`${BASE}/products`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -88,7 +119,8 @@ export default function EditProduct({
                         Price: basePrice,
                         Description: form.description || null,
                         CategoryId: form.categoryId,
-                        BrandId: form.brandId
+                        SubcategoryId: form.subcategoryId,
+                        BrandId: form.brandId,
                     }
                 })
             });
@@ -119,8 +151,6 @@ export default function EditProduct({
 
     if (!isOpen || !product) return null;
 
-
-
     return (
         <div className="review-modal open" onClick={onClose}>
             <div className="review-modal-content" onClick={e => e.stopPropagation()}>
@@ -146,7 +176,7 @@ export default function EditProduct({
                                 <img
                                     src={
                                         previewUrl.startsWith('http') ||
-                                            previewUrl.startsWith('blob:')
+                                        previewUrl.startsWith('blob:')
                                             ? previewUrl
                                             : `${BASE}${previewUrl.startsWith('/') ? '' : '/'}${previewUrl}`
                                     }
@@ -179,7 +209,6 @@ export default function EditProduct({
                             onChange={handleChange}
                             required
                         />
-
                     </div>
 
                     <div>
@@ -205,6 +234,26 @@ export default function EditProduct({
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
                         </select>
+                    </div>
+
+                    <div>
+                        <label>Subcategory *</label>
+                        {loadingSubcategories && <p>Loading subcategories...</p>}
+                        {subcategoriesError && <p className="error">{subcategoriesError}</p>}
+                        {!loadingSubcategories && !subcategoriesError && (
+                            <select
+                                name="subcategoryId"
+                                value={form.subcategoryId}
+                                onChange={handleChange}
+                                required
+                                disabled={subcategories.length === 0}
+                            >
+                                <option value="">-- None --</option>
+                                {subcategories.map(sc => (
+                                    <option key={sc.id} value={sc.id}>{sc.name}</option>
+                                ))}
+                            </select>
+                        )}
                     </div>
 
                     <div>

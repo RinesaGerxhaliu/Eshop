@@ -15,7 +15,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    window.location.href = "/login";
+
   };
 
   const handleSearch = (e) => {
