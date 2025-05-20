@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Shared.Pagination;
+﻿using Shared.Pagination;
 using Catalog.Categories.DTOs;
 
 namespace Catalog.Categories.Features.GetCategories
@@ -19,13 +18,19 @@ namespace Catalog.Categories.Features.GetCategories
 
             var total = await query.LongCountAsync(ct);
 
-            var entities = await query
+            var dtos = await query
                 .OrderBy(c => c.Name)
                 .Skip(q.PaginationRequest.PageIndex * q.PaginationRequest.PageSize)
                 .Take(q.PaginationRequest.PageSize)
+                .Select(c => new CategoryDTO
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    // EF Core will translate this into a SQL COUNT sub‐query
+                    ProductCount = dbContext.Products
+                        .Count(p => p.CategoryId == c.Id)
+                })
                 .ToListAsync(ct);
-
-            var dtos = entities.Adapt<List<CategoryDTO>>();
 
             var page = new PaginatedResult<CategoryDTO>(
                 q.PaginationRequest.PageIndex,

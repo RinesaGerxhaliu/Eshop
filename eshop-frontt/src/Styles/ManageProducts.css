@@ -219,3 +219,9 @@
   font-size: 0.9rem;
   padding: 7px 15px;
 }
+
+.mp-table th:nth-child(3),
+.mp-table td:nth-child(3) {
+  width: 160px;
+  white-space: nowrap;
+}

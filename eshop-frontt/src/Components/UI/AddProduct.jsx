@@ -28,7 +28,7 @@ export default function AddProduct({
                 price: '',
                 description: '',
                 categoryId: '',
-                brandId: '',
+                brandId: ''
             });
             setImageFile(null);
             setPreviewUrl('');

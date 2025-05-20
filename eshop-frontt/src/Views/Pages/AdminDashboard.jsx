@@ -1,13 +1,13 @@
-// src/Components/Layout/AdminDashboard.jsx
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-
 import AdminSidebar   from '../../Components/Layout/AdminSidebar';
 import ChartComponent from '../../Components/ChartComponent';
-import ManageProducts from '../../Components/ManageProducts';  // ← make sure this path matches!
+import ManageProducts from '../../Components/ManageProducts';  
 import ManageUsers from '../../Components/ManageUsers'; 
-import ManageReviews from '../../Components/ManageReviews'; // Shtoni këtë
-import ManageBrands from '../../Components/ManageBrands'; // Shtoni këtë
+import ManageReviews from '../../Components/ManageReviews'; 
+import ManageBrands from '../../Components/ManageBrands'; 
+import ManageCategories from '../../Components/ManageCategories';
+import CategoriesList  from '../../Components/UI/CategoriesList';
+import SubcategoriesList from '../../Components/UI/SubcategoriesList';
 
 const AdminDashboard = () => {
   return (
@@ -23,14 +23,20 @@ const AdminDashboard = () => {
         }}
       >
         <Routes>
-          {/* Dashboard home at /admin */}
           <Route index element={<ChartComponent />} />
 
-          {/* Manage Products at /admin/products */}
           <Route path="manage-products" element={<ManageProducts />} />
-          <Route path="manage-users" element={<ManageUsers />} />  {/* Shtoni këtë rruge */}
+          <Route path="manage-users" element={<ManageUsers />} /> 
           <Route path="manage-reviews" element={<ManageReviews />} />
           <Route path="manage-brands" element={<ManageBrands />} />
+          <Route path="manage-categories" element={<ManageCategories />}>
+        <Route index element={<CategoriesList />} />
+
+        <Route
+          path=":categoryId/subcategories"
+          element={<SubcategoriesList />}
+        />
+      </Route>
         </Routes>
       </div>
     </div>

@@ -1,8 +1,6 @@
-//src/Components/Layout/AdminSidebar
-import React from "react";
 import { FaUserCog, FaBoxOpen, FaSignOutAlt, FaChartBar } from "react-icons/fa";
-import { MdRateReview } from "react-icons/md";
-import { MdStore } from "react-icons/md";
+import { MdRateReview, MdStore } from "react-icons/md";
+import { FaListUl } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import "./AdminSidebar.css";
@@ -37,6 +35,11 @@ const AdminSidebar = () => {
           <MdRateReview className="sidebar-icon" />
           Manage Reviews
         </li>
+        <li onClick={() => navigate("/admin-dashboard/manage-categories")}>
+          <FaListUl className="sidebar-icon" />
+          Manage Categories
+        </li>
+
 
         <li onClick={() => navigate("/admin-dashboard/manage-brands")}>
           <MdStore className="sidebar-icon" />
