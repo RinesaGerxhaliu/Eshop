@@ -4,21 +4,37 @@ using Catalog.Categories.DTOs;
 
 namespace Catalog.Categories.Features.GetCategories
 {
-    public record GetCategoriesQuery() : IQuery<GetCategoriesResult>;
+    public record GetCategoriesQuery(PaginationRequest PaginationRequest) : IQuery<GetCategoriesResult>;
 
-    public record GetCategoriesResult(List<CategoryDTO> Categories);
-
+    public record GetCategoriesResult(PaginatedResult<CategoryDTO> Categories);
 
     internal class GetCategoriesHandler(CatalogDbContext dbContext)
         : IQueryHandler<GetCategoriesQuery, GetCategoriesResult>
     {
-        public async Task<GetCategoriesResult> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
+        public async Task<GetCategoriesResult> Handle(GetCategoriesQuery q, CancellationToken ct)
         {
-            var categories = await dbContext.Categories.ToListAsync(cancellationToken);
+            var query = dbContext.Categories
+                .AsNoTracking()
+                .AsQueryable();
 
-            var categoryDtos = categories.Adapt<List<CategoryDTO>>();
+            var total = await query.LongCountAsync(ct);
 
-            return new GetCategoriesResult(categoryDtos);
+            var entities = await query
+                .OrderBy(c => c.Name)
+                .Skip(q.PaginationRequest.PageIndex * q.PaginationRequest.PageSize)
+                .Take(q.PaginationRequest.PageSize)
+                .ToListAsync(ct);
+
+            var dtos = entities.Adapt<List<CategoryDTO>>();
+
+            var page = new PaginatedResult<CategoryDTO>(
+                q.PaginationRequest.PageIndex,
+                q.PaginationRequest.PageSize,
+                total,
+                dtos
+            );
+
+            return new GetCategoriesResult(page);
         }
     }
 }

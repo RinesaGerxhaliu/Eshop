@@ -4,21 +4,39 @@ using Catalog.Brands.DTOs;
 
 namespace Catalog.Brands.Features.GetBrands
 {
-    public record GetBrandsQuery() : IQuery<GetBrandsResult>;
+    public record GetBrandsQuery(PaginationRequest PaginationRequest) : IQuery<GetBrandsResult>;
 
-    public record GetBrandsResult(List<BrandDTO> Brands);
+    public record GetBrandsResult(PaginatedResult<BrandDTO> Brands);
+
 
 
     internal class GetBrandsHandler(CatalogDbContext dbContext)
         : IQueryHandler<GetBrandsQuery, GetBrandsResult>
     {
-        public async Task<GetBrandsResult> Handle(GetBrandsQuery query, CancellationToken cancellationToken)
+        public async Task<GetBrandsResult> Handle(GetBrandsQuery q, CancellationToken ct)
         {
-            var brands = await dbContext.Brands.ToListAsync(cancellationToken);
+            var query = dbContext.Brands
+                .AsNoTracking()
+                .AsQueryable();
 
-            var brandDtos = brands.Adapt<List<BrandDTO>>();
+            var total = await query.LongCountAsync(ct);
 
-            return new GetBrandsResult(brandDtos);
+            var entities = await query
+                .OrderBy(b => b.Name)
+                .Skip(q.PaginationRequest.PageIndex * q.PaginationRequest.PageSize)
+                .Take(q.PaginationRequest.PageSize)
+                .ToListAsync(ct);
+
+            var dtos = entities.Adapt<List<BrandDTO>>();
+
+            var page = new PaginatedResult<BrandDTO>(
+                q.PaginationRequest.PageIndex,
+                q.PaginationRequest.PageSize,
+                total,
+                dtos
+            );
+
+            return new GetBrandsResult(page);
         }
     }
 }

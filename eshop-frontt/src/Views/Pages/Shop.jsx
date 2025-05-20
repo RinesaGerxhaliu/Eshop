@@ -97,7 +97,7 @@ const Shop = () => {
         ))}
       </div>
       <div className="pagination">
-        <div className="pagination-buttons">
+        <div className="pagination-buttons-grid">
           <button
             onClick={() => setPageIndex((i) => Math.max(i - 1, 0))}
             disabled={pageIndex === 0}
@@ -105,15 +105,16 @@ const Shop = () => {
             ← Prev
           </button>
 
+          <div className="pagination-info">
+            Page {pageIndex + 1} of {totalPages}
+          </div>
+
           <button
             onClick={() => setPageIndex((i) => Math.min(i + 1, totalPages - 1))}
             disabled={pageIndex + 1 >= totalPages}
           >
             Next →
           </button>
-        </div>
-        <div className="pagination-info">
-          Page {pageIndex + 1} of {totalPages}
         </div>
       </div>
     </section>

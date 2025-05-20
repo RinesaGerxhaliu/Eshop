@@ -79,18 +79,20 @@ const ProductDetails = () => {
 };
 
 
-  const handleAddToCart = async (e) => {
+const handleAddToCart = async (e) => {
   e.preventDefault();
+
+  let token = localStorage.getItem("token");
+  const username = localStorage.getItem("username");
+
+  if (!username || !token) {
+    window.location.href = "/login"; 
+    return;
+  }
+
   setIsAdding(true);
 
   try {
-    let token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
-
-    if (!username || !token) {
-      throw new Error("Not logged in.");
-    }
-
     const cartExists = await checkIfCartExists(username, token);
 
     const itemPayload = {

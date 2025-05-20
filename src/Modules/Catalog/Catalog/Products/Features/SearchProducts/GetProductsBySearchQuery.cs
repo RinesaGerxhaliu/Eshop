@@ -4,10 +4,10 @@ using Shared.Pagination;
 namespace Catalog.Products.Features.Search;
 
 public record GetProductsBySearchQuery(
-    string Query,
-    Guid? CategoryId,
-    decimal? MinPrice,
-    decimal? MaxPrice,
-    Guid? BrandId
-) : IQuery<List<ProductDTO>>;
-
+       string Query,
+       PaginationRequest PaginationRequest,
+       Guid? CategoryId = null,
+       decimal? MinPrice = null,
+       decimal? MaxPrice = null,
+       Guid? BrandId = null
+   ) : IQuery<PaginatedResult<ProductDTO>>;

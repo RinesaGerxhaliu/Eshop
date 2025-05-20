@@ -24,26 +24,36 @@ const FilteredProducts = () => {
       let url = "";
 
       if (filterType === "category") {
-        url = `${API}/products/by-category/${filterId}`;
+        url = `${API}/products/by-category/${filterId}?${params.toString()}`;
       } else if (filterType === "brand") {
-        url = `${API}/products/by-brand/${filterId}`;
+        url = `${API}/products/by-brand/${filterId}?${params.toString()}`;
+      } else {
+        setProducts([]);
+        setTotalCount(0);
+        return;
       }
-
-      if (!url) return;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch products");
 
-      let data = await response.json();
-      if (!Array.isArray(data)) data = [];
+      const data = await response.json();
 
-      setTotalCount(data.length); 
-      setProducts(data);
+      setProducts(data.items || []);
+      setTotalCount(data.totalCount || 0);
     } catch (err) {
       console.error("Error fetching products:", err);
       setProducts([]);
+      setTotalCount(0);
     }
   };
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [filterType, filterId]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [filterType, filterId, pageIndex]);
 
   const sortedProducts = [...products].sort((a, b) => {
     if (sortOrder === "low") return a.price - b.price;
@@ -54,31 +64,23 @@ const FilteredProducts = () => {
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-  const handleSortClick = () => setShowSortOptions(!showSortOptions);
-
-  const handleSortOption = (option) => {
-    setSortOrder(option);
-    setShowSortOptions(false);
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, [filterType, filterId, pageIndex]);
-
   return (
     <section className="product-section">
       <div className="sort-button-container">
-        <button className="sort-button" onClick={handleSortClick}>
+        <button className="sort-button" onClick={() => setShowSortOptions(!showSortOptions)}>
           <FaSort style={{ marginRight: "6px" }} />
           Sort
         </button>
         {showSortOptions && (
           <div className="sort-options">
-            <button onClick={() => handleSortOption("low")}>
+            <button onClick={() => { setSortOrder("low"); setShowSortOptions(false); }}>
               Price: Low to High
             </button>
-            <button onClick={() => handleSortOption("high")}>
+            <button onClick={() => { setSortOrder("high"); setShowSortOptions(false); }}>
               Price: High to Low
+            </button>
+            <button onClick={() => { setSortOrder("az"); setShowSortOptions(false); }}>
+              Products: A-Z
             </button>
           </div>
         )}
@@ -88,42 +90,38 @@ const FilteredProducts = () => {
         {sortedProducts.length > 0 ? (
           <>
             <div className="product-grid">
-              {sortedProducts
-                .slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE)
-                .map((product) => (
-                  <div key={product.id} className="product-card">
-                    <img src={`${API}${product.imageUrl}`} alt={product.name} />
-                    <h3>{product.name}</h3>
-                    <p>{product.description}</p>
-                    <div className="product-info">
-                      <p className="product-price">${product.price}</p>
-                      <Link to={`/products/${product.id}`} className="details">
-                        Details
-                      </Link>
-                    </div>
+              {sortedProducts.map((product) => (
+                <div key={product.id} className="product-card">
+                  <img src={`${API}${product.imageUrl}`} alt={product.name} />
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+                  <div className="product-info">
+                    <p className="product-price">${product.price}</p>
+                    <Link to={`/products/${product.id}`} className="details">Details</Link>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
 
             <div className="pagination">
-              <div className="pagination-buttons">
+              <div className="pagination-buttons-grid">
                 <button
                   onClick={() => setPageIndex((i) => Math.max(i - 1, 0))}
                   disabled={pageIndex === 0}
                 >
                   ← Prev
                 </button>
+
+                <div className="pagination-info">
+                  Page {pageIndex + 1} of {totalPages || 1}
+                </div>
+
                 <button
-                  onClick={() =>
-                    setPageIndex((i) => Math.min(i + 1, totalPages - 1))
-                  }
+                  onClick={() => setPageIndex((i) => Math.min(i + 1, totalPages - 1))}
                   disabled={pageIndex + 1 >= totalPages}
                 >
                   Next →
                 </button>
-              </div>
-              <div className="pagination-info">
-                Page {pageIndex + 1} of {totalPages}
               </div>
             </div>
           </>

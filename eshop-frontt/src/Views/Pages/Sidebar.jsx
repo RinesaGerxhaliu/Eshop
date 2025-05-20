@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../../Styles/sidebar.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -16,16 +16,22 @@ const Sidebar = ({ onClose }) => {
 
   useEffect(() => {
     setLoadingCats(true);
-    fetch(`${API}/categories`)
+    fetch(`${API}/categories?PageIndex=0&PageSize=20`)  // mund ta ndryshosh sipas nevojës
       .then((res) => res.json())
-      .then((data) => setCategories(data.categories || []))
+      .then((data) => {
+        // data.categories.data është array i kategorive
+        setCategories(data.categories?.data || []);
+      })
       .catch((err) => console.error("Fetch categories error:", err))
       .finally(() => setLoadingCats(false));
 
     setLoadingBrands(true);
-    fetch(`${API}/brands`)
+    fetch(`${API}/brands?PageIndex=0&PageSize=20`)
       .then((res) => res.json())
-      .then((data) => setBrands(data.brands || []))
+      .then((data) => {
+        // po ashtu brands.data është array i brendeve
+        setBrands(data.brands?.data || []);
+      })
       .catch((err) => console.error("Fetch brands error:", err))
       .finally(() => setLoadingBrands(false));
   }, []);
@@ -39,6 +45,11 @@ const Sidebar = ({ onClose }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
+
+  const handleFilterClick = (type, id) => {
+    onClose();
+    navigate(`/products/filter/${type}/${id}`);
+  };
 
   return (
     <div className="sidebar-overlay">
@@ -54,6 +65,7 @@ const Sidebar = ({ onClose }) => {
               <h3
                 className="toggle-header"
                 onClick={() => setActiveView("categories")}
+                style={{ cursor: "pointer" }}
               >
                 Categories
               </h3>
@@ -63,6 +75,7 @@ const Sidebar = ({ onClose }) => {
               <h3
                 className="toggle-header"
                 onClick={() => setActiveView("brands")}
+                style={{ cursor: "pointer" }}
               >
                 Brands
               </h3>
@@ -72,6 +85,7 @@ const Sidebar = ({ onClose }) => {
               <h3
                 className="toggle-header"
                 onClick={() => navigate("/profile")}
+                style={{ cursor: "pointer" }}
               >
                 User Profile
               </h3>
@@ -87,36 +101,25 @@ const Sidebar = ({ onClose }) => {
             <div className="sidebar-section">
               <h3 className="toggle-header">All Categories</h3>
               <ul>
-                {loadingCats
-                  ? <li>Loading categories…</li>
-                  : categories.length > 0
-                    ? categories.map(cat => (
-                      // ← REPLACE THIS:
-                      // <li key={cat.id}>
-                      //   <Link to={`/products/filter/category/${cat.id}`}>
-                      //     {cat.name}
-                      //   </Link>
-                      // </li>
-
-                      // …WITH THIS:
-                      <li
-                        key={cat.id}
-                        onClick={() => {
-                          onClose();
-                          navigate(`/products/filter/category/${cat.id}`);
-                        }}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {cat.name}
-                      </li>
-                    ))
-                    : <li>No categories available</li>
-                }
+                {loadingCats ? (
+                  <li>Loading categories…</li>
+                ) : categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <li
+                      key={cat.id}
+                      onClick={() => handleFilterClick("category", cat.id)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {cat.name}
+                    </li>
+                  ))
+                ) : (
+                  <li>No categories available</li>
+                )}
               </ul>
             </div>
           </>
         )}
-
 
         {activeView === "brands" && (
           <>
@@ -126,29 +129,25 @@ const Sidebar = ({ onClose }) => {
             <div className="sidebar-section">
               <h3 className="toggle-header">All Brands</h3>
               <ul>
-                {loadingBrands
-                  ? <li>Loading brands…</li>
-                  : brands.length > 0
-                    ? brands.map(brand => (
-                      <li
-                        key={brand.id}
-                        onClick={() => {
-                          onClose();
-                          navigate(`/products/filter/brand/${brand.id}`);
-                        }}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {brand.name}
-                      </li>
-                    ))
-                    : <li>No brands available</li>
-                }
+                {loadingBrands ? (
+                  <li>Loading brands…</li>
+                ) : brands.length > 0 ? (
+                  brands.map((brand) => (
+                    <li
+                      key={brand.id}
+                      onClick={() => handleFilterClick("brand", brand.id)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {brand.name}
+                    </li>
+                  ))
+                ) : (
+                  <li>No brands available</li>
+                )}
               </ul>
             </div>
           </>
         )}
-
-
       </div>
     </div>
   );

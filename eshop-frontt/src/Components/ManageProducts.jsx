@@ -39,21 +39,23 @@ export default function ManageProducts() {
   };
 
   useEffect(() => {
-    fetchJson(`${BASE}/categories`)
+    fetchJson(`${BASE}/categories?PageIndex=0&PageSize=100`)
       .then(data => {
-        const list = data.Categories ?? data.categories ?? [];
+        const list = data.categories?.data ?? data.Categories ?? [];
         setCategories(Array.isArray(list) ? list : []);
       })
       .catch(() => setCategories([]));
-
-    fetchJson(`${BASE}/brands`)
+  
+      fetchJson(`${BASE}/brands?PageIndex=0&PageSize=20`)
       .then(data => {
-        const list = data.Brands ?? data.brands ?? [];
+        const list = data.brands?.data ?? data.Brands ?? data.items ?? [];
         setBrands(Array.isArray(list) ? list : []);
       })
       .catch(() => setBrands([]));
+    
+  
   }, []);
-
+  
 
 
   const handleDelete = async (id) => {
