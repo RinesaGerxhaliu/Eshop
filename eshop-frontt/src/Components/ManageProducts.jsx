@@ -56,13 +56,14 @@ export default function ManageProducts() {
       })
       .catch(() => setBrands([]));
 
-    fetchJson(`${BASE}/by-subcategory?PageIndex=0&PageSize=100`)
+    fetchJson(`${BASE}/subcategories?PageIndex=0&PageSize=1000`)
       .then((data) => {
-        const list = data.subcategories?.data ?? data.Subcategories ?? [];
+        const list = data.subcategories?.data ?? data.Subcategories ?? data.items ?? [];
         setSubcategories(Array.isArray(list) ? list : []);
       })
       .catch(() => setSubcategories([]));
   }, []);
+
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this product?")) return;
@@ -126,15 +127,15 @@ export default function ManageProducts() {
       const items = Array.isArray(page?.data)
         ? page.data
         : Array.isArray(page?.items)
-        ? page.items
-        : [];
+          ? page.items
+          : [];
 
       const count =
         typeof page?.count === "number"
           ? page.count
           : typeof page?.totalItems === "number"
-          ? page.totalItems
-          : items.length;
+            ? page.totalItems
+            : items.length;
 
       setProducts(items);
       setTotalCount(count);
@@ -190,6 +191,7 @@ export default function ManageProducts() {
         brands={brands}
         subcategories={subcategories}
         onAdd={() => {
+          loadProducts();
           setPageIndex(0);
           setShowAddModal(false);
           setSuccessMsg("Product added successfully!");
@@ -197,6 +199,7 @@ export default function ManageProducts() {
         onError={(msg) => setSuccessMsg(msg)}
         onClose={() => setShowAddModal(false)}
       />
+
 
       {successMsg && <div className="mp-success">{successMsg}</div>}
 
@@ -304,8 +307,8 @@ export default function ManageProducts() {
                 <th>Name</th>
                 <th>Price</th>
                 <th>Category</th>
+                <th>Subcategory</th>
                 <th>Brand</th>
-                <th>Subcategory</th> {/* Në rendin e header */}
                 <th>Image</th>
                 <th>Actions</th>
               </tr>
@@ -325,14 +328,13 @@ export default function ManageProducts() {
                       <td>{p.name}</td>
                       <td>{format(convert(p.price))}</td>
                       <td>{cat || "–"}</td>
-                      <td>{brd || "–"}</td>
                       <td>{subcatName || "–"}</td>
+                      <td>{brd || "–"}</td>
                       <td>
                         {p.imageUrl ? (
                           <img
-                            src={`${BASE}${
-                              p.imageUrl.startsWith("/") ? "" : "/"
-                            }${p.imageUrl}`}
+                            src={`${BASE}${p.imageUrl.startsWith("/") ? "" : "/"
+                              }${p.imageUrl}`}
                             alt={p.name}
                             className="mp-image"
                           />

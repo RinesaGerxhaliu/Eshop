@@ -26,48 +26,37 @@ function Login() {
     e.preventDefault();
     if (!validate()) return;
 
-    const params = new URLSearchParams();
-    params.append('grant_type', 'password');
-    params.append('username', email);
-    params.append('password', password);
-
-    const clientId = 'myclient';
-    const clientSecret = 'VvZg6mZTpji9AQNRwwQLPalqWR015c7q';
-    const basic = btoa(`${clientId}:${clientSecret}`);
-
     try {
       const response = await fetch(
-        'http://localhost:9090/realms/myrealm/protocol/openid-connect/token',
+        'https://localhost:5050/auth/login',
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Basic ${basic}`,
+            'Content-Type': 'application/json',
           },
-          body: params.toString(),
+          body: JSON.stringify({
+            email,
+            password,
+            client_id: 'myclient'
+          }),
+          credentials: 'include'
         }
       );
 
       if (!response.ok) {
         const err = await response.json();
-        console.error('Keycloak error:', err);
         setErrors({ general: err.error_description || 'Invalid email or password' });
         return;
       }
 
       const data = await response.json();
-      login(data.access_token, data.refresh_token);
+
+      login(data.accessToken);
+
       navigate('/homepage');
-    }
-    catch (err) {
-      console.error('Network/Error:', err);
+    } catch {
       setErrors({ general: 'Something went wrong, please try again later' });
     }
-  };
-
-  // Funksioni për kthimin në homepage
-  const handleGoHome = () => {
-    navigate('/homepage');
   };
 
   return (
@@ -99,27 +88,11 @@ function Login() {
             <button type="submit">Sign in</button>
 
             <div className="login-links" style={{ textAlign: 'center', marginTop: '10px' }}>
-              <a
-                href="#"
-                onClick={() => navigate('/forgot-password')}
-                className="link-text"
-              >
-                Forgot Password?
-              </a>
-              <br />
-              <a
-                href="#"
-                onClick={() => navigate('/register')}
-                className="link-text"
-              >
+              <a href="#" onClick={() => navigate('/register')} className="link-text">
                 Don't have an account yet? Create Account
               </a>
               <br />
-              <a
-                href="#"
-                onClick={() => navigate('/homapage')}
-                className="link-textt"
-              >
+              <a href="#" onClick={() => navigate('/homepage')} className="link-textt">
                 Go to Home
               </a>
             </div>
@@ -128,8 +101,6 @@ function Login() {
       </div>
 
       <div className="login-image"></div>
-
-     
     </div>
   );
 }

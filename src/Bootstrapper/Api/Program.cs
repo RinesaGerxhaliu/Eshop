@@ -1,4 +1,6 @@
 using Catalog.Wishlists.Repositories;
+using MediatR;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +12,11 @@ builder.Host.UseSerilog((context, config) =>
 var catalogAssembly = typeof(CatalogModule).Assembly;
 var basketAssembly = typeof(BasketModule).Assembly;
 var orderingAssembly = typeof(OrderingModule).Assembly;
-var authAssembly = typeof(AuthModule).Assembly;
+var apiAssembly = typeof(LoginUserHandler).Assembly;
+// This always gets the Api project's assembly
 
-builder.Services.AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, authAssembly);
-builder.Services.AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly);
+builder.Services.AddCarterWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, apiAssembly);
+builder.Services.AddMediatRWithAssemblies(catalogAssembly, basketAssembly, orderingAssembly, apiAssembly);
 builder.Services.AddScoped<IClaimsTransformation, KeycloakRolesClaimsTransformation>();
 
 
@@ -21,6 +24,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
 builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
 builder.Services.AddScoped<IDataSeeder, CatalogDataSeeder>();
+builder.Services.AddScoped<IRequestHandler<LoginUserCommand, LoginResult>, LoginUserHandler>();
+
 
 builder.Services.Configure<KeycloakSettings>(
     builder.Configuration.GetSection("Keycloak"));
@@ -54,9 +59,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("https://localhost:3000")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 

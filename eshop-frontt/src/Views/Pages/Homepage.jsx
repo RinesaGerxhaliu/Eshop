@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import '../../Styles/Homepage.css';
 import ProductCard from '../../Components/UI/ProductCard';
+import { useAuth } from '../../contexts/AuthContext';
 
 const API = 'https://localhost:5050';
 
 
 const Homepage = () => {
+  const { refreshAccessToken } = useAuth();
   const [products, setProducts] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -45,6 +47,9 @@ const Homepage = () => {
             <p>Explore products from top wellness brands.</p>
             <button className='explore'>EXPLORE TOP BRANDS</button>
           </div>
+          <button onClick={() => refreshAccessToken()}>
+        Refresh Token Now (Test)
+      </button>
         </section>
 
         {/* 

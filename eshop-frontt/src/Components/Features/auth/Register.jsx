@@ -35,10 +35,7 @@ function Register() {
     try {
       const response = await fetch('https://localhost:5050/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           firstName,
           lastName,
@@ -54,8 +51,7 @@ function Register() {
       }
 
       navigate('/login');
-    } catch (ex) {
-      console.error('Registration error:', ex);
+    } catch {
       setErrors({ general: 'Network error, please try again later' });
     }
   };
@@ -114,21 +110,13 @@ function Register() {
 
           <button type="submit">Register</button>
 
-          <a
-            href="#"
-            onClick={() => navigate('/login')}
-            className="link-text"
-          >
+          <a href="#" onClick={() => navigate('/login')} className="link-text">
             Already have an account? Sign in
           </a>
           <br />
-              <a
-                href="#"
-                onClick={() => navigate('/homapage')}
-                className="link-textt"
-              >
-                Go to Home
-              </a>
+          <a href="#" onClick={() => navigate('/homepage')} className="link-textt">
+            Go to Home
+          </a>
         </form>
       </div>
       <div className="login-image"></div>

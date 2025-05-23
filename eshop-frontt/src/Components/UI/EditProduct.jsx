@@ -29,7 +29,6 @@ export default function EditProduct({
     const [previewUrl, setPreviewUrl] = useState('');
     const { convert, format } = useCurrency();
 
-    // Kur hapet modal ose ndryshon produkti, vendos të dhënat në form
     useEffect(() => {
         if (isOpen && product) {
             setForm({
@@ -49,22 +48,26 @@ export default function EditProduct({
         }
     }, [isOpen, product, convert, format]);
 
-    // Kur ndryshon categoryId, ngarko nënkategoritë e tij
     useEffect(() => {
         if (form.categoryId) {
             setLoadingSubcategories(true);
             setSubcategoriesError(null);
-            setSubcategories([]);
-            setForm(f => ({ ...f, subcategoryId: '' })); // pastro subcategoryId
-
             fetch(`${BASE}/categories/${form.categoryId}/subcategories`)
                 .then(res => {
                     if (!res.ok) throw new Error('Failed to load subcategories');
                     return res.json();
                 })
                 .then(data => {
-                    setSubcategories(data.subcategories?.data || []);
+                    const subs = data.subcategories?.data || [];
+                    setSubcategories(subs);
                     setLoadingSubcategories(false);
+
+                    if (
+                        form.subcategoryId &&
+                        !subs.some(sc => sc.id === form.subcategoryId)
+                    ) {
+                        setForm(f => ({ ...f, subcategoryId: '' }));
+                    }
                 })
                 .catch(err => {
                     console.error(err);
@@ -98,8 +101,11 @@ export default function EditProduct({
     const handleSubmit = async e => {
         e.preventDefault();
 
-        if (!form.name || !form.price || !form.categoryId || !form.subcategoryId || !form.brandId) {
-            return onError('Name, price, category, subcategory & brand are required');
+        if (!form.name || !form.price || !form.categoryId || !form.brandId) {
+            return onError('Name, price, category & brand are required');
+        }
+        if (subcategories.length > 0 && !form.subcategoryId) {
+            return onError('Please select a subcategory');
         }
 
         try {
@@ -119,7 +125,7 @@ export default function EditProduct({
                         Price: basePrice,
                         Description: form.description || null,
                         CategoryId: form.categoryId,
-                        SubcategoryId: form.subcategoryId,
+                        SubcategoryId: form.subcategoryId || null,
                         BrandId: form.brandId,
                     }
                 })
@@ -159,7 +165,6 @@ export default function EditProduct({
                 </div>
 
                 <form onSubmit={handleSubmit} className="add-product-form">
-                    {/* IMAGE UPLOAD */}
                     <div className="upload-container">
                         <label htmlFor="imageUpload" className="upload-button">
                             {imageFile ? 'Change Image' : previewUrl ? 'Replace Image' : 'Upload Image'}
@@ -176,7 +181,7 @@ export default function EditProduct({
                                 <img
                                     src={
                                         previewUrl.startsWith('http') ||
-                                        previewUrl.startsWith('blob:')
+                                            previewUrl.startsWith('blob:')
                                             ? previewUrl
                                             : `${BASE}${previewUrl.startsWith('/') ? '' : '/'}${previewUrl}`
                                     }
@@ -187,7 +192,6 @@ export default function EditProduct({
                         )}
                     </div>
 
-                    {/* OTHER FIELDS */}
                     <div>
                         <label>Name *</label>
                         <input
@@ -229,32 +233,36 @@ export default function EditProduct({
                             onChange={handleChange}
                             required
                         >
-                            <option value="">-- None --</option>
+                            <option value="">-- Select Category --</option>
                             {categories.map(c => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div>
-                        <label>Subcategory *</label>
-                        {loadingSubcategories && <p>Loading subcategories...</p>}
-                        {subcategoriesError && <p className="error">{subcategoriesError}</p>}
-                        {!loadingSubcategories && !subcategoriesError && (
+                    {form.categoryId && subcategories.length > 0 && (
+                        <div>
+                            <label>Subcategory *</label>
                             <select
                                 name="subcategoryId"
                                 value={form.subcategoryId}
                                 onChange={handleChange}
-                                required
-                                disabled={subcategories.length === 0}
+                                required={subcategories.length > 0}
+                                disabled={loadingSubcategories || !!subcategoriesError}
                             >
-                                <option value="">-- None --</option>
-                                {subcategories.map(sc => (
-                                    <option key={sc.id} value={sc.id}>{sc.name}</option>
-                                ))}
+                                {loadingSubcategories && <option value="">Loading subcategories...</option>}
+                                {subcategoriesError && <option value="">{subcategoriesError}</option>}
+                                {!loadingSubcategories && !subcategoriesError && (
+                                    <>
+                                        <option value="">Select a subcategory</option>
+                                        {subcategories.map(sc => (
+                                            <option key={sc.id} value={sc.id}>{sc.name}</option>
+                                        ))}
+                                    </>
+                                )}
                             </select>
-                        )}
-                    </div>
+                        </div>
+                    )}
 
                     <div>
                         <label>Brand *</label>
@@ -264,14 +272,13 @@ export default function EditProduct({
                             onChange={handleChange}
                             required
                         >
-                            <option value="">-- None --</option>
+                            <option value="">-- Select Brand --</option>
                             {brands.map(b => (
                                 <option key={b.id} value={b.id}>{b.name}</option>
                             ))}
                         </select>
                     </div>
 
-                    {/* ACTION BUTTONS */}
                     <div className="form-actions">
                         <button type="button" onClick={onClose}>Cancel</button>
                         <button type="submit">Save Changes</button>

@@ -50,7 +50,7 @@ export default function AddProduct({
             setSubcategoriesError(null);
             setSubcategories([]);
             setForm(f => ({ ...f, subcategoryId: '' }));
-    
+
             fetch(`${BASE}/categories/${form.categoryId}/subcategories`)
                 .then(res => {
                     if (!res.ok) throw new Error('Failed to load subcategories');
@@ -70,7 +70,7 @@ export default function AddProduct({
             setForm(f => ({ ...f, subcategoryId: '' }));
         }
     }, [form.categoryId]);
-    
+
 
     const handleChange = e => {
         let { name, value } = e.target;
@@ -216,27 +216,30 @@ export default function AddProduct({
                         </select>
                     </div>
 
-                    <div>
-                        <label>Subcategory</label>
-                        <select
-                            name="subcategoryId"
-                            value={form.subcategoryId}
-                            onChange={handleChange}
-                            disabled={!form.categoryId || loadingSubcategories || !!subcategoriesError}
-                        >
-                            {!form.categoryId && <option value="">Select a category first</option>}
-                            {loadingSubcategories && <option value="">Loading subcategories...</option>}
-                            {subcategoriesError && <option value="">{subcategoriesError}</option>}
-                            {!loadingSubcategories && !subcategoriesError && (
-                                <>
-                                    <option value="">Select a subcategory</option>
-                                    {subcategories.map(sc => (
-                                        <option key={sc.id} value={sc.id}>{sc.name}</option>
-                                    ))}
-                                </>
-                            )}
-                        </select>
-                    </div>
+                    {form.categoryId && subcategories.length > 0 && (
+                        <div>
+                            <label>Subcategory</label>
+                            <select
+                                name="subcategoryId"
+                                value={form.subcategoryId}
+                                onChange={handleChange}
+                                disabled={loadingSubcategories || !!subcategoriesError}
+                            >
+                                {loadingSubcategories && <option value="">Loading subcategories...</option>}
+                                {subcategoriesError && <option value="">{subcategoriesError}</option>}
+                                {!loadingSubcategories && !subcategoriesError && (
+                                    <>
+                                        <option value="">Select a subcategory</option>
+                                        {subcategories.map(sc => (
+                                            <option key={sc.id} value={sc.id}>{sc.name}</option>
+                                        ))}
+                                    </>
+                                )}
+                            </select>
+                        </div>
+                    )}
+
+
 
                     <div>
                         <label>Brand *</label>

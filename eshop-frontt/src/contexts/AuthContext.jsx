@@ -15,19 +15,20 @@ export const AuthProvider = ({ children }) => {
   const parseJwt = (token) => {
     try {
       return JSON.parse(atob(token.split(".")[1]));
-    } catch (e) {
+    } catch {
       return null;
     }
   };
 
-  const login = (accessToken, refreshToken, userData) => {
+  const login = (accessToken) => {
     const parsedToken = parseJwt(accessToken);
+    if (!parsedToken) return;
+
     const usernameFromToken = parsedToken?.preferred_username || parsedToken?.sub;
     const userIdFromToken = parsedToken?.sub;
     const rolesFromToken = parsedToken?.resource_access?.myclient?.roles || [];
 
     localStorage.setItem("token", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
     localStorage.setItem("username", usernameFromToken);
     localStorage.setItem("userId", userIdFromToken);
     localStorage.setItem("roles", JSON.stringify(rolesFromToken));
@@ -40,97 +41,62 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
     localStorage.removeItem("username");
     localStorage.removeItem("userId");
     localStorage.removeItem("roles");
-  
+
     setUsername("");
     setUserId("");
     setRoles([]);
     setIsLoggedIn(false);
-  
+
     setTimeout(() => {
       navigate("/login");
-    }, 70); 
+    }, 70);
   };
 
   const refreshAccessToken = useCallback(async () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) {
-      logout();
-      return;
-    }
-
-    const parsedRefreshToken = parseJwt(refreshToken);
-    const currentTime = Date.now() / 1000;
-
-    if (!parsedRefreshToken || parsedRefreshToken.exp < currentTime) {
-      console.log("Refresh token expired, logging out...");
-      logout();
-      return;
-    }
-
-    const params = new URLSearchParams();
-    params.append("grant_type", "refresh_token");
-    params.append("client_id", "myclient");
-    params.append("refresh_token", refreshToken);
-  
-
     try {
-      const response = await fetch(
-        "http://localhost:9090/realms/myrealm/protocol/openid-connect/token",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: params,
-        }
-      );
+      const response = await fetch("https://localhost:5050/auth/refresh", {
+        method: "POST",
+        credentials: "include", // send HttpOnly cookie with refresh token
+      });
 
       if (response.ok) {
         const data = await response.json();
-        login(data.access_token, data.refresh_token, username);
+        if (data.accessToken) {
+          login(data.accessToken);
+        } else {
+          logout();
+        }
       } else {
-        const errorText = await response.text();
-        console.error("Failed to refresh token:", errorText);
+        logout();
       }
-    } catch (error) {
-      console.error("Error during token refresh:", error);
+    } catch {
+      logout();
     }
-  }, [username]);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!token || !refreshToken) return;
+    if (!token) return;
 
     const parsedToken = parseJwt(token);
-    const parsedRefreshToken = parseJwt(refreshToken);
-
-    if (!parsedToken || !parsedRefreshToken) return;
+    if (!parsedToken) return;
 
     const tokenExpiresIn = parsedToken.exp - Date.now() / 1000;
-    const refreshExpiresIn = parsedRefreshToken.exp - Date.now() / 1000;
+    if (tokenExpiresIn <= 0) {
+      refreshAccessToken();
+      return;
+    }
 
-    const refreshTime = (tokenExpiresIn - 60) * 1000; 
-    const logoutTime = (refreshExpiresIn - 10) * 1000; 
+    const refreshTime = (tokenExpiresIn - 60) * 1000;
 
     const refreshTimeout = setTimeout(() => {
       refreshAccessToken();
     }, refreshTime);
 
-    const logoutTimeout = setTimeout(() => {
-      console.log("Refresh token expired. Logging out...");
-      logout();
-    }, logoutTime);
-
-    return () => {
-      clearTimeout(refreshTimeout);
-      clearTimeout(logoutTimeout);
-    };
+    return () => clearTimeout(refreshTimeout);
   }, [refreshAccessToken]);
 
   return (
