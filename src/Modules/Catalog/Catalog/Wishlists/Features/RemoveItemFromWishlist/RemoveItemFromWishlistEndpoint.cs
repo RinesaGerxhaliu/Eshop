@@ -6,12 +6,12 @@ public class RemoveItemFromWishlistEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/wishlist/{customerId}/items/{productId}",
-            async ([FromRoute] string customerId,
+        app.MapDelete("/wishlist/{userName}/items/{productId}",
+            async ([FromRoute] string userName,
                    [FromRoute] Guid productId,
                    ISender sender) =>
             {
-                var command = new RemoveItemFromWishlistCommand(customerId, productId);
+                var command = new RemoveItemFromWishlistCommand(userName, productId);
 
                 var result = await sender.Send(command);
 

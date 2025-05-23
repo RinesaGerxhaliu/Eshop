@@ -3,6 +3,6 @@
 public record WishlistDTO
 (
     Guid Id,
-    string CustomerId,
+    string UserName,
     List<WishlistItemDTO> Items
 );

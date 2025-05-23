@@ -1,9 +1,10 @@
 ﻿using Catalog.Contracts.Products.Features.GetProductById;
+using Catalog.Wishlists.DTOs;
 using Catalog.Wishlists.Repositories;
 
 namespace Catalog.Wishlists.Features.AddItemIntoWishlist;
 
-public record AddItemIntoWishlistCommand(string CustomerId, Guid ProductId)
+public record AddItemIntoWishlistCommand(string UserName, WishlistItemDTO WishlistItem)
     : ICommand<AddItemIntoWishlistResult>;
 
 public record AddItemIntoWishlistResult(Guid Id);
@@ -12,8 +13,8 @@ public class AddItemIntoWishlistCommandValidator : AbstractValidator<AddItemInto
 {
     public AddItemIntoWishlistCommandValidator()
     {
-        RuleFor(x => x.CustomerId).NotEmpty().WithMessage("CustomerId is required");
-        RuleFor(x => x.ProductId).NotEmpty().WithMessage("ProductId is required");
+        RuleFor(x => x.UserName).NotEmpty().WithMessage("Username is required");
+        RuleFor(x => x.WishlistItem.ProductId).NotEmpty().WithMessage("ProductId is required");
     }
 }
 
@@ -23,20 +24,19 @@ internal class AddItemIntoWishlistHandler(IWishlistRepository repository, ISende
     public async Task<AddItemIntoWishlistResult> Handle(AddItemIntoWishlistCommand command, CancellationToken cancellationToken)
     {
         // Get wishlist for customer
-        var wishlist = await repository.GetWishlist(command.CustomerId, false, cancellationToken);
+        var wishlist = await repository.GetWishlist(command.UserName, false, cancellationToken);
 
         // Get product info from catalog
-        var result = await sender.Send(new GetProductByIdQuery(command.ProductId));
+        var result = await sender.Send(new GetProductByIdQuery(command.WishlistItem.ProductId));
 
         // Add item to wishlist
         wishlist.AddItem(
-            command.ProductId,
+            command.WishlistItem.ProductId,
             result.Product.Price,
-            result.Product.Name
-        );
+            result.Product.Name);
 
         // Save changes
-        await repository.SaveChangesAsync(command.CustomerId, cancellationToken);
+        await repository.SaveChangesAsync(command.UserName, cancellationToken);
 
         return new AddItemIntoWishlistResult(wishlist.Id);
     }

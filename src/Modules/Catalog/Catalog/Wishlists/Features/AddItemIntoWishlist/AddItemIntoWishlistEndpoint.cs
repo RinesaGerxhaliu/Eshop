@@ -1,18 +1,20 @@
-﻿namespace Catalog.Wishlists.Features.AddItemIntoWishlist;
+﻿using Catalog.Wishlists.DTOs;
 
-public record AddItemIntoWishlistRequest(Guid ProductId);
+namespace Catalog.Wishlists.Features.AddItemIntoWishlist;
+
+public record AddItemIntoWishlistRequest(string UserName, WishlistItemDTO WishlistItem);
 public record AddItemIntoWishlistResponse(Guid Id);
 
 public class AddItemIntoWishlistEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/wishlist/{customerId}/items",
-            async ([FromRoute] string customerId,
+        app.MapPost("/wishlist/{userName}/items",
+            async ([FromRoute] string userName,
                    [FromBody] AddItemIntoWishlistRequest request,
                    ISender sender) =>
             {
-                var command = new AddItemIntoWishlistCommand(customerId, request.ProductId);
+                var command = new AddItemIntoWishlistCommand(userName, request.WishlistItem);
 
                 var result = await sender.Send(command);
 

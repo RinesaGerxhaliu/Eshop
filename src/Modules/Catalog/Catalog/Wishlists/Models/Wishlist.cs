@@ -2,39 +2,37 @@
 {
     public class Wishlist : Aggregate<Guid>
     {
-        public string CustomerId { get; private set; } = default!;
+        public string UserName { get; private set; } = default!;  
+
         private readonly List<WishlistItem> _items = new();
         public IReadOnlyList<WishlistItem> Items
             => _items.AsReadOnly();
 
         private Wishlist() { }
 
-        public static Wishlist Create(Guid id, string customerId)
+        public static Wishlist Create(Guid id, string userName)
         {
-            if (string.IsNullOrWhiteSpace(customerId))
-                throw new ArgumentNullException(nameof(customerId));
+            ArgumentException.ThrowIfNullOrEmpty(userName);
 
-            return new Wishlist
+            var wishlist = new Wishlist
             {
                 Id = id,
-                CustomerId = customerId
+                UserName = userName
             };
+
+            return wishlist;
         }
 
         public void AddItem(Guid productId, decimal priceWhenAdded, string productName)
         {
-            if (_items.Any(x => x.ProductId == productId))
-                return;
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(priceWhenAdded);
 
-            var item = new WishlistItem(
-                wishlistId: Id,
-                productId: productId,
-                priceWhenAdded: priceWhenAdded,
-                productName: productName);
+            var existingItem = Items.FirstOrDefault(x => x.ProductId == productId);
 
-            _items.Add(item);
+                var newItem = new WishlistItem(Id, productId, priceWhenAdded, productName);
+                _items.Add(newItem);
+            
         }
-
 
         public void RemoveItem(Guid productId)
         {

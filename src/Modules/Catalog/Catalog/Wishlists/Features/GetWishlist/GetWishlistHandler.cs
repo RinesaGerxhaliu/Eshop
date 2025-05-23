@@ -36,7 +36,7 @@ internal class GetWishlistHandler(IWishlistRepository repository, ISender sender
 
         var wishlistDto = new WishlistDTO(
             Id: wishlist.Id,
-            CustomerId: wishlist.CustomerId,
+            UserName: wishlist.UserName,
             Items: updatedItems
         );
 

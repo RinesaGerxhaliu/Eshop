@@ -1,4 +1,5 @@
 ﻿using Catalog.Wishlists.DTOs;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 
@@ -17,9 +18,14 @@ public class CreateWishlistEndpoint : ICarterModule
     {
         app.MapPost("/wishlist", async (CreateWishlistRequest request, ISender sender, ClaimsPrincipal user) =>
         {
-            var customerId = user.Identity!.Name;
 
-            var updatedWishlist = request.Wishlist with { CustomerId = customerId };
+            var userName = user.Identity?.Name;
+            if (string.IsNullOrEmpty(userName))
+            {
+                return Results.BadRequest("UserName is null or empty.");
+            }
+
+            var updatedWishlist = request.Wishlist with { UserName = userName };
 
             var command = new CreateWishlistCommand(updatedWishlist);
 

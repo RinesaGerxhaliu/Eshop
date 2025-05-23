@@ -1,4 +1,7 @@
-﻿namespace Catalog.Wishlists.Models;
+﻿using System.Drawing;
+using System.Text.Json.Serialization;
+
+namespace Catalog.Wishlists.Models;
 
 public class WishlistItem : Entity<Guid>
 {
@@ -7,13 +10,18 @@ public class WishlistItem : Entity<Guid>
     public decimal PriceWhenAdded { get; private set; }
     public string ProductName { get; private set; } = default!;
 
-    internal WishlistItem(
-        Guid wishlistId,
-        Guid productId,
-        decimal priceWhenAdded,
-        string productName)
+    internal WishlistItem(Guid wishListId, Guid productId, decimal priceWhenAdded, string productName)
     {
-        Id = Guid.NewGuid();
+        WishlistId = wishListId;
+        ProductId = productId;
+        PriceWhenAdded = priceWhenAdded;
+        ProductName = productName;
+    }
+
+    [JsonConstructor]
+    public WishlistItem(Guid id, Guid wishlistId, Guid productId, decimal priceWhenAdded, string productName)
+    {
+        Id = id;
         WishlistId = wishlistId;
         ProductId = productId;
         PriceWhenAdded = priceWhenAdded;

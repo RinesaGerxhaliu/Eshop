@@ -13,7 +13,7 @@ public class CreateWishlistCommandValidator : AbstractValidator<CreateWishlistCo
 {
     public CreateWishlistCommandValidator()
     {
-        RuleFor(x => x.Wishlist.CustomerId).NotEmpty().WithMessage("CustomerId is required");
+        RuleFor(x => x.Wishlist.UserName).NotEmpty().WithMessage("Username is required");
     }
 }
 
@@ -34,7 +34,7 @@ internal class CreateWishlistHandler(IWishlistRepository repository)
         // create new wishlist
         var newWishlist = Wishlist.Create(
             Guid.NewGuid(),
-            wishlistDto.CustomerId);
+            wishlistDto.UserName);
 
         wishlistDto.Items.ForEach(item =>
         {

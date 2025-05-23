@@ -2,7 +2,7 @@
 
 namespace Catalog.Wishlists.Features.RemoveItemFromWishlist;
 
-public record RemoveItemFromWishlistCommand(string CustomerId, Guid ProductId)
+public record RemoveItemFromWishlistCommand(string UserName, Guid ProductId)
     : ICommand<RemoveItemFromWishlistResult>;
 
 public record RemoveItemFromWishlistResult(Guid Id);
@@ -11,7 +11,7 @@ public class RemoveItemFromWishlistCommandValidator : AbstractValidator<RemoveIt
 {
     public RemoveItemFromWishlistCommandValidator()
     {
-        RuleFor(x => x.CustomerId).NotEmpty().WithMessage("CustomerId is required");
+        RuleFor(x => x.UserName).NotEmpty().WithMessage("Username is required");
         RuleFor(x => x.ProductId).NotEmpty().WithMessage("ProductId is required");
     }
 }
@@ -21,11 +21,11 @@ internal class RemoveItemFromWishlistHandler(IWishlistRepository repository)
 {
     public async Task<RemoveItemFromWishlistResult> Handle(RemoveItemFromWishlistCommand command, CancellationToken cancellationToken)
     {
-        var wishlist = await repository.GetWishlist(command.CustomerId, false, cancellationToken);
+        var wishlist = await repository.GetWishlist(command.UserName, false, cancellationToken);
 
         wishlist.RemoveItem(command.ProductId);
 
-        await repository.SaveChangesAsync(command.CustomerId, cancellationToken);
+        await repository.SaveChangesAsync(command.UserName, cancellationToken);
 
         return new RemoveItemFromWishlistResult(wishlist.Id);
     }

@@ -7,9 +7,9 @@ public class GetWishlistEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/wishlist/{customerId}", async (string customerId, ISender sender) =>
+        app.MapGet("/wishlist/{userName}", async (string userName, ISender sender) =>
         {
-            var result = await sender.Send(new GetWishlistQuery(customerId));
+            var result = await sender.Send(new GetWishlistQuery(userName));
 
             var response = result.Adapt<GetWishlistResponse>();
 
