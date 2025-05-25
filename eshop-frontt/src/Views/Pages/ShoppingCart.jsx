@@ -7,9 +7,15 @@ const ShoppingCartPage = () => {
   const { refreshAccessToken } = useAuth();
   const [cart, setCart] = useState({ items: [] });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Track loading state for cart data
-  const [imagesLoaded, setImagesLoaded] = useState(false); // Track image loading state
+  const [isLoading, setIsLoading] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const navigate = useNavigate();
+
+  // Handler for proceeding to checkout/process order
+  const handleProcessOrder = () => {
+    // Navigate to your checkout or order processing route
+    navigate('/order');
+  };
 
   // Fetch product details (including image) for each item
   const fetchProductDetails = async (productId) => {
@@ -36,29 +42,28 @@ const ShoppingCartPage = () => {
         throw new Error("User is not logged in or token is missing.");
       }
 
-     let response = await fetch(`https://localhost:5050/basket/${username}`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  },
-});
+      let response = await fetch(`https://localhost:5050/basket/${username}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-if (response.status === 401) {
-  console.log("Token expired, attempting to refresh...");
-  token = await refreshAccessToken(); 
-  if (!token) {
-    navigate("/login");
-    return;
-  }
+      if (response.status === 401) {
+        console.log("Token expired, attempting to refresh...");
+        token = await refreshAccessToken();
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
-  response = await fetch(`https://localhost:5050/basket/${username}`, {
-    headers: {
-      Authorization: `Bearer ${token}`, 
-      "Content-Type": "application/json",
-    },
-  });
-}
-
+        response = await fetch(`https://localhost:5050/basket/${username}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
       if (response.status === 404) {
         setCart({ items: [] });
@@ -99,7 +104,7 @@ if (response.status === 401) {
       items: updatedItems,
     }));
 
-    setImagesLoaded(true); 
+    setImagesLoaded(true);
   };
 
   const removeItemFromCart = async (productId) => {
@@ -126,7 +131,7 @@ if (response.status === 401) {
         throw new Error("Failed to remove item from cart");
       }
 
-      getCart(); 
+      getCart();
     } catch (error) {
       console.error("Error removing item from cart:", error);
       setError(error.message || "An unknown error occurred.");
@@ -134,7 +139,7 @@ if (response.status === 401) {
   };
 
   useEffect(() => {
-    getCart(); 
+    getCart();
   }, []);
 
   return (
@@ -144,45 +149,55 @@ if (response.status === 401) {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {isLoading ? (
-        <div>Loading your cart...</div> 
+        <div>Loading your cart...</div>
       ) : cart.items.length === 0 ? (
         <div>
           <p>Your shopping cart is empty.</p>
           <button onClick={() => navigate("/shop")}>Go to Shop</button>
         </div>
       ) : (
-        <ul>
-          {cart.items.map((item, idx) => (
-            <li key={idx} className="cart-item">
-              <div className="cart-item-image-container">
-                {!item.imageUrl || !imagesLoaded ? (
-                  <div className="image-placeholder">Loading Image...</div>
-                ) : (
-                  <img
-                    src={`https://localhost:5050${item.imageUrl}`}
-                    alt={item.productName}
-                    className="cart-item-image"
-                  />
-                )}
-              </div>
+        <>
+          <ul>
+            {cart.items.map((item, idx) => (
+              <li key={idx} className="cart-item">
+                <div className="cart-item-image-container">
+                  {!item.imageUrl || !imagesLoaded ? (
+                    <div className="image-placeholder">Loading Image...</div>
+                  ) : (
+                    <img
+                      src={`https://localhost:5050${item.imageUrl}`}
+                      alt={item.productName}
+                      className="cart-item-image"
+                    />
+                  )}
+                </div>
 
-              <div className="cart-item-details">
-                <p>
-                  <strong>{item.productName}</strong>
-                </p>
-                <p>Price: €{item.price}</p>
-                <p>Quantity: {item.quantity}</p>
-                <p>Color: {item.color}</p>
-              </div>
+                <div className="cart-item-details">
+                  <p><strong>{item.productName}</strong></p>
+                  <p>Price: €{item.price}</p>
+                  <p>Quantity: {item.quantity}</p>
+                  <p>Color: {item.color}</p>
+                </div>
 
-              <div className="remove-button-container">
-                <button onClick={() => removeItemFromCart(item.productId)}>
-                  Remove
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                <div className="remove-button-container">
+                  <button onClick={() => removeItemFromCart(item.productId)}>
+                    Remove
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Process Order Button */}
+          <div className="process-order-container">
+            <button
+              className="process-order-button"
+              onClick={handleProcessOrder}
+            >
+              Proceed to Checkout
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

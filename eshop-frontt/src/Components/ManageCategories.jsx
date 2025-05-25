@@ -1,8 +1,9 @@
+// ManageCategories.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaCheck } from "react-icons/fa";
 import AddCategory from "./UI/AddCategory";
-import "../Styles/ManageProducts.css";
+import "../Styles/ManageCategories.css";
 
 const BASE = "https://localhost:5050";
 const PAGE_SIZE = 8;
@@ -65,19 +66,13 @@ export default function ManageCategories() {
     loadCategories();
   };
 
-  const handleDelete = id => {
-    setDeleteTarget(id);
-  };
+  const handleDelete = id => setDeleteTarget(id);
   const confirmDelete = () => {
     api
       .delete(`/categories/${deleteTarget}`)
       .then(res => {
-        if (res.status === 200) {
-          setSuccessMsg("Category deleted successfully!");
-          loadCategories();
-        } else {
-          setSuccessMsg("Deletion failed.");
-        }
+        setSuccessMsg(res.status === 200 ? "Category deleted successfully!" : "Deletion failed.");
+        loadCategories();
       })
       .catch(err => {
         console.error(err);
@@ -94,13 +89,9 @@ export default function ManageCategories() {
     api
       .put(`/categories/${editingId}`, { name: editingName })
       .then(res => {
-        if (res.status === 200) {
-          setSuccessMsg("Category updated!");
-          loadCategories();
-          setEditingId(null);
-        } else {
-          setSuccessMsg("Update failed.");
-        }
+        setSuccessMsg(res.status === 200 ? "Category updated!" : "Update failed.");
+        loadCategories();
+        setEditingId(null);
       })
       .catch(err => {
         console.error(err);
@@ -114,7 +105,6 @@ export default function ManageCategories() {
 
   return (
     <>
-      {/* AddCategory Modal */}
       <AddCategory
         isOpen={showAddModal}
         onAdd={handleAddSuccess}
@@ -122,21 +112,21 @@ export default function ManageCategories() {
         onClose={() => setShowAddModal(false)}
       />
 
-      {successMsg && <div className="mp-success">{successMsg}</div>}
+      {successMsg && <div className="manage-categories-success">{successMsg}</div>}
 
-      <div className="mp-container">
-        <header className="mp-header">
+      <div className="manage-categories-container">
+        <header className="manage-categories-header">
           <h1>Manage Categories</h1>
           <button
-            className="mp-btn mp-btn-primary"
+            className="manage-categories-btn manage-categories-btn-primary"
             onClick={() => setShowAddModal(true)}
           >
             + Add Category
           </button>
         </header>
 
-        <div className="mp-table-wrap">
-          <table className="mp-table">
+        <div className="manage-categories-table-wrap">
+          <table className="manage-categories-table">
             <thead>
               <tr>
                 <th>Name</th>
@@ -153,9 +143,7 @@ export default function ManageCategories() {
                         <input
                           value={editingName}
                           onChange={e => setEditingName(e.target.value)}
-                          onKeyDown={e => {
-                            if (e.key === "Enter") saveEdit();
-                          }}
+                          onKeyDown={e => e.key === "Enter" && saveEdit()}
                           autoFocus
                         />
                       ) : (
@@ -166,12 +154,15 @@ export default function ManageCategories() {
                     <td style={{ textAlign: "right" }}>
                       {isAdmin &&
                         (editingId === c.id ? (
-                          <button className="mp-btn mp-btn-success" onClick={saveEdit}>
+                          <button
+                            className="manage-categories-btn manage-categories-btn-action"
+                            onClick={saveEdit}
+                          >
                             <FaCheck />
                           </button>
                         ) : (
                           <button
-                            className="mp-btn mp-btn-secondary"
+                            className="manage-categories-btn manage-categories-btn-secondary"
                             onClick={() => handleEdit(c.id, c.name)}
                           >
                             <FaEdit />
@@ -179,7 +170,7 @@ export default function ManageCategories() {
                         ))}
                       {isAdmin && (
                         <button
-                          className="mp-btn mp-btn-danger"
+                          className="manage-categories-btn manage-categories-btn-danger"
                           onClick={() => handleDelete(c.id)}
                           style={{ marginLeft: 8 }}
                         >
@@ -187,7 +178,7 @@ export default function ManageCategories() {
                         </button>
                       )}
                       <button
-                        className="mp-btn mp-btn-action"
+                        className="manage-categories-btn manage-categories-btn-action"
                         style={{ marginLeft: 8 }}
                         onClick={() => window.location.assign(`${c.id}/subcategories`)}
                       >
@@ -208,9 +199,9 @@ export default function ManageCategories() {
         </div>
 
         {totalPages > 1 && (
-          <div className="mp-pagination">
+          <div className="manage-categories-pagination">
             <button
-              className="mp-btn mp-btn-secondary"
+              className="manage-categories-btn manage-categories-btn-secondary"
               onClick={() => setPageIndex(i => Math.max(i - 1, 0))}
               disabled={!pageIndex}
             >
@@ -220,11 +211,11 @@ export default function ManageCategories() {
               Page {pageIndex + 1} of {totalPages}
             </span>
             <button
-              className="mp-btn mp-btn-secondary"
+              className="manage-categories-btn manage-categories-btn-secondary"
               onClick={() => setPageIndex(i => Math.min(i + 1, totalPages - 1))}
               disabled={pageIndex + 1 >= totalPages}
             >
-              Next →
+              Next →  
             </button>
           </div>
         )}
@@ -235,10 +226,18 @@ export default function ManageCategories() {
               <h2>Confirm Delete</h2>
               <p>Delete “{cats.find(c => c.id === deleteTarget)?.name}”?</p>
               <div className="form-actions">
-                <button type="button" className="mp-btn mp-btn-secondary" onClick={() => setDeleteTarget(null)}>
+                <button
+                  type="button"
+                  className="manage-categories-btn manage-categories-btn-secondary"
+                  onClick={() => setDeleteTarget(null)}
+                >
                   Cancel
                 </button>
-                <button type="button" className="mp-btn mp-btn-danger" onClick={confirmDelete}>
+                <button
+                  type="button"
+                  className="manage-categories-btn manage-categories-btn-danger"
+                  onClick={confirmDelete}
+                >
                   Delete
                 </button>
               </div>

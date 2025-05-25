@@ -1,6 +1,7 @@
+/* Styles/ManageCategories.css */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-.mr-container {
+.manage-categories-container {
   font-family: 'Poppins', sans-serif;
   padding: 24px;
   background: #fff5f8;
@@ -10,71 +11,93 @@
   color: #333;
 }
 
-.mp-header {
+.manage-categories-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   flex-wrap: nowrap;
 }
 
-.mp-header h1,
-.mp-header .mp-btn {
+.manage-categories-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
   flex: 0 0 auto;
 }
 
-.mp-btn {
+.manage-categories-header .manage-categories-btn-primary {
+  font-size: 1rem;
+  padding: 8px 16px;
+  min-width: auto;
+  flex: 0 0 auto;
+}
+
+.manage-categories-btn {
   width: auto !important;
   max-width: none !important;
   padding: 2px 8px;
   font-size: 0.75rem;
 }
 
-
-.mp-btn:active {
+.manage-categories-btn:active {
   transform: scale(0.97);
 }
 
-.mp-btn-primary {
+.manage-categories-btn-primary {
   background: #e83e8c;
   color: #fff;
 }
 
-.mp-btn-primary:hover {
+.manage-categories-btn-primary:hover {
   background: #d6336c;
 }
 
-.mp-btn-secondary {
+.manage-categories-btn-secondary {
   background: #f8d7e9;
   color: #d6336c;
 }
 
-.mp-btn-secondary:hover {
+.manage-categories-btn-secondary:hover {
   background: #f1c2da;
 }
 
-.mp-btn-action {
+.manage-categories-btn-action {
   background: #f06595;
   color: #fff;
 }
 
-.mp-btn-action:hover {
+.manage-categories-btn-action:hover {
   background: #d6336c;
 }
 
-.mp-btn-danger {
+.manage-categories-btn-danger {
   background: #ff6b81;
   color: #fff;
 }
 
-.mp-btn-danger:hover {
+.manage-categories-btn-danger:hover {
   background: #e55370;
 }
 
-.mp-filters {
+.manage-categories-filters {
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 12px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
-.mp-select {
+.manage-categories-filters > button {
+  margin-top: 7px;
+}
+
+.manage-categories-filters > .manage-categories-btn-secondary {
+  font-size: 0.9rem;
+  padding: 7px 15px;
+}
+
+.manage-categories-select {
   display: inline-block;
   white-space: nowrap;
   padding: 6px 10px;
@@ -85,7 +108,8 @@
   font-size: 0.9rem;
 }
 
-.mr-table-wrap {
+/* table container */
+.manage-categories-table-wrap {
   flex: 1;
   overflow: auto;
   background: #ffffff;
@@ -93,39 +117,44 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.mr-table {
-  width: 100%;
+/* base table */
+.manage-categories-table {
   border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
 }
 
-.mp-table th,
-.mp-table td {
+/* shared cell styling */
+.manage-categories-table th,
+.manage-categories-table td {
   padding: 10px 6px;
   text-align: left;
   border-bottom: 1px solid #f1ecf1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.mp-table thead {
+.manage-categories-table thead {
   background: #fde8f2;
 }
 
-.mp-table tr:hover {
+.manage-categories-table tr:hover {
   background: #ffeef8;
 }
 
-.mp-image {
+.manage-categories-image {
   height: 40px;
   border-radius: 4px;
   object-fit: cover;
 }
 
-.mp-no-image {
+.manage-categories-no-image {
   color: #bbb;
 }
 
-.mp-success {
+.manage-categories-success {
   position: fixed;
-  top: 20px;
   top: 100px;
   left: 50%;
   transform: translateX(-50%);
@@ -143,85 +172,53 @@
   transition: opacity 0.3s ease;
 }
 
-.mp-pagination {
+.manage-categories-pagination {
   display: flex;
   justify-content: center;
   gap: 12px;
 }
 
-.mp-pagination .mp-btn {
+.manage-categories-pagination .manage-categories-btn {
   flex: 0 0 auto;
 }
 
-.mp-table td .mp-btn+.mp-btn {
+.manage-categories-table td .manage-categories-btn + .manage-categories-btn {
   margin-left: 12px;
 }
 
-.mp-table td .mp-btn-action,
-.mp-table td .mp-btn-danger {
+.manage-categories-table td .manage-categories-btn-action,
+.manage-categories-table td .manage-categories-btn-danger {
   font-size: 0.9rem;
   padding: 6px 8px;
 }
 
-.mp-pagination .mp-btn-secondary {
+.manage-categories-pagination .manage-categories-btn-secondary {
   font-size: 1rem;
   padding: 8px 12px;
 }
 
-.mp-pagination>span {
-  display: inline-block !important;
-  margin: 8px 12px 0 !important;
-}
-
-.mp-pagination>span {
+.manage-categories-pagination > span {
   display: inline-block !important;
   margin: 16px 24px 0 !important;
 }
 
-
-.mp-pagination>button {
+.manage-categories-pagination > button {
   margin-top: 8px !important;
 }
 
-
-.mp-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+/* explicit column widths */
+.manage-categories-table th:nth-child(1),
+.manage-categories-table td:nth-child(1) {
+  width: 50%;
 }
 
-.mp-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
+.manage-categories-table th:nth-child(2),
+.manage-categories-table td:nth-child(2) {
+  width: 20%;
 }
 
-
-.mp-header .mp-btn-primary {
-  font-size: 1rem;
-  padding: 8px 16px;
-  min-width: auto;
-}
-
-.mp-filters {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.mp-filters>button {
-  margin-top: 7px;
-}
-
-.mp-filters>.mp-btn-secondary {
-  font-size: 0.9rem;
-  padding: 7px 15px;
-}
-
-.mp-table th:nth-child(3),
-.mp-table td:nth-child(3) {
-  width: 160px;
-  white-space: nowrap;
+.manage-categories-table th:nth-child(3),
+.manage-categories-table td:nth-child(3) {
+  width: 30%;
+  text-align: right;
 }

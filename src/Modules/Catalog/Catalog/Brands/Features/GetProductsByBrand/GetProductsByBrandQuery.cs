@@ -1,4 +1,2 @@
-﻿using Catalog.Products.Features.GetProductsByCategory;
-
-namespace Catalog.Brands.Features.GetProductsByBrand;
+﻿namespace Catalog.Brands.Features.GetProductsByBrand;
 public record GetProductsByBrandQuery(Guid BrandId, int PageIndex, int PageSize) : IRequest<PaginatedProductsDTO>;

@@ -17,6 +17,7 @@ import ProductDetails from './Views/Pages/ProductDetails';
 import Sidebar from './Views/Pages/Sidebar';
 import FilteredProducts from './Views/Pages/FilteredProducts';
 import ProductSearchResults from './Components/UI/ProductSearchResults '
+import CreateOrderPage from './Views/Pages/CreateOrderPage';
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function AppContent() {
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/cart" element={<ShoppingCartPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/order" element={<CreateOrderPage />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/filter/:filterType/:filterId" element={<FilteredProducts />} />

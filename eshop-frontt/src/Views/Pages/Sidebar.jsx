@@ -1,156 +1,126 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Styles/sidebar.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 const API = "https://localhost:5050";
 
-const Sidebar = ({ onClose }) => {
+export default function Sidebar({ onClose }) {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [loadingCats, setLoadingCats] = useState(false);
   const [loadingBrands, setLoadingBrands] = useState(false);
-  const [activeView, setActiveView] = useState("main");
+
+  const [expandedCats, setExpandedCats] = useState([]);
+  const [subMap, setSubMap] = useState({});
+  const [loadingSubs, setLoadingSubs] = useState({});
+
   const sidebarRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     setLoadingCats(true);
-    fetch(`${API}/categories?PageIndex=0&PageSize=20`)  // mund ta ndryshosh sipas nevojës
-      .then((res) => res.json())
-      .then((data) => {
-        // data.categories.data është array i kategorive
-        setCategories(data.categories?.data || []);
-      })
-      .catch((err) => console.error("Fetch categories error:", err))
+    fetch(`${API}/categories?PageIndex=0&PageSize=50`)
+      .then(res => res.json())
+      .then(d => setCategories(d.categories?.data || []))
+      .catch(console.error)
       .finally(() => setLoadingCats(false));
 
     setLoadingBrands(true);
-    fetch(`${API}/brands?PageIndex=0&PageSize=20`)
-      .then((res) => res.json())
-      .then((data) => {
-        // po ashtu brands.data është array i brendeve
-        setBrands(data.brands?.data || []);
-      })
-      .catch((err) => console.error("Fetch brands error:", err))
+    fetch(`${API}/brands?PageIndex=0&PageSize=50`)
+      .then(res => res.json())
+      .then(d => setBrands(d.brands?.data || []))
+      .catch(console.error)
       .finally(() => setLoadingBrands(false));
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+    const handler = e => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
         onClose();
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
-  const handleFilterClick = (type, id) => {
+  const handleFilter = (type, id) => {
     onClose();
     navigate(`/products/filter/${type}/${id}`);
+  };
+
+  const toggleCat = catId => {
+    if (expandedCats.includes(catId)) {
+      setExpandedCats(expandedCats.filter(id => id !== catId));
+    } else {
+      setExpandedCats([...expandedCats, catId]);
+      if (!subMap[catId]) {
+        setLoadingSubs(prev => ({ ...prev, [catId]: true }));
+        fetch(`${API}/categories/${catId}/subcategories?PageIndex=0&PageSize=50`)
+          .then(r => r.json())
+          .then(d => {
+            setSubMap(prev => ({ ...prev, [catId]: d.subcategories?.data || [] }));
+          })
+          .catch(console.error)
+          .finally(() => {
+            setLoadingSubs(prev => ({ ...prev, [catId]: false }));
+          });
+      }
+    }
   };
 
   return (
     <div className="sidebar-overlay">
       <div className="sidebar" ref={sidebarRef}>
-        <button className="close-btn" onClick={onClose}>
-          ×
-        </button>
+        <button className="close-btn" onClick={onClose}>×</button>
 
-        {activeView === "main" && (
-          <>
-            <h3 className="toggle-header">View All</h3>
-            <div className="sidebar-section">
-              <h3
-                className="toggle-header"
-                onClick={() => setActiveView("categories")}
-                style={{ cursor: "pointer" }}
-              >
-                Categories
-              </h3>
-            </div>
-
-            <div className="sidebar-section">
-              <h3
-                className="toggle-header"
-                onClick={() => setActiveView("brands")}
-                style={{ cursor: "pointer" }}
-              >
-                Brands
-              </h3>
-            </div>
-
-            <div className="sidebar-section">
-              <h3
-                className="toggle-header"
-                onClick={() => navigate("/profile")}
-                style={{ cursor: "pointer" }}
-              >
-                User Profile
-              </h3>
-            </div>
-          </>
-        )}
-
-        {activeView === "categories" && (
-          <>
-            <button className="back-btn" onClick={() => setActiveView("main")}>
-              ← Back
-            </button>
-            <div className="sidebar-section">
-              <h3 className="toggle-header">All Categories</h3>
-              <ul>
-                {loadingCats ? (
-                  <li>Loading categories…</li>
-                ) : categories.length > 0 ? (
-                  categories.map((cat) => (
-                    <li
-                      key={cat.id}
-                      onClick={() => handleFilterClick("category", cat.id)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {cat.name}
-                    </li>
-                  ))
-                ) : (
-                  <li>No categories available</li>
+        <div className="sidebar-section">
+          <h3>All Categories</h3>
+          <ul>
+            {loadingCats && <li>Loading categories…</li>}
+            {!loadingCats && categories.length === 0 && (
+              <li>No categories available</li>
+            )}
+            {!loadingCats && categories.map(cat => (
+              <React.Fragment key={cat.id}>
+                <li onClick={() => toggleCat(cat.id)}>
+                  {cat.name}
+                </li>
+                {expandedCats.includes(cat.id) && (
+                  <ul className="sidebar-sublist">
+                    {loadingSubs[cat.id] && <li>Loading…</li>}
+                    {!loadingSubs[cat.id] && subMap[cat.id]?.length === 0 && (
+                      <li>No subcategories</li>
+                    )}
+                    {!loadingSubs[cat.id] && subMap[cat.id].map(sub => (
+                      <li
+                        key={sub.id}
+                        onClick={() => handleFilter("subcategory", sub.id)}
+                      >
+                        {sub.name}
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              </ul>
-            </div>
-          </>
-        )}
+              </React.Fragment>
+            ))}
+          </ul>
+        </div>
 
-        {activeView === "brands" && (
-          <>
-            <button className="back-btn" onClick={() => setActiveView("main")}>
-              ← Back
-            </button>
-            <div className="sidebar-section">
-              <h3 className="toggle-header">All Brands</h3>
-              <ul>
-                {loadingBrands ? (
-                  <li>Loading brands…</li>
-                ) : brands.length > 0 ? (
-                  brands.map((brand) => (
-                    <li
-                      key={brand.id}
-                      onClick={() => handleFilterClick("brand", brand.id)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {brand.name}
-                    </li>
-                  ))
-                ) : (
-                  <li>No brands available</li>
-                )}
-              </ul>
-            </div>
-          </>
-        )}
+        <div className="sidebar-section">
+          <h3>All Brands</h3>
+          <ul>
+            {loadingBrands && <li>Loading brands…</li>}
+            {!loadingBrands && brands.length === 0 && (
+              <li>No brands available</li>
+            )}
+            {!loadingBrands && brands.map(br => (
+              <li key={br.id} onClick={() => handleFilter("brand", br.id)}>
+                {br.name}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Sidebar;
+}

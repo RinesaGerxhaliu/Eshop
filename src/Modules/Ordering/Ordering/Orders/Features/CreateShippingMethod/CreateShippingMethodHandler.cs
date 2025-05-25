@@ -1,8 +1,4 @@
-﻿using FluentValidation;
-using Ordering.Orders.Dtos;
-using Ordering.Orders.Models;
-
-namespace Ordering.Orders.Features.CreateShippingMethod;
+﻿namespace Ordering.Orders.Features.CreateShippingMethod;
 
 public record CreateShippingMethodCommand(ShippingMethodDto ShippingMethod)
     : ICommand<CreateShippingMethodResult>;

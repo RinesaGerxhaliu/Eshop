@@ -1,0 +1,77 @@
+/* CreateOrder.css */
+
+.create-order-container {
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 2rem;
+  background-color: #fff0f5;      /* LavenderBlush */
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif;
+}
+
+.create-order-container .card {
+  border: none;
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.create-order-container .card-header {
+  background-color: #e83e8c;    /* Pink */
+  color: #fff;
+  padding: 1rem 1.5rem;
+}
+
+.create-order-container .card-header h3 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.create-order-container .card-body {
+  background-color: #fff0f5;    /* Match container */
+  padding: 1.5rem;
+}
+
+.create-order-container .list-group-item {
+  background-color: #ffffff;
+  border: 1px solid #f2e6ef;
+  border-radius: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.create-order-container .form-label {
+  color: #8b005d;
+  font-weight: 500;
+}
+
+.create-order-container .form-control,
+.create-order-container .form-select {
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.create-order-container .form-control:focus,
+.create-order-container .form-select:focus {
+  border-color: #e83e8c;
+  box-shadow: 0 0 0 0.2rem rgba(232, 62, 140, 0.25);
+}
+
+.create-order-container button.btn-success {
+  background-color: #e83e8c;
+  border-color: #e83e8c;
+  border-radius: 1rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+.create-order-container button.btn-success:hover {
+  background-color: #d6336c;
+  border-color: #d6336c;
+}
+
+@media (max-width: 768px) {
+  .create-order-container {
+    padding: 1rem;
+    margin: 30px 1rem;
+  }
+}

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// Navbar.jsx
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaShoppingBag, FaBars, FaSignOutAlt, FaHeart } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
@@ -10,41 +11,35 @@ const Navbar = () => {
   const { isLoggedIn, logout, roles } = useAuth();
   const { currency, rates, setCurrency } = useCurrency();
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const location = useLocation();
-
-  React.useEffect(() => {
+  useEffect(() => {
     setSearchQuery("");
     setSuggestions([]);
     setShowSuggestions(false);
   }, [location.pathname]);
-
 
   const handleLogout = () => {
     logout();
     window.location.href = "/login";
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
     if (searchQuery) {
       navigate(`/products?search=${searchQuery}`);
     }
   };
 
-  const handleCartClick = () => {
-    navigate("/cart");
-  };
+  const handleCartClick = () => navigate("/cart");
+  const handleWishlist = () => navigate("/wishlist");
 
-  const handleWishlist = () => {
-    navigate("/wishlist");
-  };
-
-  const handleInputChange = async (e) => {
+  const handleInputChange = async e => {
     const value = e.target.value;
     setSearchQuery(value);
 
@@ -58,7 +53,7 @@ const Navbar = () => {
           setSuggestions(data.data || []);
           setShowSuggestions(true);
         }
-      } catch (err) {
+      } catch {
         setSuggestions([]);
         setShowSuggestions(false);
       }
@@ -82,11 +77,10 @@ const Navbar = () => {
             <Link className="nav-link" to="/homepage">About Us</Link>
             <Link className="nav-link" to="/shop">Shop</Link>
           </div>
+
           {/* Center: Brand + Search */}
           <div className="nav-block nav-center">
-            <Link className="navbar-brandd" to="/homepage">
-              Trendora
-            </Link>
+            <Link className="navbar-brandd" to="/homepage">Trendora</Link>
             <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
@@ -98,12 +92,11 @@ const Navbar = () => {
                 onFocus={() => suggestions.length && setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
               />
-              <button type="submit" className="search-button">
-                Search
-              </button>
+              <button type="submit" className="search-button">Search</button>
+
               {showSuggestions && suggestions.length > 0 && (
                 <ul className="suggestions-list">
-                  {suggestions.map((product) => (
+                  {suggestions.map(product => (
                     <li
                       key={product.id}
                       className="suggestion-item"
@@ -114,7 +107,11 @@ const Navbar = () => {
                       }}
                     >
                       <img
-                        src={product.imageUrl ? `https://localhost:5050${product.imageUrl}` : "/placeholder.png"}
+                        src={
+                          product.imageUrl
+                            ? `https://localhost:5050${product.imageUrl}`
+                            : "/placeholder.png"
+                        }
                         alt={product.name}
                         className="suggestion-thumb"
                       />
@@ -128,39 +125,57 @@ const Navbar = () => {
               )}
             </form>
           </div>
+
+          {/* Right: Icons & User */}
           <div className="nav-block nav-right">
-            <FaShoppingBag className="user-icon" onClick={handleCartClick} title="View cart" />
-            <FaHeart className="user-icon" onClick={handleWishlist} title="Wishlist" />
+            <FaShoppingBag
+              className="user-icon"
+              onClick={handleCartClick}
+              title="View cart"
+            />
+            <FaHeart
+              className="user-icon"
+              onClick={handleWishlist}
+              title="Wishlist"
+            />
+
             {isLoggedIn ? (
               <>
-                <FaUserCircle className="user-icon" onClick={() => navigate("/profile")} />
+                <FaUserCircle
+                  className="user-icon"
+                  onClick={() => navigate("/profile")}
+                />
                 {roles.includes("admin") && (
                   <Link className="nav-link" to="/admin-dashboard">
                     Dashboard
                   </Link>
                 )}
-                <button className="nav-link logout-btn" onClick={handleLogout}>
-                  <FaSignOutAlt className="logout-icon" />
-                  Logout
-                </button>
+                {/* Logout as Link */}
+                <Link
+                  to="#"
+                  className="nav-link logout-link"
+                  onClick={e => {
+                    e.preventDefault();
+                    handleLogout();
+                  }}
+                >
+                  <FaSignOutAlt className="logout-icon" /> Logout
+                </Link>
               </>
             ) : (
               <>
                 <FaUserCircle className="user-icon" />
-                <Link className="nav-link" to="/login">
-                  Sign In
-                </Link>
+                <Link className="nav-link" to="/login">Sign In</Link>
               </>
             )}
+
             <select
               className="currency-select"
               value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
+              onChange={e => setCurrency(e.target.value)}
             >
-              {options.map((code) => (
-                <option key={code} value={code}>
-                  {code}
-                </option>
+              {options.map(code => (
+                <option key={code} value={code}>{code}</option>
               ))}
             </select>
           </div>
