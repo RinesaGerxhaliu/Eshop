@@ -21,7 +21,7 @@ internal class RemoveItemFromWishlistHandler(IWishlistRepository repository)
 {
     public async Task<RemoveItemFromWishlistResult> Handle(RemoveItemFromWishlistCommand command, CancellationToken cancellationToken)
     {
-        var wishlist = await repository.GetWishlist(command.UserName, false, cancellationToken);
+        var wishlist = await repository.GetWishlist(command.UserName, true, cancellationToken);
 
         wishlist.RemoveItem(command.ProductId);
 

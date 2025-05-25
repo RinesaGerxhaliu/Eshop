@@ -36,9 +36,12 @@
 
         public void RemoveItem(Guid productId)
         {
-            var item = _items.FirstOrDefault(x => x.ProductId == productId);
-            if (item is not null)
+            var item = Items.FirstOrDefault(x => x.ProductId == productId);
+
+            if (item != null)
+            {
                 _items.Remove(item);
+            }
         }
     }
 }
