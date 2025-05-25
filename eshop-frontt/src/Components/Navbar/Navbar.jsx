@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaUserCircle, FaShoppingBag, FaBars, FaSignOutAlt } from "react-icons/fa";
+import { FaUserCircle, FaShoppingBag, FaBars, FaSignOutAlt, FaHeart } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCurrency } from "../../contexts/CurrencyContext";
 import Sidebar from "../../Views/Pages/Sidebar";
@@ -38,6 +38,10 @@ const Navbar = () => {
 
   const handleCartClick = () => {
     navigate("/cart");
+  };
+
+  const handleWishlist = () => {
+    navigate("/wishlist");
   };
 
   const handleInputChange = async (e) => {
@@ -126,6 +130,7 @@ const Navbar = () => {
           </div>
           <div className="nav-block nav-right">
             <FaShoppingBag className="user-icon" onClick={handleCartClick} title="View cart" />
+            <FaHeart className="user-icon" onClick={handleWishlist} title="Wishlist" />
             {isLoggedIn ? (
               <>
                 <FaUserCircle className="user-icon" onClick={() => navigate("/profile")} />

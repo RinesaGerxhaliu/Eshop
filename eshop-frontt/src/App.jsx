@@ -8,6 +8,7 @@ import Homepage from './Views/Pages/Homepage';
 import { AuthProvider } from './contexts/AuthContext';
 import UserProfile from './Views/Pages/UserProfile';
 import ShoppingCartPage from './Views/Pages/ShoppingCart';
+import Wishlist from './Views/Pages/Wishlist';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import Dashboard from './Views/Pages/AdminDashboard';
 import PrivateRoute from './Components/PrivateRoute'; 
@@ -48,6 +49,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/cart" element={<ShoppingCartPage />} />
+        <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/filter/:filterType/:filterId" element={<FilteredProducts />} />
