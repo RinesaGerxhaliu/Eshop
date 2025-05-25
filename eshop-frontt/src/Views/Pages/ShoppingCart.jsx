@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "../../Styles/ShoppingCart.css";
+import { useCurrency } from "../../contexts/CurrencyContext";
 
 const ShoppingCartPage = () => {
   const { refreshAccessToken } = useAuth();
@@ -10,14 +11,12 @@ const ShoppingCartPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const navigate = useNavigate();
+  const { convert, format } = useCurrency();
 
-  // Handler for proceeding to checkout/process order
   const handleProcessOrder = () => {
-    // Navigate to your checkout or order processing route
     navigate('/order');
   };
 
-  // Fetch product details (including image) for each item
   const fetchProductDetails = async (productId) => {
     try {
       const response = await fetch(`https://localhost:5050/products/${productId}`);
@@ -32,7 +31,6 @@ const ShoppingCartPage = () => {
     }
   };
 
-  // Fetch the shopping cart data
   const getCart = async () => {
     try {
       const username = localStorage.getItem("username");
@@ -174,7 +172,9 @@ const ShoppingCartPage = () => {
 
                 <div className="cart-item-details">
                   <p><strong>{item.productName}</strong></p>
-                  <p>Price: €{item.price}</p>
+                  <p>
+                  Price: {format(convert(item.price))}
+                </p>
                   <p>Quantity: {item.quantity}</p>
                   <p>Color: {item.color}</p>
                 </div>

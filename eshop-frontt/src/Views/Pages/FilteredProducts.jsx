@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FaSort } from "react-icons/fa";
+import { useCurrency } from "../../contexts/CurrencyContext";
 import "../../Styles/FilterProducts.css";
 
 const API = "https://localhost:5050";
@@ -13,6 +14,8 @@ const FilteredProducts = () => {
   const [pageIndex, setPageIndex] = useState(0);
   const PAGE_SIZE = 8;
   const [totalCount, setTotalCount] = useState(0);
+
+  const { convert, format } = useCurrency();
 
   const fetchProducts = async () => {
     const params = new URLSearchParams({
@@ -96,7 +99,7 @@ const FilteredProducts = () => {
                   <h3>{product.name}</h3>
                   <p>{product.description}</p>
                   <div className="product-info">
-                    <p className="product-price">${product.price}</p>
+                    <p className="product-price">{format(convert(product.price))}</p>
                     <Link to={`/products/${product.id}`} className="details">Details</Link>
                   </div>
                 </div>

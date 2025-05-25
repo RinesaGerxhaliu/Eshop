@@ -32,7 +32,6 @@ const ChartComponent = () => {
 
         const data = await response.json();
 
-        // Kontrollo strukturën e përgjigjes, rregullo sipas backend-it tënd:
         const catList = Array.isArray(data.categories)
           ? data.categories
           : Array.isArray(data)
