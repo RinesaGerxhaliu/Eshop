@@ -6,7 +6,6 @@ import ManageUsers from '../../Components/ManageUsers';
 import ManageReviews from '../../Components/ManageReviews'; 
 import ManageBrands from '../../Components/ManageBrands'; 
 import ManageCategories from '../../Components/ManageCategories';
-import CategoriesList  from '../../Components/UI/CategoriesList';
 import SubcategoriesList from '../../Components/UI/SubcategoriesList';
 
 const AdminDashboard = () => {
@@ -30,7 +29,6 @@ const AdminDashboard = () => {
           <Route path="manage-reviews" element={<ManageReviews />} />
           <Route path="manage-brands" element={<ManageBrands />} />
           <Route path="manage-categories" element={<ManageCategories />}>
-        <Route index element={<CategoriesList />} />
 
         <Route
           path=":categoryId/subcategories"
