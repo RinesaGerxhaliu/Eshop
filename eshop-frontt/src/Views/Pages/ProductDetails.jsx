@@ -5,6 +5,8 @@ import { useCurrency } from "../../contexts/CurrencyContext";
 import ProductReviews from "./ProductReviews"; // kjo mund të hiqet për admin
 import { useAuth } from "../../contexts/AuthContext"; // për të marrë rolet
 import axios from "axios";
+import { FaHeart } from "react-icons/fa";
+
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -24,6 +26,8 @@ const ProductDetails = () => {
   const [reviewError, setReviewError] = useState("");
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [refreshReviewsKey, setRefreshReviewsKey] = useState(0);
+const [isFavorite, setIsFavorite] = useState(false);
+
 
 
   const refreshToken = async () => {
@@ -149,6 +153,146 @@ const handleAddToCart = async (e) => {
     setIsAdding(false);
   }
 };
+ const fetchWishlistStatus = async () => {
+  const username = localStorage.getItem("username");
+  let token = localStorage.getItem("token");
+
+  if (!username || !token) {
+    setIsFavorite(false);
+    return;
+  }
+
+  try {
+    let response = await fetch(`https://localhost:5050/wishlist/${username}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      token = await refreshToken();
+      localStorage.setItem("token", token);
+      response = await fetch(`https://localhost:5050/wishlist/${username}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    }
+
+    if (!response.ok) throw new Error("Failed to fetch wishlist");
+
+    const data = await response.json();
+    const items = data.wishlist?.items || [];
+    const found = items.some(item => item.productId === id);
+
+    setIsFavorite(found);
+  } catch (error) {
+    console.error("Could not load wishlist status", error);
+    setIsFavorite(false);
+  }
+};
+  useEffect(() => {
+    if (id) {
+      fetchWishlistStatus();
+    }
+  }, [id]);
+
+const handleWishlistToggle = async () => {
+  console.log("Toggling wishlist for product id:", id, "Currently favorite:", isFavorite);
+  
+
+  const username = localStorage.getItem("username");
+  let token = localStorage.getItem("token");
+
+  if (!username || !token) {
+    window.location.href = "/login";
+    return;
+  }
+
+  const deleteUrl = `https://localhost:5050/wishlist/${username}/items/${id}`;
+  const postUrl = `https://localhost:5050/wishlist/${username}/items`;
+
+  try {
+    if (isFavorite) {
+      console.log("Trying to DELETE from wishlist:", deleteUrl);
+
+      let response = await fetch(deleteUrl, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401) {
+        token = await refreshToken();
+        localStorage.setItem("token", token);
+
+        response = await fetch(deleteUrl, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Failed to remove from wishlist:", response.status, errorText);
+        console.log("Response status:", response.status);
+        throw new Error("Failed to remove from wishlist");
+      }
+
+      setIsFavorite(false);
+      console.log("Item removed from wishlist.");
+    } else {
+      console.log("Trying to POST to wishlist:", postUrl);
+
+      const body = JSON.stringify({
+        userName: username,
+        wishlistItem: {
+          productId: id,
+
+        },
+      });
+
+      let response = await fetch(postUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body,
+      });
+
+      if (response.status === 401) {
+        token = await refreshToken();
+        localStorage.setItem("token", token);
+
+        response = await fetch(postUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body,
+        });
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Failed to add to wishlist:", response.status, errorText);
+        throw new Error("Failed to add to wishlist");
+      }
+
+      setIsFavorite(true);
+      console.log("Item added to wishlist.");
+    }
+  } catch (error) {
+    console.error("Wishlist toggle failed", error);
+  }
+};
+
+
 
 
   const handleReviewSubmit = async (e) => {
@@ -237,7 +381,21 @@ const handleAddToCart = async (e) => {
             </div>
 
             <div className="product-infoo">
-              <h1>{product.name}</h1>
+<div className="product-title-row">
+  <h1 className="product-name">{product.name}</h1>
+  {!isAdmin && (
+    <button
+      className={`wishlist-heart ${isFavorite ? "active" : ""}`}
+      onClick={handleWishlistToggle}
+      title={isFavorite ? "Remove from Wishlist" : "Add to Wishlist"}
+      aria-pressed={isFavorite}
+      style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.5rem" }}
+    >
+      <FaHeart color={isFavorite ? "red" : "gray"} />
+    </button>
+  )}
+</div>
+
               <p className="product-descriptionn">{product.description}</p>
               <p className="product-pricee">
                 {product.price
@@ -277,6 +435,7 @@ const handleAddToCart = async (e) => {
                           : "Add to Cart"}
                       </button>
                     </div>
+
                   </div>
                 </form>
               )}
