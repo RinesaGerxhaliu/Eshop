@@ -21,11 +21,15 @@ namespace Ordering.Orders.Models
         public static ShippingMethod Create(Guid id, string name, decimal cost)
             => new ShippingMethod(id, name, cost);
 
-        public void UpdateCost(decimal newCost)
+        public void Update(string name, decimal cost)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(newCost, nameof(newCost));
-            Cost = newCost;
+            ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
+            ArgumentOutOfRangeException.ThrowIfNegative(cost, nameof(cost));
+
+            Name = name;
+            Cost = cost;
         }
+
 
     }
 }

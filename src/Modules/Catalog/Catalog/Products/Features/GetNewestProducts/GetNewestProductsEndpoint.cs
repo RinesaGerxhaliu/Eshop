@@ -17,6 +17,6 @@ public class GetNewestProductsEndpoint : ICarterModule
         .Produces<List<ProductDTO>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Get 4 newest products")
-        .WithDescription("Returns the 4 most recently added products based on ID.");
+        .WithDescription("Returns the 4 most recently added products based on CreatedAt.");
     }
 }
