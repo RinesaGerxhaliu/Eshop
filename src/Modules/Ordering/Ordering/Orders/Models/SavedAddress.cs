@@ -12,6 +12,13 @@ namespace Ordering.Orders.Models
 
         private SavedAddress() { }
 
+        public void Update(string customerId, ShippingAddress address, bool isDefault)
+        {
+            CustomerId = customerId;
+            Address = address;
+            IsDefault = isDefault;
+        }
+
         public static SavedAddress Create(
             Guid id,
             string customerId,

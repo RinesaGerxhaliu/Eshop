@@ -1,7 +1,4 @@
-﻿using Ordering.Orders.Dtos;
-using Ordering.Orders.Exceptions;
-
-namespace Ordering.Orders.Features.GetOrderById;
+﻿namespace Ordering.Orders.Features.GetOrderById;
 
 public record GetOrderByIdQuery(Guid Id)
     : IQuery<GetOrderByIdResult>;

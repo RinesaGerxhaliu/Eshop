@@ -31,20 +31,23 @@ internal class CreateWishlistHandler(IWishlistRepository repository)
 
     private Wishlist CreateNewWishlist(WishlistDTO wishlistDto)
     {
-        // create new wishlist
         var newWishlist = Wishlist.Create(
             Guid.NewGuid(),
             wishlistDto.UserName);
 
-        wishlistDto.Items.ForEach(item =>
+        if (wishlistDto.Items != null)
         {
-            newWishlist.AddItem(
-                item.ProductId,
-                item.PriceWhenAdded,
-                item.ProductName);
-        });
+            wishlistDto.Items.ForEach(item =>
+            {
+                newWishlist.AddItem(
+                    item.ProductId,
+                    item.PriceWhenAdded,
+                    item.ProductName);
+            });
+        }
 
         return newWishlist;
     }
+
 }
 

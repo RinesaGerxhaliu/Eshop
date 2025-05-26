@@ -1,5 +1,6 @@
 ﻿using Catalog.Wishlists.DTOs;
 using Catalog.Wishlists.Repositories;
+using Shared.Exceptions;
 
 namespace Catalog.Wishlists.Features.GetWishlist;
 
@@ -13,10 +14,13 @@ internal class GetWishlistHandler(IWishlistRepository repository, ISender sender
 {
     public async Task<GetWishlistResult> Handle(GetWishlistQuery query, CancellationToken cancellationToken)
     {
-        // Get the wishlist
         var wishlist = await repository.GetWishlist(query.CustomerId, true, cancellationToken);
 
-        // Build live-updated WishlistItemDTOs
+        if (wishlist == null)
+        {
+            throw new NotFoundException($"Wishlist for user '{query.CustomerId}' not found.");
+        }
+
         var updatedItems = new List<WishlistItemDTO>();
 
         foreach (var item in wishlist.Items)
@@ -27,7 +31,7 @@ internal class GetWishlistHandler(IWishlistRepository repository, ISender sender
                 Id: item.Id,
                 WishlistId: item.WishlistId,
                 ProductId: item.ProductId,
-                PriceWhenAdded: productResult.Product.Price, // you could also choose to keep the original price if needed
+                PriceWhenAdded: productResult.Product.Price,
                 ProductName: productResult.Product.Name
             );
 
@@ -42,5 +46,6 @@ internal class GetWishlistHandler(IWishlistRepository repository, ISender sender
 
         return new GetWishlistResult(wishlistDto);
     }
+
 }
 

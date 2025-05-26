@@ -1,8 +1,5 @@
-﻿using Ordering.Orders.Dtos;
+﻿namespace Ordering.Orders.Features.GetOrderById;
 
-namespace Ordering.Orders.Features.GetOrderById;
-
-//public record GetOrderByIdRequest();
 public record GetOrderByIdResponse(OrderDto Order);
 
 public class GetOrderByIdEndpoints : ICarterModule
