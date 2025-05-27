@@ -15,6 +15,11 @@ internal class CreateSavedAddressHandler(OrderingDbContext dbContext)
     {
         var dto = command.SavedAddress;
 
+        if (dto == null || dto.Address == null)
+        {
+            throw new ArgumentNullException(nameof(dto), "SavedAddressDto or Address cannot be null");
+        }
+
         var address = new ShippingAddress
         {
             Street = dto.Address.Street,
@@ -37,4 +42,5 @@ internal class CreateSavedAddressHandler(OrderingDbContext dbContext)
 
         return new CreateSavedAddressResult(savedAddress.Id);
     }
+
 }

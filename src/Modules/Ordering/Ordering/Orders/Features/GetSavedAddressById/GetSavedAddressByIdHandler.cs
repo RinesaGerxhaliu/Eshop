@@ -2,15 +2,24 @@
     : IQuery<GetSavedAddressByIdResult?>;
 
 public record GetSavedAddressByIdResult(SavedAddressDto Address);
+public record GetSavedAddressByCustomerIdQuery(string CustomerId) : IQuery<GetSavedAddressByIdResult?>;
 
-internal class GetSavedAddressByIdHandler(OrderingDbContext dbContext)
-    : IQueryHandler<GetSavedAddressByIdQuery, GetSavedAddressByIdResult?>
+internal class GetSavedAddressByCustomerIdHandler : IQueryHandler<GetSavedAddressByCustomerIdQuery, GetSavedAddressByIdResult?>
 {
-    public async Task<GetSavedAddressByIdResult?> Handle(GetSavedAddressByIdQuery query, CancellationToken cancellationToken)
-    {
-        var address = await dbContext.SavedAddresses.FindAsync(new object[] { query.Id }, cancellationToken);
+    private readonly OrderingDbContext dbContext;
 
-        if (address is null)
+    public GetSavedAddressByCustomerIdHandler(OrderingDbContext dbContext)
+    {
+        this.dbContext = dbContext;
+    }
+
+    public async Task<GetSavedAddressByIdResult?> Handle(GetSavedAddressByCustomerIdQuery query, CancellationToken cancellationToken)
+    {
+        var address = await dbContext.SavedAddresses
+            .Where(a => a.CustomerId == query.CustomerId && a.IsDefault)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (address == null)
             return null;
 
         var dto = new SavedAddressDto(
@@ -30,3 +39,4 @@ internal class GetSavedAddressByIdHandler(OrderingDbContext dbContext)
         return new GetSavedAddressByIdResult(dto);
     }
 }
+

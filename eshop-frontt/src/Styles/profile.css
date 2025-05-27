@@ -97,3 +97,30 @@ button:hover {
   background-color: #f2d7df;
   margin: 20px 0;
 }
+
+.address-item {
+  background-color: #fff0f6;
+  border: 1.5px solid #d63384;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+}
+
+.address-item .field {
+  padding: 8px 0;
+  border-bottom: 1px solid #f2d7df; 
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  color: #333;
+}
+
+.address-item .field:last-child {
+  border-bottom: none;
+}
+
+.address-item .field strong {
+  color: #d63384;
+  font-weight: 600;
+}
+
