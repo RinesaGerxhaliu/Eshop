@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import "../../Styles/profile.css";
 import AddAddressForm from "./AddAddressForm";
+import EditAddressForm from "./EditAddressForm";
 
 function UserProfile() {
   const { isLoggedIn } = useAuth();
 
   const [userInfo, setUserInfo] = useState(null);
-  const [activeSection, setActiveSection] = useState("info");
   const [userInfoLoading, setUserInfoLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState("info");
 
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -19,6 +20,7 @@ function UserProfile() {
   const [addressLoading, setAddressLoading] = useState(false);
   const [addressError, setAddressError] = useState(null);
   const [addingAddress, setAddingAddress] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -28,7 +30,6 @@ function UserProfile() {
 
   const getToken = () => localStorage.getItem("token");
 
-  // Load user info from token
   useEffect(() => {
     const token = getToken();
     if (token && isLoggedIn) {
@@ -45,7 +46,6 @@ function UserProfile() {
     setUserInfoLoading(false);
   }, [isLoggedIn]);
 
-  // Fetch orders or addresses when section or pagination changes
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -65,7 +65,6 @@ function UserProfile() {
     }
   }, [activeSection, pagination.pageIndex, pagination.pageSize]);
 
-  // Fetch orders with pagination
   const fetchOrders = async (token, pageIndex, pageSize) => {
     try {
       const userId = localStorage.getItem("userId");
@@ -96,7 +95,6 @@ function UserProfile() {
     }
   };
 
-  // Fetch single order details
   const fetchOrderById = async (orderId) => {
     const token = getToken();
     try {
@@ -114,7 +112,6 @@ function UserProfile() {
     }
   };
 
-  // Fetch saved addresses for user
   const fetchAddresses = async (token) => {
     try {
       const response = await fetch(`https://localhost:5050/saved-addresses/me`, {
@@ -123,7 +120,6 @@ function UserProfile() {
 
       if (!response.ok) {
         if (response.status === 404) {
-          // No saved addresses found
           setAddresses([]);
           setAddressError(null);
           return;
@@ -133,8 +129,8 @@ function UserProfile() {
       }
 
       const data = await response.json();
-
       const addr = data.address;
+
       if (!addr) {
         setAddresses([]);
         setAddressError(null);
@@ -167,10 +163,7 @@ function UserProfile() {
   };
 
   const handleNextPage = () => {
-    if (
-      pagination.pageIndex <
-      Math.ceil(pagination.totalCount / pagination.pageSize) - 1
-    ) {
+    if (pagination.pageIndex < Math.ceil(pagination.totalCount / pagination.pageSize) - 1) {
       setPagination((prev) => ({ ...prev, pageIndex: prev.pageIndex + 1 }));
     }
   };
@@ -210,14 +203,8 @@ function UserProfile() {
                   <p>Loading user info...</p>
                 ) : userInfo ? (
                   <>
-                    <p>
-                      <strong>Email:</strong> {userInfo.email}
-                    </p>
-                    <p>
-                      <strong>Full Name:</strong>{" "}
-                      {userInfo.name ||
-                        `${userInfo.given_name || ""} ${userInfo.family_name || ""}`}
-                    </p>
+                    <p><strong>Email:</strong> {userInfo.email}</p>
+                    <p><strong>Full Name:</strong> {userInfo.name || `${userInfo.given_name || ""} ${userInfo.family_name || ""}`}</p>
                   </>
                 ) : (
                   <p>No user information available.</p>
@@ -235,17 +222,9 @@ function UserProfile() {
                     {orders.length > 0 ? (
                       <ul>
                         {orders.map((order) => (
-                          <li
-                            key={order.id}
-                            onClick={() => handleOrderClick(order.id)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <p>
-                              <strong>Order Name:</strong> {order.orderName}
-                            </p>
-                            <p>
-                              <strong>Items:</strong> {order.items?.length}
-                            </p>
+                          <li key={order.id} onClick={() => handleOrderClick(order.id)} style={{ cursor: "pointer" }}>
+                            <p><strong>Order Name:</strong> {order.orderName}</p>
+                            <p><strong>Items:</strong> {order.items?.length}</p>
                           </li>
                         ))}
                       </ul>
@@ -254,19 +233,10 @@ function UserProfile() {
                     )}
 
                     <div className="pagination-controls">
-                      <button
-                        onClick={handlePreviousPage}
-                        disabled={pagination.pageIndex <= 0}
-                      >
+                      <button onClick={handlePreviousPage} disabled={pagination.pageIndex <= 0}>
                         Previous
                       </button>
-                      <button
-                        onClick={handleNextPage}
-                        disabled={
-                          pagination.pageIndex >=
-                          Math.ceil(pagination.totalCount / pagination.pageSize) - 1
-                        }
-                      >
+                      <button onClick={handleNextPage} disabled={pagination.pageIndex >= Math.ceil(pagination.totalCount / pagination.pageSize) - 1}>
                         Next
                       </button>
                     </div>
@@ -275,20 +245,12 @@ function UserProfile() {
                   <div>
                     <button onClick={() => setSelectedOrder(null)}>Back to Orders</button>
                     <h3>Order Details</h3>
-                    <p>
-                      <strong>Order Name:</strong> {selectedOrder.orderName}
-                    </p>
-                    <p>
-                      <strong>Status:</strong> {selectedOrder.status}
-                    </p>
-                    <p>
-                      <strong>Items:</strong>
-                    </p>
+                    <p><strong>Order Name:</strong> {selectedOrder.orderName}</p>
+                    <p><strong>Status:</strong> {selectedOrder.status}</p>
+                    <p><strong>Items:</strong></p>
                     <ul>
                       {selectedOrder.items?.map((item) => (
-                        <li key={item.id}>
-                          {item.productName} - Qty: {item.quantity}
-                        </li>
+                        <li key={item.id}>{item.productName} - Qty: {item.quantity}</li>
                       ))}
                     </ul>
                   </div>
@@ -296,50 +258,65 @@ function UserProfile() {
               </div>
             )}
 
-{activeSection === "addressBook" && (
-  <div className="address-book-section">
-    {addressLoading && <p>Loading addresses...</p>}
-    {addressError && <p style={{ color: "red" }}>{addressError}</p>}
+            {activeSection === "addressBook" && (
+              <div className="address-book-section">
+                {addressLoading && <p>Loading addresses...</p>}
+                {addressError && <p style={{ color: "red" }}>{addressError}</p>}
 
-    {addresses.length > 0 ? (
-  <>
-    <ul>
-      {addresses.map((addr) => (
-        <li key={addr.id}>
-          {addr.street}, {addr.city}, {addr.state}, {addr.postalCode},{" "}
-          {addr.country}, Phone: {addr.phoneNumber}{" "}
-          {addr.isDefault && <strong>(Default)</strong>}
-        </li>
-      ))}
-    </ul>
-    {/* Nëse ka adresa, mos e shfaq butonin "Add Address" */}
-  </>
-) : (
-  <>
-    <p>No saved addresses.</p>
-    {/* Nëse nuk ka adresa, shfaq butonin */}
-    {!addingAddress && (
-      <button onClick={() => setAddingAddress(true)}>Add Address</button>
-    )}
-  </>
-)}
+                {!editingAddress ? (
+                  <>
+                    {addresses.length > 0 ? (
+                      <div className="address-list">
+                        {addresses.map((addr) => (
+                          <div key={addr.id} className="address-card">
+                            <p className="section-title">Your Saved Address</p>
+                            <p><strong>Street:</strong> {addr.street}</p>
+                            <p><strong>City:</strong> {addr.city}</p>
+                            <p><strong>State:</strong> {addr.state}</p>
+                            <p><strong>Postal Code:</strong> {addr.postalCode}</p>
+                            <p><strong>Country:</strong> {addr.country}</p>
+                            <p><strong>Phone:</strong> {addr.phoneNumber}</p>
+                            {addr.isDefault && <p className="default-label">(Default)</p>}
+                            <button className="edit-btn" onClick={() => setEditingAddress(addr)}>Edit</button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <>
+                        <p>No saved addresses.</p>
+                        {!addingAddress && (
+                          <button onClick={() => setAddingAddress(true)}>Add Address</button>
+                        )}
+                      </>
+                    )}
 
-{addingAddress && (
-  <AddAddressForm
-    customerId={userInfo?.sub || localStorage.getItem("userId")}
-    token={getToken()}
-    onSuccess={() => {
-      setAddingAddress(false);
-      fetchAddresses(getToken());
-    }}
-    onCancel={() => setAddingAddress(false)}
-  />
-)}
-
-  </div>
-)}
-
-             
+                    {addingAddress && (
+                      <div className="address-form-wrapper">
+                        <AddAddressForm
+                          customerId={userInfo?.sub || localStorage.getItem("userId")}
+                          token={getToken()}
+                          onSuccess={() => {
+                            setAddingAddress(false);
+                            fetchAddresses(getToken());
+                          }}
+                          onCancel={() => setAddingAddress(false)}
+                        />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <EditAddressForm
+                    address={editingAddress}
+                    token={getToken()}
+                    onSuccess={() => {
+                      setEditingAddress(null);
+                      fetchAddresses(getToken());
+                    }}
+                    onCancel={() => setEditingAddress(null)}
+                  />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,32 +1,43 @@
 import React, { useState } from "react";
 
-function AddAddressForm({ customerId, token, onSuccess, onCancel }) {
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [country, setCountry] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [isDefault, setIsDefault] = useState(false);
+function EditAddressForm({ address, token, onSuccess, onCancel }) {
+  const [formData, setFormData] = useState({
+    street: address.street,
+    city: address.city,
+    state: address.state,
+    postalCode: address.postalCode,
+    country: address.country,
+    phoneNumber: address.phoneNumber,
+    isDefault: address.isDefault,
+  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newAddress = {
+    const payload = {
       savedAddress: {
-        customerId,
+        id: address.id,
+        customerId: address.customerId,
         address: {
-          street,
-          city,
-          state,
-          postalCode,
-          country,
-          phoneNumber,
+          street: formData.street,
+          city: formData.city,
+          state: formData.state,
+          postalCode: formData.postalCode,
+          country: formData.country,
+          phoneNumber: formData.phoneNumber,
         },
-        isDefault,
+        isDefault: formData.isDefault,
       },
     };
 
@@ -34,22 +45,21 @@ function AddAddressForm({ customerId, token, onSuccess, onCancel }) {
     setError(null);
 
     try {
-      const response = await fetch("https://localhost:5050/saved-addresses", {
-        method: "POST",
+      const response = await fetch(`https://localhost:5050/saved-addresses/${address.id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(newAddress),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save address");
+        throw new Error("Failed to update address");
       }
-
       onSuccess();
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      setError(err.message || "Failed to update address");
     } finally {
       setLoading(false);
     }
@@ -57,54 +67,62 @@ function AddAddressForm({ customerId, token, onSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} style={styles.form}>
+      <h3 style={styles.title}>Edit Address</h3>
+
       {error && <p style={styles.error}>{error}</p>}
 
       <div style={styles.gridContainer}>
         <input
           type="text"
+          name="street"
           placeholder="Street"
-          value={street}
-          onChange={(e) => setStreet(e.target.value)}
+          value={formData.street}
+          onChange={handleChange}
           required
           style={styles.input}
         />
         <input
           type="text"
+          name="city"
           placeholder="City"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
+          value={formData.city}
+          onChange={handleChange}
           required
           style={styles.input}
         />
         <input
           type="text"
+          name="state"
           placeholder="State"
-          value={state}
-          onChange={(e) => setState(e.target.value)}
+          value={formData.state}
+          onChange={handleChange}
           required
           style={styles.input}
         />
         <input
           type="text"
+          name="postalCode"
           placeholder="Postal Code"
-          value={postalCode}
-          onChange={(e) => setPostalCode(e.target.value)}
+          value={formData.postalCode}
+          onChange={handleChange}
           required
           style={styles.input}
         />
         <input
           type="text"
+          name="country"
           placeholder="Country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
+          value={formData.country}
+          onChange={handleChange}
           required
           style={styles.input}
         />
         <input
           type="tel"
+          name="phoneNumber"
           placeholder="Phone Number"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          value={formData.phoneNumber}
+          onChange={handleChange}
           required
           style={styles.input}
         />
@@ -113,52 +131,50 @@ function AddAddressForm({ customerId, token, onSuccess, onCancel }) {
       <label style={styles.checkboxLabel}>
         <input
           type="checkbox"
-          checked={isDefault}
-          onChange={(e) => setIsDefault(e.target.checked)}
+          name="isDefault"
+          checked={formData.isDefault}
+          onChange={handleChange}
           style={styles.checkbox}
         />
         Set as default address
       </label>
 
       <div style={styles.buttonContainer}>
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            ...styles.button,
-            backgroundColor: loading ? "#f8d7e7" : "#f5b6ce",
-            cursor: loading ? "not-allowed" : "pointer",
-            color: "#831843",
-            boxShadow: "0 0 8px #f5b6ceaa",
-          }}
-          onMouseEnter={(e) => {
-            if (!loading) e.currentTarget.style.backgroundColor = "#f78fb0";
-          }}
-          onMouseLeave={(e) => {
-            if (!loading) e.currentTarget.style.backgroundColor = "#f5b6ce";
-          }}
-        >
-          {loading ? "Saving..." : "Save Address"}
-        </button>
+      <button
+  type="submit"
+  disabled={loading}
+  style={{
+    ...styles.button,
+    backgroundColor: loading ? "#f8b7cd" : "#fce4ec",
+    color: "#d63384", 
+    cursor: loading ? "not-allowed" : "pointer",
+    boxShadow: "0 0 8px rgba(245, 120, 180, 0.5)", 
+  }}
+  onMouseEnter={(e) => {
+    if (!loading) e.currentTarget.style.backgroundColor = "#f8b7cd"; 
+  }}
+  onMouseLeave={(e) => {
+    if (!loading) e.currentTarget.style.backgroundColor = "#fce4ec"; 
+  }}
+>
+  {loading ? "Saving..." : "Save Changes"}
+</button>
 
-        <button
-          type="button"
-          onClick={onCancel}
-          style={{
-            ...styles.button,
-            backgroundColor: "#fcd2d5",
-            color: "#9b2c2c",
-            boxShadow: "0 0 8px #fcd2d5aa",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = "#fca5a5")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "#fcd2d5")
-          }
-        >
-          Cancel
-        </button>
+<button
+  type="button"
+  onClick={onCancel}
+  style={{
+    ...styles.button,
+    backgroundColor: "#fce4ec",
+    color: "#b83280", 
+    boxShadow: "0 0 8px rgba(245, 120, 180, 0.4)",
+  }}
+  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f8b7cd")} 
+  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fce4ec")} 
+>
+  Cancel
+</button>
+
       </div>
     </form>
   );
@@ -167,13 +183,18 @@ function AddAddressForm({ customerId, token, onSuccess, onCancel }) {
 const styles = {
   form: {
     maxWidth: "500px",
-    margin: "100px 0",
+    margin: "2rem auto",
     padding: "2rem",
     border: "1px solid #ddd",
     borderRadius: "12px",
     backgroundColor: "#f9f9f9",
     boxShadow: "0 4px 12px rgba(175, 105, 155, 0.1)",
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  },
+  title: {
+    marginBottom: "1rem",
+    textAlign: "center",
+    color: "#333",
   },
   error: {
     color: "#ff4d4f",
@@ -237,4 +258,4 @@ const styles = {
   },
 };
 
-export default AddAddressForm;
+export default EditAddressForm;

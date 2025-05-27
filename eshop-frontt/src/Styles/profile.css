@@ -13,7 +13,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-start;
+
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -77,8 +77,8 @@ button:hover {
 }
 
 .section-content {
-  margin-top: 10px;
   width: 100%;
+  margin-top: 50px;
 }
 
 .orders-section, .address-book-section {
@@ -123,4 +123,47 @@ button:hover {
   color: #d63384;
   font-weight: 600;
 }
+.address-card p {
+  margin: 4px 0;
+  font-size: 17px;
+  color: #272525;
+  padding: 10px;
+}
 
+.address-card strong {
+  color: #d63384;
+}
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #050304; 
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+ font-family: 'Times New Roman', Times, serif;
+ font-style: initial;
+ margin-bottom: 20px;
+}
+.left-panel {
+  margin-top: 20px; 
+}
+
+.address-book-section {
+  margin-bottom: 100px;
+  padding: 30px 30px 10px 30px;
+  margin-top: 0px; 
+  position: relative;
+  min-height: 400px;
+}
+
+.address-form-wrapper {
+  margin-top: -120px; 
+  transition: margin-top 0.3s ease;
+  z-index: 10; 
+  position: relative;
+}
+
+.edit-btn{
+width: 50%;
+}

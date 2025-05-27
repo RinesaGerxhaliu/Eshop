@@ -21,15 +21,15 @@ const CreateOrderPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-const parseJwt = (token) => {
-  try {
-    return JSON.parse(atob(token.split(".")[1]));
-  } catch {
-    return {};
-  }
-};
+  const parseJwt = (token) => {
+    try {
+      return JSON.parse(atob(token.split(".")[1]));
+    } catch {
+      return {};
+    }
+  };
 
-
+  // Merr produktet ne basket per user
   useEffect(() => {
     (async () => {
       const username = localStorage.getItem("username");
@@ -49,7 +49,7 @@ const parseJwt = (token) => {
       }
     })();
   }, []);
-
+  
   useEffect(() => {
     (async () => {
       const resp = await fetch("https://localhost:5050/shipping-methods");
@@ -58,6 +58,26 @@ const parseJwt = (token) => {
         setShippingMethods(list);
       } else {
         console.error("Failed to fetch shipping methods", resp.statusText);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const token = localStorage.getItem("token");
+      const resp = await fetch("https://localhost:5050/saved-addresses/me", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.address && data.address.address) {
+          setAddress(data.address.address);
+        }
+      } else {
+        console.warn("No saved address found or failed to fetch.");
       }
     })();
   }, []);
@@ -71,12 +91,10 @@ const parseJwt = (token) => {
     setIsSubmitting(true);
     setError("");
 
-    const token = localStorage.getItem("token");
+    let token = localStorage.getItem("token");
     const decoded = parseJwt(token);
     const customerId =
-      decoded[
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-      ] || decoded.sub;
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || decoded.sub;
 
     const payload = {
       order: {
@@ -87,6 +105,7 @@ const parseJwt = (token) => {
         shippingAddress: address
       }
     };
+
     let resp = await fetch("https://localhost:5050/orders", {
       method: "POST",
       headers: {
