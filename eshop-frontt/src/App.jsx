@@ -18,6 +18,7 @@ import Sidebar from './Views/Pages/Sidebar';
 import FilteredProducts from './Views/Pages/FilteredProducts';
 import ProductSearchResults from './Components/UI/ProductSearchResults '
 import CreateOrderPage from './Views/Pages/CreateOrderPage';
+import Subcategories from "./Components/Subcategories";
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function AppContent() {
         <Route path="/products/sorted/by-price" element={<FilteredProducts />} />
         <Route path="/products/sorted/by-price-descending" element={<FilteredProducts />} />
         <Route path="/products" element={<ProductSearchResults />} />
+        <Route path="/categories/:categoryId/subcategories" element={<Subcategories />} />
         <Route
           path="/admin-dashboard/*"
           element={

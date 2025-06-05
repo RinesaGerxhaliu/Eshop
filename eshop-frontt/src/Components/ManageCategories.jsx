@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaCheck } from "react-icons/fa";
 import AddCategory from "./UI/AddCategory";
+import { useNavigate } from "react-router-dom";
 import "../Styles/ManageCategories.css";
 
 const BASE = "https://localhost:5050";
@@ -17,6 +18,7 @@ export default function ManageCategories() {
   const [successMsg, setSuccessMsg] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState("");
+  const navigate = useNavigate();
 
   const api = axios.create({
     baseURL: BASE,
@@ -32,7 +34,7 @@ export default function ManageCategories() {
   const loadCategories = () => {
     api
       .get("/categories", { params: { pageIndex, pageSize: PAGE_SIZE } })
-      .then(res => {
+      .then((res) => {
         const page = res.data.categories ?? res.data.Categories ?? {};
         const items = Array.isArray(page.data)
           ? page.data
@@ -50,7 +52,7 @@ export default function ManageCategories() {
         setCats(items);
         setTotalCount(count);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setCats([]);
         setTotalCount(0);
@@ -66,15 +68,19 @@ export default function ManageCategories() {
     loadCategories();
   };
 
-  const handleDelete = id => setDeleteTarget(id);
+  const handleDelete = (id) => setDeleteTarget(id);
   const confirmDelete = () => {
     api
       .delete(`/categories/${deleteTarget}`)
-      .then(res => {
-        setSuccessMsg(res.status === 200 ? "Category deleted successfully!" : "Deletion failed.");
+      .then((res) => {
+        setSuccessMsg(
+          res.status === 200
+            ? "Category deleted successfully!"
+            : "Deletion failed."
+        );
         loadCategories();
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setSuccessMsg("Error: " + err.message);
       })
@@ -88,12 +94,14 @@ export default function ManageCategories() {
   const saveEdit = () => {
     api
       .put(`/categories/${editingId}`, { name: editingName })
-      .then(res => {
-        setSuccessMsg(res.status === 200 ? "Category updated!" : "Update failed.");
+      .then((res) => {
+        setSuccessMsg(
+          res.status === 200 ? "Category updated!" : "Update failed."
+        );
         loadCategories();
         setEditingId(null);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setSuccessMsg("Error: " + err.message);
       });
@@ -101,18 +109,20 @@ export default function ManageCategories() {
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   const roles = JSON.parse(localStorage.getItem("roles") || "[]");
-  const isAdmin = roles.map(r => r.toLowerCase()).includes("admin");
+  const isAdmin = roles.map((r) => r.toLowerCase()).includes("admin");
 
   return (
     <>
       <AddCategory
         isOpen={showAddModal}
         onAdd={handleAddSuccess}
-        onError={msg => setSuccessMsg(msg)}
+        onError={(msg) => setSuccessMsg(msg)}
         onClose={() => setShowAddModal(false)}
       />
 
-      {successMsg && <div className="manage-categories-success">{successMsg}</div>}
+      {successMsg && (
+        <div className="manage-categories-success">{successMsg}</div>
+      )}
 
       <div className="manage-categories-container">
         <header className="manage-categories-header">
@@ -136,21 +146,25 @@ export default function ManageCategories() {
             </thead>
             <tbody>
               {cats.length ? (
-                cats.map(c => (
+                cats.map((c) => (
                   <tr key={c.id}>
                     <td>
                       {editingId === c.id ? (
                         <input
                           value={editingName}
-                          onChange={e => setEditingName(e.target.value)}
-                          onKeyDown={e => e.key === "Enter" && saveEdit()}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && saveEdit()}
                           autoFocus
                         />
                       ) : (
                         c.name
                       )}
                     </td>
-                    <td>{typeof c.productCount === "number" ? c.productCount : "–"}</td>
+                    <td>
+                      {typeof c.productCount === "number"
+                        ? c.productCount
+                        : "–"}
+                    </td>
                     <td style={{ textAlign: "right" }}>
                       {isAdmin &&
                         (editingId === c.id ? (
@@ -180,7 +194,9 @@ export default function ManageCategories() {
                       <button
                         className="manage-categories-btn manage-categories-btn-action"
                         style={{ marginLeft: 8 }}
-                        onClick={() => window.location.assign(`${c.id}/subcategories`)}
+                        onClick={() =>
+                          navigate(`/categories/${c.id}/subcategories`)
+                        }
                       >
                         View Subcategories
                       </button>
@@ -202,7 +218,7 @@ export default function ManageCategories() {
           <div className="manage-categories-pagination">
             <button
               className="manage-categories-btn manage-categories-btn-secondary"
-              onClick={() => setPageIndex(i => Math.max(i - 1, 0))}
+              onClick={() => setPageIndex((i) => Math.max(i - 1, 0))}
               disabled={!pageIndex}
             >
               ← Prev
@@ -212,19 +228,27 @@ export default function ManageCategories() {
             </span>
             <button
               className="manage-categories-btn manage-categories-btn-secondary"
-              onClick={() => setPageIndex(i => Math.min(i + 1, totalPages - 1))}
+              onClick={() =>
+                setPageIndex((i) => Math.min(i + 1, totalPages - 1))
+              }
               disabled={pageIndex + 1 >= totalPages}
             >
-              Next →  
+              Next →
             </button>
           </div>
         )}
 
         {deleteTarget !== null && (
-          <div className="review-modal open" onClick={() => setDeleteTarget(null)}>
-            <div className="review-modal-content" onClick={e => e.stopPropagation()}>
+          <div
+            className="review-modal open"
+            onClick={() => setDeleteTarget(null)}
+          >
+            <div
+              className="review-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2>Confirm Delete</h2>
-              <p>Delete “{cats.find(c => c.id === deleteTarget)?.name}”?</p>
+              <p>Delete “{cats.find((c) => c.id === deleteTarget)?.name}”?</p>
               <div className="form-actions">
                 <button
                   type="button"
