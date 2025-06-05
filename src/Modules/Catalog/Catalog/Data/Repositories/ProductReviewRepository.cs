@@ -63,6 +63,19 @@ namespace Catalog.Data.Repositories;
             items
         );
     }
+    public async Task<double> GetAverageRatingByProductId(Guid productId, CancellationToken ct)
+    {
+        var ratings = await _dbContext.ProductReviews
+            .Where(r => r.ProductId == productId)
+            .Select(r => r.Rating)
+            .ToListAsync(ct);
+
+        if (ratings.Count == 0)
+            return 0;
+
+        return Math.Round(ratings.Average(), 2);
+    }
+
 
 }
 

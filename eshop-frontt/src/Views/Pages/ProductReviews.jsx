@@ -8,7 +8,7 @@ import axios from "axios";
 import "../../Styles/ProductReviews.css";
 const API = "https://localhost:5050";
 
-const ProductReviews = () => {
+const ProductReviews = ({ onReviewsChange }) => {
   const { id } = useParams();
   const [reviews, setReviews] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
@@ -29,6 +29,7 @@ const ProductReviews = () => {
     setReviews((prevReviews) =>
       prevReviews.filter((review) => review.id !== reviewId)
     );
+    if(onReviewsChange) onReviewsChange();
   };
 
   useEffect(() => {
@@ -64,6 +65,7 @@ const ProductReviews = () => {
 
   const handleAddReview = (newReview) => {
     setReviews((prevReviews) => [newReview, ...prevReviews]);
+    if(onReviewsChange) onReviewsChange();
   };
 
   const currentlyEditingReview = reviews.find((r) => r.id === editingReviewId);

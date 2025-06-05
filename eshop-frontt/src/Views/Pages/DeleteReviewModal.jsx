@@ -8,8 +8,23 @@ const DeleteReviewModal = ({
   reviewId,
   productId,
   onDeleteSuccess,
+  setAverageRating,
 }) => {
   const [errorMsg, setErrorMsg] = useState("");
+
+  const fetchAverageRating = () => {
+   fetch(`https://localhost:5050/products/${productId}/average-rating`)
+     .then((res) => {
+       if (!res.ok) throw new Error("Failed to fetch average rating");
+       return res.json();
+     })
+     .then((data) => {
+       setAverageRating(data.averageRating);
+     })
+     .catch((err) => {
+       console.error("❌ Error fetching average rating:", err);
+     });
+ };
 
   const handleDelete = () => {
     fetch(`https://localhost:5050/products/reviews/${reviewId}`, {
@@ -23,6 +38,7 @@ const DeleteReviewModal = ({
           setShowModal(false);
           setErrorMsg("Review deleted successfully!");
           if (onDeleteSuccess) onDeleteSuccess(reviewId);
+          fetchAverageRating();
         } else {
           setErrorMsg("Failed to delete the review.");
         }

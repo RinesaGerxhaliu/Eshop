@@ -6,6 +6,7 @@ import ProductReviews from "./ProductReviews"; // kjo mund të hiqet për admin
 import { useAuth } from "../../contexts/AuthContext"; // për të marrë rolet
 import axios from "axios";
 import { FaHeart } from "react-icons/fa";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 
 const ProductDetails = () => {
@@ -27,6 +28,20 @@ const ProductDetails = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [refreshReviewsKey, setRefreshReviewsKey] = useState(0);
 const [isFavorite, setIsFavorite] = useState(false);
+const [averageRating, setAverageRating] = useState(null);
+
+  // Fetch average rating function
+  const fetchAverageRating = async () => {
+    try {
+      const response = await fetch(`https://localhost:5050/products/${id}/average-rating`);
+      if (!response.ok) throw new Error("Failed to fetch average rating");
+      const data = await response.json();
+      setAverageRating(data.averageRating);
+    } catch (err) {
+      console.error("Error fetching average rating:", err);
+      setAverageRating(null);
+    }
+  };
 
 
 
@@ -69,8 +84,29 @@ const [isFavorite, setIsFavorite] = useState(false);
   };
 
   useEffect(() => {
-    if (id) fetchProduct();
+    if (id) {
+      fetchProduct();
+      fetchAverageRating();
+    }
   }, [id]);
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating - fullStars >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<FaStar key={"full-" + i} color="#FFD700" />); // full star gold
+    }
+    if (hasHalfStar) {
+      stars.push(<FaStarHalfAlt key="half" color="#FFD700" />); // half star
+    }
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<FaRegStar key={"empty-" + i} color="#FFD700" />); // empty star outline
+    }
+    return stars;
+  };
 
   const checkIfCartExists = async (username, token) => {
   const response = await fetch(`https://localhost:5050/basket/${username}`, {
@@ -402,9 +438,13 @@ const handleWishlistToggle = async () => {
                   ? format(convert(product.price))
                   : "Price not available"}
               </p>
-              <div className="product-rating">
-                Review: ★★★★☆ ({product.reviews} Reviews)
-              </div>
+              {averageRating !== null && (
+                <div className="product-rating" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span>Average Rating:</span>
+                  <div>{renderStars(averageRating)}</div>
+                  <span style={{ marginLeft: "0.5rem" }}>{averageRating.toFixed(1)}</span>
+                </div>
+             )}
 
               {!isAdmin && (
                 <form onSubmit={handleAddToCart}>

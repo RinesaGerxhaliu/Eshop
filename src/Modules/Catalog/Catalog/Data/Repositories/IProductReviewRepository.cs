@@ -13,6 +13,7 @@ public interface IProductReviewRepository
             PaginationRequest pagination,
             Guid? productId,
             CancellationToken cancellationToken);
+    Task<double> GetAverageRatingByProductId(Guid productId, CancellationToken ct);
 
 }
 
