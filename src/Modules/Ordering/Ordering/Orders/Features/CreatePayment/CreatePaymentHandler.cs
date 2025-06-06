@@ -1,11 +1,10 @@
-﻿using MediatR;
+﻿// File: Ordering/Orders/Features/CreatePayment/CreatePaymentHandler.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Ordering.Data;          // the namespace where your OrderingDbContext is
+using Ordering.Data;
 using Ordering.Data.Configurations;
 using Ordering.Orders.Models;
 using Stripe;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,47 +22,90 @@ namespace Ordering.Orders.Features.CreatePayment
         {
             _db = db;
             _stripeSettings = stripeOpts.Value;
+            StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
         }
 
         public async Task<CreatePaymentResult> Handle(CreatePaymentCommand cmd, CancellationToken ct)
         {
-            // 1. Load the Order from DbContext directly
+            // 1) Gjej Order-in me artikujt
             var order = await _db.Orders
                                  .Include(o => o.Items)
                                  .FirstOrDefaultAsync(o => o.Id == cmd.OrderId, ct);
-
-            if (order is null)
+            if (order == null)
                 return new CreatePaymentResult(false, null, null, "Order not found");
 
-            // … rest of your Stripe logic remains the same …
+            // 2) Kontroll idempotency për payments Pending
+            var existingPayment = await _db.Payments
+                .FirstOrDefaultAsync(p =>
+                    p.OrderId == order.Id &&
+                    p.Method == PaymentMethodType.Stripe &&
+                    p.Status == PaymentStatus.Pending,
+                    ct);
+            if (existingPayment != null)
+                return new CreatePaymentResult(
+                    true,
+                    existingPayment.ClientSecret!,
+                    existingPayment.StripePaymentIntentId!,
+                    null);
 
-            var amountDecimal = order.TotalPrice;
-            var amountInCents = (long)Math.Round(amountDecimal * 100M, 0);
+            // 3) Gjej shipment dhe shippingMethod për këtë order
+            var shipment = await _db.Shipments
+                .FirstOrDefaultAsync(s => s.OrderId == order.Id, ct);
+            if (shipment == null)
+                return new CreatePaymentResult(false, null, null, "Shipment not found");
 
-            var options = new PaymentIntentCreateOptions
+            var shippingMethod = await _db.ShippingMethods
+                .FirstOrDefaultAsync(sm => sm.Id == shipment.ShippingMethodId, ct);
+            if (shippingMethod == null)
+                return new CreatePaymentResult(false, null, null, "Shipping method not found");
+
+            // 4) Llogarit subtotal + shippingCost
+            decimal subtotal = order.TotalPrice;
+            decimal shippingCost = shippingMethod.Cost;
+            decimal total = subtotal + shippingCost;
+
+            // 5) Konverto total-in në cent
+            var amountInCents = (long)(total * 100m);
+
+            // 6) Përgatisim PaymentIntentCreateOptions
+            var intentOptions = new PaymentIntentCreateOptions
             {
                 Amount = amountInCents,
-                Currency = (string.IsNullOrWhiteSpace(cmd.CurrencyCode) ? order.CurrencyCode : cmd.CurrencyCode).ToLower(),
+                Currency = (string.IsNullOrWhiteSpace(cmd.CurrencyCode)
+                              ? order.CurrencyCode
+                              : cmd.CurrencyCode).ToLower(),
                 Metadata = new Dictionary<string, string>
                 {
                     { "order_id", cmd.OrderId.ToString() }
                 }
             };
+            var requestOptions = new RequestOptions { IdempotencyKey = order.Id.ToString() };
 
+            // 7) Krijo PaymentIntent
             var service = new PaymentIntentService();
             PaymentIntent intent;
             try
             {
-                intent = await service.CreateAsync(options, cancellationToken: ct);
+                intent = await service.CreateAsync(intentOptions, requestOptions, ct);
             }
             catch (StripeException ex)
             {
                 return new CreatePaymentResult(false, null, null, ex.Message);
             }
 
-            // 2. (Optional) If you want to persist a Payment entity,
-            //    you can do it here using _db.Payments.Add(...) + _db.SaveChangesAsync().
+            // 8) Ruaj Payment në DB (AmountInCurrency = total)
+            var newPayment = Payment.CreateStripePayment(
+                Guid.NewGuid(),
+                order.Id,
+                intent.Id,
+                intent.ClientSecret!,
+                total,
+                intent.Currency!.ToUpper()
+            );
+            _db.Payments.Add(newPayment);
+            await _db.SaveChangesAsync(ct);
 
+            // 9) Kthe clientSecret + paymentIntentId tek front-end
             return new CreatePaymentResult(
                 true,
                 intent.ClientSecret!,

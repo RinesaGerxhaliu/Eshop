@@ -11,7 +11,7 @@ public class Order : Aggregate<Guid>
     public decimal TotalInCurrency { get; private set; }    
 
 
-    public static Order Create(Guid id, Guid customerId, string orderName)
+    public static Order Create(Guid id, Guid customerId)
     {
         var order = new Order
         {

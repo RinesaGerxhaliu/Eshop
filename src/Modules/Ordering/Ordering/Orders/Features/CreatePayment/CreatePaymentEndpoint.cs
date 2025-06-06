@@ -1,8 +1,9 @@
-﻿using Carter;
+﻿// File: Ordering/Orders/Features/CreatePayment/CreatePaymentEndpoint.cs
+using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using System.Threading.Tasks;
+using Mapster;
 
 namespace Ordering.Orders.Features.CreatePayment
 {
@@ -11,23 +12,23 @@ namespace Ordering.Orders.Features.CreatePayment
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapPost("/payments/create", async (
-                    CreatePaymentRequest request,
+                    CreatePaymentRequest request,  // Carter bëri binding automatikisht
                     ISender sender
                 ) =>
             {
-                // Map the incoming request DTO to your MediatR command:
-                var cmd = new CreatePaymentCommand(request.OrderId, request.CurrencyCode);
+                // 1) Convert DTO në komandë
+                var cmd = request.Adapt<CreatePaymentCommand>();
 
-                // Dispatch the command:
+                // 2) Dërgo te handler-i MediatR
                 var result = await sender.Send(cmd);
 
-                // If something went wrong (e.g. order not found, Stripe error), return 400 with an error message:
+                // 3) Nëse gabim, kthe BadRequest
                 if (!result.Success)
                 {
                     return Results.BadRequest(new { error = result.ErrorMessage });
                 }
 
-                // Otherwise, build and return the 200 response containing ClientSecret + PaymentIntentId:
+                // 4) Përgatis përgjigjen
                 var response = new CreatePaymentResponse
                 {
                     ClientSecret = result.ClientSecret!,

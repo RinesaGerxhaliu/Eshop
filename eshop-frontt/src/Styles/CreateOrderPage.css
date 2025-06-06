@@ -37,6 +37,40 @@
   border: 1px solid #f2e6ef;
   border-radius: 1rem;
   margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+}
+
+.create-order-container .item-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-right: 1rem;
+  border: 1px solid #ececec;
+}
+
+.create-order-container .item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-order-container .item-details .name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.create-order-container .item-details .quantity,
+.create-order-container .item-details .unit-price {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.create-order-container .item-subtotal {
+  font-weight: 600;
+  margin-left: 1rem;
 }
 
 .create-order-container .form-label {
@@ -56,15 +90,23 @@
   box-shadow: 0 0 0 0.2rem rgba(232, 62, 140, 0.25);
 }
 
-.create-order-container button.btn-success {
+.create-order-container button.btn-pink {
   background-color: #e83e8c;
   border-color: #e83e8c;
   border-radius: 1rem;
   padding: 0.75rem;
   font-size: 1rem;
+  color: #fff;
+  width: 100%;
 }
 
-.create-order-container button.btn-success:hover {
+.create-order-container button.btn-pink:disabled {
+  background-color: #e0a3bf;
+  border-color: #e0a3bf;
+  cursor: not-allowed;
+}
+
+.create-order-container button.btn-pink:hover:not(:disabled) {
   background-color: #d6336c;
   border-color: #d6336c;
 }
@@ -73,5 +115,13 @@
   .create-order-container {
     padding: 1rem;
     margin: 30px 1rem;
+  }
+  .create-order-container .list-group-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .create-order-container .item-subtotal {
+    margin-left: 0;
+    margin-top: 0.5rem;
   }
 }

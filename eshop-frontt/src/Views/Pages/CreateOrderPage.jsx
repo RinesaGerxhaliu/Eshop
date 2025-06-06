@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import "../../Styles/CreateOrderPage.css";
+import "../../Styles/CreateOrderPage.css"; // ← updated CSS path
 
-const CreateOrderPage = () => {
+export default function CreateOrderPage() {
   const { refreshAccessToken } = useAuth();
   const navigate = useNavigate();
 
   // --------- State variables ---------
-  // 1. Hiqëm orderName, sepse nuk ekziston si kolone në back
   const [shippingMethodId, setShippingMethodId] = useState("");
   const [address, setAddress] = useState({
     street: "",
@@ -18,8 +17,8 @@ const CreateOrderPage = () => {
     country: "",
     phoneNumber: ""
   });
-  const [items, setItems] = useState([]);                        // list of { productId, productName, quantity, price }
-  const [shippingMethods, setShippingMethods] = useState([]);    // list of { id, name, cost }
+  const [items, setItems] = useState([]);                     // { productId, productName, quantity, price, imageUrl }
+  const [shippingMethods, setShippingMethods] = useState([]); // { id, name, cost }
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingBasket, setIsLoadingBasket] = useState(true);
@@ -50,25 +49,44 @@ const CreateOrderPage = () => {
         const resp = await fetch(`https://localhost:5050/basket/${username}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (resp.ok) {
-          const data = await resp.json();
-          console.log("BASKET RESPONSE:", data.shoppingCart.items);
-
-          setItems(
-            data.shoppingCart.items.map((i) => ({
-              productId:   i.productId,
-              productName: i.productName,
-              quantity:    i.quantity,
-              // përshtatni sipas emrit të vërtetë të fushës për çmimin:
-              price:       i.price != null ? Number(i.price) : 0
-            }))
-          );
-        } else {
+        if (!resp.ok) {
           console.error("Failed to fetch basket:", resp.statusText);
           setItems([]);
+          setIsLoadingBasket(false);
+          return;
         }
+
+        const data = await resp.json();
+        // Map items and fetch each image:
+        const simpleItems = data.shoppingCart.items.map((i) => ({
+          productId: i.productId,
+          productName: i.productName,
+          quantity: i.quantity,
+          price: typeof i.price === "number" ? i.price : Number(i.price || 0),
+          imageUrl: null
+        }));
+
+        const enriched = await Promise.all(
+          simpleItems.map(async (item) => {
+            try {
+              const prodResp = await fetch(`https://localhost:5050/products/${item.productId}`);
+              if (!prodResp.ok) throw new Error("Product not found");
+              const pd = await prodResp.json();
+              return {
+                ...item,
+                imageUrl: pd.product.imageUrl || null
+              };
+            } catch {
+              return { ...item, imageUrl: null };
+            }
+          })
+        );
+
+        setItems(enriched);
+        setError("");
       } catch (e) {
         console.error("Error fetching basket:", e);
+        setError("Failed to load your shopping cart.");
         setItems([]);
       } finally {
         setIsLoadingBasket(false);
@@ -76,7 +94,7 @@ const CreateOrderPage = () => {
     };
 
     fetchBasket();
-  }, []);
+  }, [refreshAccessToken, navigate]);
 
   // --------- 2. Fetch available shipping methods ---------
   useEffect(() => {
@@ -84,19 +102,21 @@ const CreateOrderPage = () => {
       setIsLoadingShippingMethods(true);
       try {
         const resp = await fetch("https://localhost:5050/shipping-methods");
-        if (resp.ok) {
-          const list = await resp.json();
-          setShippingMethods(
-            list.map((m) => ({
-              id:   m.id,
-              name: m.name,
-              cost: m.cost != null ? Number(m.cost) : 0
-            }))
-          );
-        } else {
+        if (!resp.ok) {
           console.error("Failed to fetch shipping methods:", resp.statusText);
           setShippingMethods([]);
+          setIsLoadingShippingMethods(false);
+          return;
         }
+
+        const list = await resp.json();
+        setShippingMethods(
+          list.map((m) => ({
+            id: m.id,
+            name: m.name,
+            cost: typeof m.cost === "number" ? m.cost : Number(m.cost || 0)
+          }))
+        );
       } catch (e) {
         console.error("Error fetching shipping methods:", e);
         setShippingMethods([]);
@@ -117,14 +137,13 @@ const CreateOrderPage = () => {
         const resp = await fetch("https://localhost:5050/saved-addresses/me", {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (resp.ok) {
-          const data = await resp.json();
-          if (data.address && data.address.address) {
-            setAddress(data.address.address);
-          }
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data.address && data.address.address) {
+          setAddress(data.address.address);
         }
-      } catch (e) {
-        console.warn("No saved address found or failed to fetch.", e);
+      } catch {
+        // ignore if nothing saved
       }
     };
     fetchSavedAddress();
@@ -139,20 +158,17 @@ const CreateOrderPage = () => {
   // --------- 5. Compute subtotal, shipping cost, and total ---------
   const subtotal = useMemo(() => {
     return items.reduce((sum, i) => {
-      const priceNum = typeof i.price === "number" ? i.price : parseFloat(i.price) || 0;
-      const qtyNum   = typeof i.quantity === "number" ? i.quantity : parseInt(i.quantity) || 0;
-      return sum + priceNum * qtyNum;
+      const p = typeof i.price === "number" ? i.price : parseFloat(i.price) || 0;
+      const q = typeof i.quantity === "number" ? i.quantity : parseInt(i.quantity) || 0;
+      return sum + p * q;
     }, 0);
   }, [items]);
 
-  const shippingCost = useMemo(() => {
-    const method = shippingMethods.find((m) => m.id === shippingMethodId);
-    return method ? method.cost : 0;
-  }, [shippingMethodId, shippingMethods]);
+  const shippingMethod = shippingMethods.find((m) => m.id === shippingMethodId);
+  const shippingCost = shippingMethod ? shippingMethod.cost : 0;
+  const total = subtotal + shippingCost;
 
-  const total = useMemo(() => subtotal + shippingCost, [subtotal, shippingCost]);
-
-  // --------- 6. Form validation (disable “Place Order” if something is missing) ---------
+  // --------- 6. Form validation ---------
   const isFormValid = useMemo(() => {
     if (items.length === 0) return false;
     if (!shippingMethodId) return false;
@@ -182,18 +198,21 @@ const CreateOrderPage = () => {
       let token = localStorage.getItem("token");
       const decoded = parseJwt(token);
       const customerId =
-        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || decoded.sub;
+        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+        decoded.sub;
 
-      // **Hiqëm orderName nga payload**
+      // We must still send orderName="" and savedAddressId=null
       const payload = {
         order: {
           customerId,
+          orderName: "",
           items: items.map((i) => ({
             productId: i.productId,
-            quantity:  i.quantity,
-            price:     i.price
+            quantity: i.quantity,
+            price: i.price
           })),
           shippingMethodId,
+          savedAddressId: null,
           shippingAddress: address
         }
       };
@@ -207,6 +226,7 @@ const CreateOrderPage = () => {
         body: JSON.stringify(payload)
       });
 
+      // If 401, refresh token
       if (resp.status === 401) {
         token = await refreshAccessToken();
         if (!token) return navigate("/login");
@@ -222,7 +242,18 @@ const CreateOrderPage = () => {
 
       if (resp.ok) {
         const { id } = await resp.json();
-        navigate(`/checkout/${id}`);
+
+        // Pass subtotal/shippingCost/total in location.state
+        navigate(
+          `/checkout/${id}`,
+          {
+            state: {
+              subtotal: subtotal,     // from your useMemo
+              shippingCost: shippingCost,
+              total: total
+            }
+          }
+        );
       } else {
         const errText = await resp.text();
         setError(errText);
@@ -237,16 +268,20 @@ const CreateOrderPage = () => {
 
   // --------- 8. Render ---------
   return (
-    <div className="container my-4">
-      <div className="card shadow-sm">
-        <div className="card-header text-white" style={{ backgroundColor: "#e83e8c" }}>
-          <h3 className="mb-0">Create New Order</h3>
+    <div className="create-order-container">
+      <div className="card">
+        <div className="card-header">
+          <h3>Create New Order</h3>
         </div>
+        <div className="card-body">
+          {/* Display any error */}
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
 
-        <div className="card-body" style={{ backgroundColor: "#fff0f5" }}>
-          {error && <div className="alert alert-danger">{error}</div>}
-
-          {/* 8.1 Loading states */}
+          {/* Loading spinner */}
           {(isLoadingBasket || isLoadingShippingMethods) && (
             <div className="text-center my-4">
               <div className="spinner-border text-primary" role="status">
@@ -255,45 +290,57 @@ const CreateOrderPage = () => {
             </div>
           )}
 
-          {/* 8.2 Order Summary: Items + Subtotal */}
+          {/* Order Summary */}
           {!isLoadingBasket && items.length > 0 && (
             <>
               <h5>Order Summary</h5>
               <ul className="list-group mb-2">
                 {items.map((i, idx) => {
-                  const priceNum = typeof i.price === "number" ? i.price : parseFloat(i.price) || 0;
-                  const qtyNum   = typeof i.quantity === "number" ? i.quantity : parseInt(i.quantity) || 0;
+                  const p = typeof i.price === "number" ? i.price : parseFloat(i.price) || 0;
+                  const q = typeof i.quantity === "number" ? i.quantity : parseInt(i.quantity) || 0;
                   return (
-                    <li
-                      key={idx}
-                      className="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                      <div>
-                        {i.productName} (Qty: {qtyNum}) @ €{priceNum.toFixed(2)}
+                    <li key={idx} className="list-group-item d-flex align-items-center">
+                      <div className="item-image-wrapper">
+                        {i.imageUrl ? (
+                          <img
+                            src={`https://localhost:5050${i.imageUrl}`}
+                            alt={i.productName}
+                            className="item-image"
+                          />
+                        ) : (
+                          <div className="item-image placeholder" />
+                        )}
                       </div>
-                      <div>€{(priceNum * qtyNum).toFixed(2)}</div>
+                      <div className="item-details">
+                        <div className="item-name">{i.productName}</div>
+                        <div className="item-subinfo">
+                          Qty: {q} × €{p.toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="item-line-total">
+                        €{(p * q).toFixed(2)}
+                      </div>
                     </li>
                   );
                 })}
               </ul>
-              <div className="d-flex justify-content-between mb-4">
+              <div className="d-flex justify-content-between mb-4 totals-row">
                 <strong>Subtotal:</strong>
                 <strong>€{subtotal.toFixed(2)}</strong>
               </div>
             </>
           )}
 
-          {/* 8.3 Form për krijimin e porosisë (pa Order Name) */}
+          {/* Create Order Form */}
           <form onSubmit={handleSubmit}>
             {/* Shipping Method */}
             <div className="mb-3">
-              <label className="form-label text-pink">Shipping Method</label>
+              <label className="form-label">Shipping Method</label>
               <select
                 className="form-select"
                 value={shippingMethodId}
                 onChange={(e) => setShippingMethodId(e.target.value)}
                 required
-                style={{ borderRadius: "0.75rem" }}
               >
                 <option value="">Select method</option>
                 {shippingMethods.map((sm) => (
@@ -304,29 +351,25 @@ const CreateOrderPage = () => {
               </select>
             </div>
 
-            {/* Compute and display Shipping Cost & Total */}
+            {/* Shipping Cost & Total */}
             {shippingMethodId && (
               <>
-                <div className="mb-3 d-flex justify-content-between">
-                  <div>
-                    <strong>Shipping Cost:</strong>
-                  </div>
-                  <div>€{shippingCost.toFixed(2)}</div>
+                <div className="mb-3 d-flex justify-content-between totals-row">
+                  <span><strong>Shipping Cost:</strong></span>
+                  <span>€{shippingCost.toFixed(2)}</span>
                 </div>
-                <div className="mb-4 d-flex justify-content-between">
-                  <div>
-                    <strong>Total:</strong>
-                  </div>
-                  <div>€{total.toFixed(2)}</div>
+                <div className="mb-4 d-flex justify-content-between totals-row">
+                  <span><strong>Total:</strong></span>
+                  <span>€{total.toFixed(2)}</span>
                 </div>
               </>
             )}
 
             {/* Shipping Address */}
-            <h5 className="text-pink">Shipping Address</h5>
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label text-pink">Street</label>
+            <h5 className="mb-3">Shipping Address</h5>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label className="form-label">Street</label>
                 <input
                   name="street"
                   type="text"
@@ -335,11 +378,10 @@ const CreateOrderPage = () => {
                   onChange={handleAddressChange}
                   placeholder="Street name"
                   required
-                  style={{ borderRadius: "0.75rem" }}
                 />
               </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label text-pink">City</label>
+              <div className="col-md-6">
+                <label className="form-label">City</label>
                 <input
                   name="city"
                   type="text"
@@ -348,14 +390,13 @@ const CreateOrderPage = () => {
                   onChange={handleAddressChange}
                   placeholder="City"
                   required
-                  style={{ borderRadius: "0.75rem" }}
                 />
               </div>
             </div>
 
-            <div className="row">
-              <div className="col-md-4 mb-3">
-                <label className="form-label text-pink">State</label>
+            <div className="row g-3 mt-2">
+              <div className="col-md-4">
+                <label className="form-label">State</label>
                 <input
                   name="state"
                   type="text"
@@ -364,11 +405,10 @@ const CreateOrderPage = () => {
                   onChange={handleAddressChange}
                   placeholder="State"
                   required
-                  style={{ borderRadius: "0.75rem" }}
                 />
               </div>
-              <div className="col-md-4 mb-3">
-                <label className="form-label text-pink">Postal Code</label>
+              <div className="col-md-4">
+                <label className="form-label">Postal Code</label>
                 <input
                   name="postalCode"
                   type="text"
@@ -377,11 +417,10 @@ const CreateOrderPage = () => {
                   onChange={handleAddressChange}
                   placeholder="Postal Code"
                   required
-                  style={{ borderRadius: "0.75rem" }}
                 />
               </div>
-              <div className="col-md-4 mb-3">
-                <label className="form-label text-pink">Country</label>
+              <div className="col-md-4">
+                <label className="form-label">Country</label>
                 <input
                   name="country"
                   type="text"
@@ -390,13 +429,12 @@ const CreateOrderPage = () => {
                   onChange={handleAddressChange}
                   placeholder="Country"
                   required
-                  style={{ borderRadius: "0.75rem" }}
                 />
               </div>
             </div>
 
-            <div className="mb-4">
-              <label className="form-label text-pink">Phone Number</label>
+            <div className="mt-3">
+              <label className="form-label">Phone Number</label>
               <input
                 name="phoneNumber"
                 type="tel"
@@ -405,19 +443,13 @@ const CreateOrderPage = () => {
                 onChange={handleAddressChange}
                 placeholder="e.g. 049-000-000"
                 required
-                style={{ borderRadius: "0.75rem" }}
               />
             </div>
 
             <button
               type="submit"
-              className="btn btn-pink w-100"
+              className="btn btn-pink mt-4"
               disabled={!isFormValid || isSubmitting || isLoadingBasket || isLoadingShippingMethods}
-              style={{
-                borderRadius: "1rem",
-                backgroundColor: !isFormValid || isSubmitting ? "#e0a3bf" : "#e83e8c",
-                borderColor: !isFormValid || isSubmitting ? "#e0a3bf" : "#e83e8c"
-              }}
             >
               {isSubmitting ? (
                 <>
@@ -433,6 +465,4 @@ const CreateOrderPage = () => {
       </div>
     </div>
   );
-};
-
-export default CreateOrderPage;
+}
