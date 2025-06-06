@@ -17,4 +17,8 @@
     <Folder Include="SavedAddress\ExceptionSavedAddress\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Stripe.net" Version="48.2.0" />
+  </ItemGroup>
+
 </Project>

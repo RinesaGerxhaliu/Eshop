@@ -18,7 +18,6 @@ public class OrderingDbContext : DbContext
     {
         builder.HasDefaultSchema("ordering");
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        base.OnModelCreating(builder);
 
         builder.Entity<Payment>(b =>
         {

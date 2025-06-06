@@ -4,9 +4,6 @@ public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
 {
     public CreateOrderCommandValidator()
     {
-        RuleFor(x => x.Order.OrderName)
-            .NotEmpty().WithMessage("OrderName is required");
-
         RuleFor(x => x.Order.Items)
             .NotEmpty().WithMessage("Order must have at least one item");
 

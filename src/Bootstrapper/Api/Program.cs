@@ -1,8 +1,15 @@
 using Catalog.Wishlists.Repositories;
 using MediatR;
+using Ordering.Data.Configurations;
+using Stripe;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 1. Bind the StripeSettings section into DI
+builder.Services.Configure<StripeSettings>(
+    builder.Configuration.GetSection("Stripe")
+);
 
 MapsterConfig.RegisterMappings();
 
@@ -74,6 +81,9 @@ builder.Services
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 var app = builder.Build();
+
+var stripeOpts = app.Services.GetRequiredService<IOptions<StripeSettings>>().Value;
+StripeConfiguration.ApiKey = stripeOpts.SecretKey;
 
 app.UseSerilogRequestLogging();
 app.UseCors("AllowReactApp");

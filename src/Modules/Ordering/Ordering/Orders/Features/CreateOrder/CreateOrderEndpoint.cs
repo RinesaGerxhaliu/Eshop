@@ -6,16 +6,29 @@ public class CreateOrderEndpoint : ICarterModule
     {
         app.MapPost("/orders", async (CreateOrderRequest request, ISender sender) =>
         {
+            // 1) Map DTO → Command:
             var command = request.Adapt<CreateOrderCommand>();
-            var result = await sender.Send(command);
-            var response = result.Adapt<CreateOrderResponse>();
 
-            return Results.Created($"/orders/{response.Id}", response);
+            // 2) Thërrit handler‐in
+            var result = await sender.Send(command);
+
+            // 3) Përpiloj CreateOrderResponse me të katër fushat
+            var response = new CreateOrderResponse(
+                Id: result.Id,
+                Subtotal: result.Subtotal,
+                ShippingCost: result.ShippingCost,
+                Total: result.Total
+            );
+
+            // 4) Kthe 201 Created me response JSON
+            return Results.Created($"/orders/{result.Id}", response);
         })
-        .WithName("CreateOrder")
+        .Accepts<CreateOrderRequest>("application/json")
         .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Create Order")
-        .WithDescription("Create Order");
+        .WithName("CreateOrder")
+        .WithSummary("Create a new order");
+
+
     }
 }

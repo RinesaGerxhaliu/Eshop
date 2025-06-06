@@ -24,7 +24,6 @@ internal class GetOrdersHandler(OrderingDbContext dbContext)
             .AsNoTracking()
             .Include(x => x.Items)
             .Where(o => o.CustomerId == customerId) 
-            .OrderBy(p => p.OrderName)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

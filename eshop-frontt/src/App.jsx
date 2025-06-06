@@ -19,12 +19,16 @@ import FilteredProducts from './Views/Pages/FilteredProducts';
 import ProductSearchResults from './Components/UI/ProductSearchResults '
 import CreateOrderPage from './Views/Pages/CreateOrderPage';
 import Subcategories from "./Components/Subcategories";
+import StripeProvider from "./StripeProvider";
+import CheckoutForm from './Views/Pages/CheckoutForm';
 
 function App() {
   return (
     <Router>
       <CurrencyProvider>
+        <StripeProvider>
         <AppContent />
+        </StripeProvider>
       </CurrencyProvider>
     </Router>
   );
@@ -53,6 +57,7 @@ function AppContent() {
         <Route path="/cart" element={<ShoppingCartPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/order" element={<CreateOrderPage />} />
+        <Route path="/checkout/:orderId" element={<CheckoutForm />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/filter/:filterType/:filterId" element={<FilteredProducts />} />

@@ -40,19 +40,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("roles");
+    // 1. Tell the server to expire the HttpOnly refreshToken cookie
+    fetch("https://localhost:5050/auth/logout", {
+      method: "POST",
+      credentials: "include", // send along the existing refreshToken cookie
+    })
+      .finally(() => {
+        // 2. Clear all client‐side state
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("roles");
 
-    setUsername("");
-    setUserId("");
-    setRoles([]);
-    setIsLoggedIn(false);
+        setUsername("");
+        setUserId("");
+        setRoles([]);
+        setIsLoggedIn(false);
 
-    setTimeout(() => {
-      navigate("/login");
-    }, 70);
+        // 3. Redirect to /login
+        navigate("/login");
+      });
   };
 
   const refreshAccessToken = useCallback(async () => {

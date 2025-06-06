@@ -91,6 +91,27 @@ namespace Api.Identity
             .Produces(StatusCodes.Status200OK)
             .WithName("RefreshToken")
             .WithSummary("Refresh access token using HttpOnly cookie");
+
+            app.MapPost("/auth/logout", (HttpResponse response) =>
+            {
+                response.Cookies.Append(
+                    "refreshToken",
+                    "",
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,               
+                        SameSite = SameSiteMode.None,
+                        Path = "/",                  
+                        Expires = DateTimeOffset.UtcNow.AddDays(-1)
+                    }
+                );
+
+                return Results.Ok(new { message = "Logged out" });
+            })
+            .WithName("Logout")
+            .WithSummary("Clears the HttpOnly refreshToken cookie");
+
         }
     }
 }

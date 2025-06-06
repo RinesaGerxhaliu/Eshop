@@ -6,7 +6,6 @@ public record OrderSummaryDto(
     Guid OrderId,
     Guid ShipmentId,
     ShipmentStatus Status,
-    string OrderName,
     Guid CustomerId
 );
 
@@ -34,7 +33,6 @@ internal class GetOrdersByShipmentStatusHandler
                     order.Id,
                     shipment.Id,
                     shipment.Status,
-                    order.OrderName,
                     order.CustomerId))
             .ToListAsync(cancellationToken);
 

@@ -1,34 +1,46 @@
-﻿using Ordering.Shippings.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Ordering.Shippings.Models;
+using Ordering.Orders.Models;
 using Ordering.Orders.Features.CreateOrder;
 
-internal class CreateOrderHandler(OrderingDbContext dbContext)
-    : ICommandHandler<CreateOrderCommand, CreateOrderResult>
+internal class CreateOrderHandler : ICommandHandler<CreateOrderCommand, CreateOrderResult>
 {
+    private readonly OrderingDbContext _dbContext;
+
+    public CreateOrderHandler(OrderingDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public async Task<CreateOrderResult> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
+        // 1) Krijo entitetin Order
         var order = Order.Create(
             Guid.NewGuid(),
             command.Order.CustomerId,
             command.Order.OrderName
         );
 
+        // 2) Shto çdo OrderItem
         foreach (var item in command.Order.Items)
         {
             order.Add(item.ProductId, item.Quantity, item.Price);
         }
 
-        var shippingMethod = await dbContext.ShippingMethods
+        // 3) Merr ShippingMethod nga Db
+        var shippingMethod = await _dbContext.ShippingMethods
             .FirstOrDefaultAsync(sm => sm.Id == command.Order.ShippingMethodId, cancellationToken);
 
         if (shippingMethod is null)
             throw new Exception("Shipping method not found");
 
+        // 4) Përgatit ShippingAddress (nga SavedAddressId ose nga ShippingAddressDto)
         ShippingAddress shippingAddress;
         Guid? savedAddressId = null;
 
         if (command.Order.SavedAddressId.HasValue)
         {
-            var saved = await dbContext.SavedAddresses
+            var saved = await _dbContext.SavedAddresses
                 .Include(a => a.Address)
                 .FirstOrDefaultAsync(a => a.Id == command.Order.SavedAddressId.Value, cancellationToken);
 
@@ -55,6 +67,7 @@ internal class CreateOrderHandler(OrderingDbContext dbContext)
             throw new Exception("Shipping address information is required");
         }
 
+        // 5) Krijo entitetin Shipment
         var shipment = Shipment.Create(
             shipmentId: Guid.NewGuid(),
             orderId: order.Id,
@@ -64,10 +77,22 @@ internal class CreateOrderHandler(OrderingDbContext dbContext)
             savedAddressId: savedAddressId
         );
 
-        dbContext.Orders.Add(order);
-        dbContext.Shipments.Add(shipment);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        // 6) Ruaj Order + Shipment në databazë
+        _dbContext.Orders.Add(order);
+        _dbContext.Shipments.Add(shipment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return new CreateOrderResult(order.Id);
+        // 7) Llogarit “Subtotal” (Order.TotalPrice), “ShippingCost” (shippingMethod.Cost), dhe “Total”
+        decimal subtotal = order.TotalPrice;
+        decimal shippingCost = shippingMethod.Cost;
+        decimal total = subtotal + shippingCost;
+
+        // 8) Kthe CreateOrderResult me të gjitha këto vlera
+        return new CreateOrderResult(
+            Id: order.Id,
+            Subtotal: subtotal,
+            ShippingCost: shippingCost,
+            Total: total
+        );
     }
 }

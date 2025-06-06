@@ -1,13 +1,10 @@
-﻿using System.Net;
-
-namespace Ordering.Orders.Models;
+﻿namespace Ordering.Orders.Models;
 public class Order : Aggregate<Guid>
 {
     private readonly List<OrderItem> _items = new();
     public IReadOnlyList<OrderItem> Items => _items.AsReadOnly();
 
     public Guid CustomerId { get; private set; } = default!;
-    public string OrderName { get; private set; } = default!;
     public decimal TotalPrice => Items.Sum(x => x.Price * x.Quantity);
     public string CurrencyCode { get; private set; } = "EUR";
     public decimal ExchangeRate { get; private set; } = 1m;
@@ -20,7 +17,6 @@ public class Order : Aggregate<Guid>
         {
             Id = id,
             CustomerId = customerId,
-            OrderName = orderName
         };
 
         order.AddDomainEvent(new OrderCreatedEvent(order));
