@@ -4,5 +4,7 @@
     {
         public string ClientSecret { get; set; } = default!;
         public string? PaymentIntentId { get; set; }
+
+        public string? Message { get; set; }
     }
 }

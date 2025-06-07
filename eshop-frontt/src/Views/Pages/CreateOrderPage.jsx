@@ -7,7 +7,7 @@ export default function CreateOrderPage() {
   const { refreshAccessToken } = useAuth();
   const navigate = useNavigate();
 
-  // State
+  // States
   const [shippingMethodId, setShippingMethodId] = useState("");
   const [address, setAddress] = useState({
     street: "", city: "", state: "", postalCode: "", country: "", phoneNumber: ""
@@ -19,7 +19,10 @@ export default function CreateOrderPage() {
   const [isLoadingBasket, setIsLoadingBasket] = useState(true);
   const [isLoadingShippingMethods, setIsLoadingShippingMethods] = useState(true);
 
-  // Parse JWT
+  // Payment method state: "stripe" or "cod"
+  const [paymentMethod, setPaymentMethod] = useState("stripe");
+
+  // Parse JWT helper
   const parseJwt = (token) => {
     try { return JSON.parse(atob(token.split(".")[1])); } catch { return {}; }
   };
@@ -123,42 +126,72 @@ export default function CreateOrderPage() {
     return true;
   }, [items, shippingMethodId, address]);
 
-  // Submit handler (NAVIGON TE CHECKOUT)
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isFormValid || isSubmitting) return;
-    setIsSubmitting(true); setError("");
-    try {
-      const token = localStorage.getItem("token");
-      const decoded = parseJwt(token);
-      const customerId =
-        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
-        decoded.sub;
+   const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!isFormValid || isSubmitting) return;
+  setIsSubmitting(true);
+  setError("");
 
-      // Dërgo draft order + totals te checkout për pagesë
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Not authenticated");
+
+    // ←– NEW: decode token and grab customerId
+    const decoded = parseJwt(token);
+    const customerId =
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+      decoded.sub;
+    if (!customerId) throw new Error("Customer ID not found in token");
+
+    // build the order payload
+    const orderPayload = {
+      customerId,              // ←– use the decoded customerId here
+      orderName: "",
+      items: items.map(i => ({
+        productId: i.productId,
+        quantity: i.quantity,
+        price: i.price
+      })),
+      shippingMethodId,
+      savedAddressId: null,
+      shippingAddress: address
+    };
+
+    if (paymentMethod === "stripe") {
       navigate("/checkout", {
-        state: {
-          order: {
-            customerId,
-            orderName: "",
-            items: items.map((i) => ({
-              productId: i.productId,
-              quantity: i.quantity,
-              price: i.price
-            })),
-            shippingMethodId,
-            savedAddressId: null,
-            shippingAddress: address
-          },
-          subtotal, shippingCost, total
-        }
+        state: { order: orderPayload, subtotal, shippingCost, total }
       });
-    } catch (ex) {
-      setError("Something went wrong.");
-    } finally { setIsSubmitting(false); }
-  };
+    } else {
+      const resp = await fetch("https://localhost:5050/payments/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          order: orderPayload,
+          currencyCode: "EUR",
+          paymentMethod: "CashOnDelivery"
+        })
+      });
 
-  // Render
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error || "Failed to place COD order");
+      }
+
+      navigate("/order-confirmation", {
+        state: { order: orderPayload, subtotal, shippingCost, total }
+      });
+    }
+  } catch (ex) {
+    setError(ex.message);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
   return (
     <div className="create-order-container">
       <div className="card">
@@ -205,6 +238,7 @@ export default function CreateOrderPage() {
               </div>
             </>
           )}
+
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="form-label">Shipping Method</label>
@@ -215,6 +249,38 @@ export default function CreateOrderPage() {
                 ))}
               </select>
             </div>
+
+            {/* Payment Method Radios */}
+            <div className="mb-3">
+              <label className="form-label">Payment Method</label>
+              <div>
+                <div className="form-check form-check-inline">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="paymentMethod"
+                    id="payStripe"
+                    value="stripe"
+                    checked={paymentMethod === "stripe"}
+                    onChange={() => setPaymentMethod("stripe")}
+                  />
+                  <label className="form-check-label" htmlFor="payStripe">Pay with Stripe</label>
+                </div>
+                <div className="form-check form-check-inline">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="paymentMethod"
+                    id="payCOD"
+                    value="cod"
+                    checked={paymentMethod === "cod"}
+                    onChange={() => setPaymentMethod("cod")}
+                  />
+                  <label className="form-check-label" htmlFor="payCOD">Pay on Delivery</label>
+                </div>
+              </div>
+            </div>
+
             {shippingMethodId && (
               <>
                 <div className="mb-3 d-flex justify-content-between totals-row">
@@ -227,6 +293,7 @@ export default function CreateOrderPage() {
                 </div>
               </>
             )}
+
             <h5 className="mb-3">Shipping Address</h5>
             <div className="row g-3">
               <div className="col-md-6">
@@ -256,9 +323,20 @@ export default function CreateOrderPage() {
               <label className="form-label">Phone Number</label>
               <input name="phoneNumber" type="tel" className="form-control" value={address.phoneNumber} onChange={handleAddressChange} placeholder="e.g. 049-000-000" required />
             </div>
-            <button type="submit" className="btn btn-pink mt-4"
-              disabled={!isFormValid || isSubmitting || isLoadingBasket || isLoadingShippingMethods}>
-              {isSubmitting ? (<><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />Placing Order…</>) : ("Continue to Payment")}
+
+            <button
+              type="submit"
+              className="btn btn-pink mt-4"
+              disabled={!isFormValid || isSubmitting || isLoadingBasket || isLoadingShippingMethods}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                  {paymentMethod === "stripe" ? "Processing Payment…" : "Processing Order…"}
+                </>
+              ) : (
+                paymentMethod === "stripe" ? "Continue to Payment" : "Process Order"
+              )}
             </button>
           </form>
         </div>

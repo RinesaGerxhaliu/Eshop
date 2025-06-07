@@ -7,14 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared\Shared.csproj" />
+    <Compile Remove="SavedAddress\**" />
+    <EmbeddedResource Remove="SavedAddress\**" />
+    <None Remove="SavedAddress\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SavedAddress\DTO\" />
-    <Folder Include="SavedAddress\ExceptionSavedAddress\" />
+    <ProjectReference Include="..\..\..\Shared\Shared.Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Shared.Messaging\Shared.Messaging.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Shared\Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

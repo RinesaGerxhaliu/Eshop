@@ -1,47 +1,34 @@
-﻿// File: Ordering/Orders/Features/CreatePayment/CreatePaymentEndpoint.cs
-using Carter;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Mapster;
+﻿using Ordering.Orders.Features.CreatePayment;
 
-namespace Ordering.Orders.Features.CreatePayment
+public class CreatePaymentEndpoint : ICarterModule
 {
-    public class CreatePaymentEndpoint : ICarterModule
+    public void AddRoutes(IEndpointRouteBuilder app)
     {
-        public void AddRoutes(IEndpointRouteBuilder app)
+        app.MapPost("/payments/create", async (
+                CreatePaymentRequest request,
+                ISender sender
+            ) =>
         {
-            app.MapPost("/payments/create", async (
-                    CreatePaymentRequest request,  // Carter bëri binding automatikisht
-                    ISender sender
-                ) =>
+            var cmd = request.Adapt<CreatePaymentCommand>();
+
+            var result = await sender.Send(cmd);
+            if (!result.Success)
+                return Results.BadRequest(new { error = result.ErrorMessage });
+
+            var response = new CreatePaymentResponse();
+            if (cmd.PaymentMethod == PaymentMethodType.CashOnDelivery)
             {
-                // 1) Convert DTO në komandë
-                var cmd = request.Adapt<CreatePaymentCommand>();
-
-                // 2) Dërgo te handler-i MediatR
-                var result = await sender.Send(cmd);
-
-                // 3) Nëse gabim, kthe BadRequest
-                if (!result.Success)
-                {
-                    return Results.BadRequest(new { error = result.ErrorMessage });
-                }
-
-                // 4) Përgatis përgjigjen
-                var response = new CreatePaymentResponse
-                {
-                    ClientSecret = result.ClientSecret!,
-                    PaymentIntentId = result.PaymentIntentId!
-                };
-
-                return Results.Ok(response);
-            })
-            .Accepts<CreatePaymentRequest>("application/json")
-            .Produces<CreatePaymentResponse>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .WithName("CreatePayment")
-            .WithSummary("Creates a Stripe PaymentIntent for an order and returns its client_secret");
-        }
+                response.Message = "Order placed successfully (Cash on Delivery)";
+            }
+            else
+            {
+                response.ClientSecret = result.ClientSecret;
+                response.PaymentIntentId = result.PaymentIntentId;
+            }
+            return Results.Ok(response);
+        })
+        .Accepts<CreatePaymentRequest>("application/json")
+        .Produces<CreatePaymentResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

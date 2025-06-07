@@ -58,6 +58,27 @@ namespace Ordering.Orders.Models
             };
         }
 
+        // Factory for Cash on Delivery payments
+        public static Payment CreateCashOnDeliveryPayment(
+            Guid paymentId,
+            Guid orderId,
+            decimal amountInCurrency,
+            string currencyCode)
+        {
+            return new Payment
+            {
+                Id = paymentId,
+                OrderId = orderId,
+                Method = PaymentMethodType.CashOnDelivery,
+                StripePaymentIntentId = null,
+                ClientSecret = null,
+                AmountInCurrency = amountInCurrency,
+                CurrencyCode = currencyCode,
+                Status = PaymentStatus.Pending,
+                CreatedOn = DateTime.UtcNow
+            };
+        }
+
         public void MarkAsSucceeded() => Status = PaymentStatus.Succeeded;
         public void MarkAsFailed() => Status = PaymentStatus.Failed;
     }

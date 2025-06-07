@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Ordering.Data.Configurations;
-using Ordering.Orders.Dtos;
-using Ordering.Orders.Models;
-using Ordering.Shippings.Models;
 using Stripe;
 using System.Text.Json;
 
@@ -12,6 +9,7 @@ namespace Ordering.Orders.Features.CreatePayment
     {
         public DraftOrderDto Order { get; init; } = default!;
         public string? CurrencyCode { get; init; }
+        public PaymentMethodType PaymentMethod { get; init; } = PaymentMethodType.Stripe;
     }
 
     public class CreatePaymentResult
@@ -20,6 +18,7 @@ namespace Ordering.Orders.Features.CreatePayment
         public string? ClientSecret { get; }
         public string? PaymentIntentId { get; }
         public string? ErrorMessage { get; }
+
         public CreatePaymentResult(bool success, string? cs, string? pi, string? err)
             => (Success, ClientSecret, PaymentIntentId, ErrorMessage) = (success, cs, pi, err);
     }
@@ -28,74 +27,85 @@ namespace Ordering.Orders.Features.CreatePayment
     {
         private readonly StripeSettings _stripeSettings;
         private readonly OrderingDbContext _db;
+        private readonly ISender _mediator;
 
-        public CreatePaymentHandler(IOptions<StripeSettings> stripeOpts, OrderingDbContext db)
+        public CreatePaymentHandler(
+            IOptions<StripeSettings> stripeOpts,
+            OrderingDbContext db,
+            ISender mediator)    // <-- injekto ISender
         {
             _stripeSettings = stripeOpts.Value;
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
             _db = db;
+            _mediator = mediator;
         }
 
         public async Task<CreatePaymentResult> Handle(CreatePaymentCommand cmd, CancellationToken ct)
         {
-            var draftOrder = cmd.Order;
+            var d = cmd.Order;
+            if (!Guid.TryParse(d.ShippingMethodId.ToString(), out var shipId))
+                return new(false, null, null, "Invalid shippingMethodId");
 
-            Guid shippingMethodGuid;
-            if (!Guid.TryParse(draftOrder.ShippingMethodId.ToString(), out shippingMethodGuid))
-                return new CreatePaymentResult(false, null, null, "Shipping method id is invalid");
+            var ship = await _db.ShippingMethods
+                .FirstOrDefaultAsync(x => x.Id == shipId, ct);
+            if (ship == null) return new(false, null, null, "Shipping method not found");
 
-            var shippingMethod = await _db.ShippingMethods
-                .FirstOrDefaultAsync(sm => sm.Id == shippingMethodGuid, ct);
+            var subtotal = d.Items.Sum(i => i.Price * i.Quantity);
+            var total = subtotal + ship.Cost;
 
-
-            if (shippingMethod == null)
-                return new CreatePaymentResult(false, null, null, "Shipping method not found");
-
-            // Llogarit subtotal nga items
-            decimal subtotal = draftOrder.Items.Sum(i => i.Price * i.Quantity);
-            decimal shippingCost = shippingMethod.Cost;
-            decimal total = subtotal + shippingCost;
-
-            // Fillo DraftOrderDto për metadata me subtotal, shippingCost, total
-            var orderForMeta = new DraftOrderDto(
-                draftOrder.CustomerId,
-                draftOrder.Items,
-                draftOrder.ShippingMethodId,
-                draftOrder.SavedAddressId,
-                draftOrder.ShippingAddress,
-                subtotal,
-                shippingCost,
-                total
-            );
-            var orderJson = JsonSerializer.Serialize(orderForMeta);
-
-            var intentOptions = new PaymentIntentCreateOptions
+            if (cmd.PaymentMethod == PaymentMethodType.CashOnDelivery)
             {
-                Amount = (long)(total * 100m),
-                Currency = (string.IsNullOrWhiteSpace(cmd.CurrencyCode) ? "eur" : cmd.CurrencyCode).ToLower(),
-                Metadata = new Dictionary<string, string>
+                var createOrderCmd = new Orders.CreateOrderCommand
                 {
-                    { "order", orderJson }
-                }
+                    Order = d,
+                    PaymentMethod = PaymentMethodType.CashOnDelivery,
+                    CurrencyCode = cmd.CurrencyCode
+                };
+                await _mediator.Send(createOrderCmd, ct);
+
+                var payment = Payment.CreateCashOnDeliveryPayment(
+                    Guid.NewGuid(),
+                    createOrderCmd.Order.CustomerId,
+                    total,
+                    cmd.CurrencyCode?.ToUpper() ?? "EUR"
+                );
+                payment.MarkAsSucceeded();
+                _db.Payments.Add(payment);
+                await _db.SaveChangesAsync(ct);
+
+                return new(true, null, null, null);
+            }
+
+            var dtoJson = JsonSerializer.Serialize(new DraftOrderDto(
+                d.CustomerId, d.Items, d.ShippingMethodId, d.SavedAddressId, d.ShippingAddress,
+                subtotal, ship.Cost, total));
+
+            var metadata = new Dictionary<string, string>();
+            const int CHUNK = 450;
+            for (int i = 0, part = 0; i < dtoJson.Length; i += CHUNK, ++part)
+            {
+                var len = Math.Min(CHUNK, dtoJson.Length - i);
+                metadata[$"order_chunk_{part}"] = dtoJson.Substring(i, len);
+            }
+
+            var opts = new PaymentIntentCreateOptions
+            {
+                Amount = (long)(total * 100),
+                Currency = (cmd.CurrencyCode ?? "eur").ToLower(),
+                Metadata = metadata
             };
 
-            var service = new PaymentIntentService();
-            PaymentIntent intent;
             try
             {
-                intent = await service.CreateAsync(intentOptions, null, ct);
+                var intent = await new PaymentIntentService()
+                    .CreateAsync(opts, null, ct);
+
+                return new(true, intent.ClientSecret, intent.Id, null);
             }
             catch (StripeException ex)
             {
-                return new CreatePaymentResult(false, null, null, ex.Message);
+                return new(false, null, null, ex.Message);
             }
-
-            return new CreatePaymentResult(
-                true,
-                intent.ClientSecret!,
-                intent.Id,
-                null
-            );
         }
     }
 }
