@@ -6,5 +6,8 @@ public record OrderDto(
     List<OrderItemDto> Items,
     Guid ShippingMethodId,                      
     Guid? SavedAddressId,                       
-    ShippingAddressDto? ShippingAddress         
+    ShippingAddressDto? ShippingAddress,
+     decimal Subtotal,
+    decimal ShippingCost,
+    decimal Total
 );

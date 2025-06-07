@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import "../../Styles/CreateOrderPage.css"; // ← updated CSS path
+import "../../Styles/CreateOrderPage.css"; 
 
 export default function CreateOrderPage() {
   const { refreshAccessToken } = useAuth();
@@ -17,8 +17,8 @@ export default function CreateOrderPage() {
     country: "",
     phoneNumber: ""
   });
-  const [items, setItems] = useState([]);                     // { productId, productName, quantity, price, imageUrl }
-  const [shippingMethods, setShippingMethods] = useState([]); // { id, name, cost }
+  const [items, setItems] = useState([]);                    
+  const [shippingMethods, setShippingMethods] = useState([]); 
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingBasket, setIsLoadingBasket] = useState(true);

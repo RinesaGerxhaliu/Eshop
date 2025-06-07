@@ -9,20 +9,17 @@ const ShoppingCartPage = () => {
   const [cart, setCart] = useState({ items: [] });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
   const navigate = useNavigate();
   const { convert, format } = useCurrency();
 
   const handleProcessOrder = () => {
-    navigate('/order');
+    navigate("/order");
   };
 
   const fetchProductDetails = async (productId) => {
     try {
       const response = await fetch(`https://localhost:5050/products/${productId}`);
-      if (!response.ok) {
-        throw new Error("Product not found");
-      }
+      if (!response.ok) throw new Error("Product not found");
       const data = await response.json();
       return data.product;
     } catch (err) {
@@ -31,79 +28,63 @@ const ShoppingCartPage = () => {
     }
   };
 
-  const getCart = async () => {
-    try {
-      const username = localStorage.getItem("username");
-      let token = localStorage.getItem("token");
+  useEffect(() => {
+    const loadCartWithDetails = async () => {
+      try {
+        setIsLoading(true);
+        setError("");
+        const username = localStorage.getItem("username");
+        let token = localStorage.getItem("token");
 
-      if (!username || !token) {
-        throw new Error("User is not logged in or token is missing.");
-      }
+        if (!username || !token) throw new Error("User is not logged in or token is missing.");
 
-      let response = await fetch(`https://localhost:5050/basket/${username}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+        let response = await fetch(`https://localhost:5050/basket/${username}`, {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        });
 
-      if (response.status === 401) {
-        console.log("Token expired, attempting to refresh...");
-        token = await refreshAccessToken();
-        if (!token) {
-          navigate("/login");
+        if (response.status === 401) {
+          token = await refreshAccessToken();
+          if (!token) return navigate("/login");
+
+          response = await fetch(`https://localhost:5050/basket/${username}`, {
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          });
+        }
+
+        if (response.status === 404) {
+          setCart({ items: [] });
+          setIsLoading(false);
           return;
         }
 
-        response = await fetch(`https://localhost:5050/basket/${username}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-      }
+        if (!response.ok) throw new Error("Failed to fetch cart.");
 
-      if (response.status === 404) {
-        setCart({ items: [] });
-        setError("");
-        setIsLoading(false);
-        return;
-      }
+        const data = await response.json();
+        const rawItems = data.shoppingCart.items;
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart.");
-      }
+        // Merret detajet e produkteve PARA se të shfaqë listën
+        const productsDetails = await Promise.all(
+          rawItems.map((item) => fetchProductDetails(item.productId))
+        );
 
-      const data = await response.json();
-      setCart({ items: data.shoppingCart.items });
-      setError("");
-      setIsLoading(false);
-
-      loadProductImages(data.shoppingCart.items);
-    } catch (err) {
-      console.error("Error fetching shopping cart:", err);
-      setError(err.message || "An unknown error occurred.");
-      setIsLoading(false);
-    }
-  };
-
-  const loadProductImages = async (items) => {
-    const updatedItems = await Promise.all(
-      items.map(async (item) => {
-        const product = await fetchProductDetails(item.productId);
-        return {
+        // Bashkon detajet e produkteve me artikujt e shportës
+        const enrichedItems = rawItems.map((item, index) => ({
           ...item,
-          imageUrl: product ? product.imageUrl : null,
-        };
-      })
-    );
+          imageUrl: productsDetails[index]?.imageUrl || null,
+          productName: productsDetails[index]?.name || item.productId,
+        }));
 
-    setCart((prevCart) => ({
-      items: updatedItems,
-    }));
+        setCart({ items: enrichedItems });
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching shopping cart:", err);
+        setError(err.message || "An unknown error occurred.");
+        setIsLoading(false);
+      }
+    };
 
-    setImagesLoaded(true);
-  };
+    loadCartWithDetails();
+  }, [refreshAccessToken, navigate]);
 
   const removeItemFromCart = async (productId) => {
     try {
@@ -129,16 +110,17 @@ const ShoppingCartPage = () => {
         throw new Error("Failed to remove item from cart");
       }
 
-      getCart();
+      // Rifresko shportën pas fshirjes
+      // thjesht e thërret përsëri loadCartWithDetails me fetch të plotë
+      // ose e rifreskon me filtrim lokal
+      setCart((prev) => ({
+        items: prev.items.filter((item) => item.productId !== productId),
+      }));
     } catch (error) {
       console.error("Error removing item from cart:", error);
       setError(error.message || "An unknown error occurred.");
     }
   };
-
-  useEffect(() => {
-    getCart();
-  }, []);
 
   return (
     <div className="shopping-cart-container">
@@ -156,44 +138,38 @@ const ShoppingCartPage = () => {
       ) : (
         <>
           <ul>
-            {cart.items.map((item, idx) => (
-              <li key={idx} className="cart-item">
+            {cart.items.map((item) => (
+              <li key={item.productId} className="cart-item">
                 <div className="cart-item-image-container">
-                  {!item.imageUrl || !imagesLoaded ? (
-                    <div className="image-placeholder">Loading Image...</div>
-                  ) : (
+                  {item.imageUrl ? (
                     <img
                       src={`https://localhost:5050${item.imageUrl}`}
                       alt={item.productName}
                       className="cart-item-image"
                     />
+                  ) : (
+                    <div className="image-placeholder">No image</div>
                   )}
                 </div>
 
                 <div className="cart-item-details">
-                  <p><strong>{item.productName}</strong></p>
                   <p>
-                  Price: {format(convert(item.price))}
-                </p>
+                    <strong>{item.productName || item.productId}</strong>
+                  </p>
+                  <p>Price: {format(convert(item.price))}</p>
                   <p>Quantity: {item.quantity}</p>
                   <p>Color: {item.color}</p>
                 </div>
 
                 <div className="remove-button-container">
-                  <button onClick={() => removeItemFromCart(item.productId)}>
-                    Remove
-                  </button>
+                  <button onClick={() => removeItemFromCart(item.productId)}>Remove</button>
                 </div>
               </li>
             ))}
           </ul>
 
-          {/* Process Order Button */}
           <div className="process-order-container">
-            <button
-              className="process-order-button"
-              onClick={handleProcessOrder}
-            >
+            <button className="process-order-button" onClick={handleProcessOrder}>
               Proceed to Checkout
             </button>
           </div>
