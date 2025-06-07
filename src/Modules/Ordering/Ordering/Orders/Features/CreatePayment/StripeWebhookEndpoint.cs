@@ -45,7 +45,7 @@ public class StripeWebhookEndpoint : ICarterModule
                     );
                     foreach (var item in orderDto.Items)
                     {
-                        order.Add(item.ProductId, item.Quantity, item.Price);
+                        order.Add(item.ProductId, item.ProductName, item.Quantity, item.Price);
                     }
 
                     var shippingMethod = await dbContext.ShippingMethods

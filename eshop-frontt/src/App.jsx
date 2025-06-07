@@ -21,6 +21,7 @@ import CreateOrderPage from './Views/Pages/CreateOrderPage';
 import Subcategories from "./Components/Subcategories";
 import StripeProvider from "./StripeProvider";
 import CheckoutForm from './Views/Pages/CheckoutForm';
+import GetOrders from './Views/Pages/GetOrders.jsx';
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function AppContent() {
         <Route path="/products/sorted/by-price-descending" element={<FilteredProducts />} />
         <Route path="/products" element={<ProductSearchResults />} />
         <Route path="/categories/:categoryId/subcategories" element={<Subcategories />} />
+        <Route path="/user-orders/:userId" element={<GetOrders />} />
         <Route
           path="/admin-dashboard/*"
           element={

@@ -1,0 +1,10 @@
+.accordion .accordion-item {
+  margin: 0; /* removes vertical space between items */
+  border-radius: 0;
+  border-top: 1px solid #dee2e6;
+  border-bottom: none;
+}
+
+.accordion .accordion-item:last-child {
+  border-bottom: 1px solid #dee2e6;
+}

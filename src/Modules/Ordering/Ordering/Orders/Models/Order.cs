@@ -36,7 +36,7 @@ public class Order : Aggregate<Guid>
         TotalInCurrency = Math.Round(TotalPrice * rate, 2);
     }
 
-    public void Add(Guid productId, int quantity, decimal price)
+    public void Add(Guid productId, string productName, int quantity, decimal price)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
@@ -49,7 +49,7 @@ public class Order : Aggregate<Guid>
         }
         else
         {
-            var orderItem = new OrderItem(Id, productId, quantity, price);
+            var orderItem = new OrderItem(Id, productId, productName, quantity, price);
             _items.Add(orderItem);
         }
     }

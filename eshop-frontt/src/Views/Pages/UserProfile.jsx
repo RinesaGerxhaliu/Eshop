@@ -3,6 +3,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import "../../Styles/profile.css";
 import AddAddressForm from "./AddAddressForm";
 import EditAddressForm from "./EditAddressForm";
+import { useNavigate } from "react-router-dom";
+
 
 function UserProfile() {
   const { isLoggedIn } = useAuth();
@@ -95,23 +97,6 @@ function UserProfile() {
     }
   };
 
-  const fetchOrderById = async (orderId) => {
-    const token = getToken();
-    try {
-      const response = await fetch(`https://localhost:5050/orders/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch order details");
-      const data = await response.json();
-      setSelectedOrder(data.order);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching order details:", err);
-      setError("Error fetching order details.");
-    }
-  };
-
   const fetchAddresses = async (token) => {
     try {
       const response = await fetch(`https://localhost:5050/saved-addresses/me`, {
@@ -174,9 +159,13 @@ function UserProfile() {
     }
   };
 
-  const handleOrderClick = (orderId) => {
-    fetchOrderById(orderId);
-  };
+  const navigate = useNavigate();
+
+const handleOrdersPageRedirect = () => {
+  const userId = localStorage.getItem("userId");
+  if (userId) navigate(`/user-orders/${userId}`);
+};
+
 
   return (
     <div className="profile-container">
@@ -189,8 +178,8 @@ function UserProfile() {
           <h2 className="myaccount">My Info</h2>
           <div className="button-group">
             <button onClick={() => setActiveSection("info")}>My Info</button>
-            <button onClick={() => setActiveSection("orders")}>My Orders</button>
             <button onClick={() => setActiveSection("addressBook")}>My Address Book</button>
+            <button onClick={handleOrdersPageRedirect}>My Orders</button>
           </div>
         </div>
 
@@ -208,52 +197,6 @@ function UserProfile() {
                   </>
                 ) : (
                   <p>No user information available.</p>
-                )}
-              </div>
-            )}
-
-            {activeSection === "orders" && (
-              <div className="orders-section">
-                {loading && <p>Loading orders...</p>}
-                {error && <p style={{ color: "red" }}>{error}</p>}
-
-                {!selectedOrder ? (
-                  <>
-                    {orders.length > 0 ? (
-                      <ul>
-                        {orders.map((order) => (
-                          <li key={order.id} onClick={() => handleOrderClick(order.id)} style={{ cursor: "pointer" }}>
-                            <p><strong>Order Name:</strong> {order.orderName}</p>
-                            <p><strong>Items:</strong> {order.items?.length}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>No orders found.</p>
-                    )}
-
-                    <div className="pagination-controls">
-                      <button onClick={handlePreviousPage} disabled={pagination.pageIndex <= 0}>
-                        Previous
-                      </button>
-                      <button onClick={handleNextPage} disabled={pagination.pageIndex >= Math.ceil(pagination.totalCount / pagination.pageSize) - 1}>
-                        Next
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div>
-                    <button onClick={() => setSelectedOrder(null)}>Back to Orders</button>
-                    <h3>Order Details</h3>
-                    <p><strong>Order Name:</strong> {selectedOrder.orderName}</p>
-                    <p><strong>Status:</strong> {selectedOrder.status}</p>
-                    <p><strong>Items:</strong></p>
-                    <ul>
-                      {selectedOrder.items?.map((item) => (
-                        <li key={item.id}>{item.productName} - Qty: {item.quantity}</li>
-                      ))}
-                    </ul>
-                  </div>
                 )}
               </div>
             )}
