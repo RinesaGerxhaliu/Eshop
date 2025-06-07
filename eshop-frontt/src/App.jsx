@@ -57,7 +57,7 @@ function AppContent() {
         <Route path="/cart" element={<ShoppingCartPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/order" element={<CreateOrderPage />} />
-        <Route path="/checkout/:orderId" element={<CheckoutForm />} />
+        <Route path="/checkout" element={<CheckoutForm />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/filter/:filterType/:filterId" element={<FilteredProducts />} />

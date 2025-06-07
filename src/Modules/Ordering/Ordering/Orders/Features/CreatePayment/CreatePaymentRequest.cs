@@ -2,8 +2,7 @@
 {
     internal class CreatePaymentRequest
     {
-        public Guid OrderId { get; set; }
-        // You can also pass currency override if you allow multiple currencies:
+        public DraftOrderDto Order { get; set; } = default!;
         public string? CurrencyCode { get; set; }
     }
 }

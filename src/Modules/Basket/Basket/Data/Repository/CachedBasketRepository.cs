@@ -55,15 +55,27 @@ public class CachedBasketRepository (IBasketRepository repository, IDistributedC
 
     }
 
+    private async Task UpdateCache(ShoppingCart basket, CancellationToken cancellationToken)
+    {
+        await cache.SetStringAsync(
+            basket.UserName,
+            JsonSerializer.Serialize(basket, _options),
+            cancellationToken
+        );
+    }
+
+
     public async Task<int> SaveChangesAsync(string? userName = null, CancellationToken cancellationToken = default)
     {
         var result = await repository.SaveChangesAsync(userName, cancellationToken);
 
-        if (userName is not null) 
+        if (userName is not null)
         {
-            await cache.RemoveAsync(userName, cancellationToken);
+            var basket = await repository.GetBasket(userName, true, cancellationToken);
+            await UpdateCache(basket, cancellationToken);
         }
 
         return result;
     }
+
 }

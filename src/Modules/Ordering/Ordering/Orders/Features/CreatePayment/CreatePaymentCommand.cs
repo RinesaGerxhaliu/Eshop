@@ -1,12 +1,7 @@
-﻿// CreatePaymentCommand.cs
-using MediatR;
+﻿using Ordering.Orders.Features.CreatePayment;
 
-namespace Ordering.Orders.Features.CreatePayment
+public class CreatePaymentCommand : IRequest<CreatePaymentResult>
 {
-    // Remove the outer “CreatePaymentCommand” class; declare the record directly:
-    public record CreatePaymentCommand(
-        Guid OrderId,
-        Guid ShippingMethodId,
-        string? CurrencyCode
-    ) : IRequest<CreatePaymentResult>;
+    public DraftOrderDto Order { get; set; } = default!;
+    public string? CurrencyCode { get; set; }
 }

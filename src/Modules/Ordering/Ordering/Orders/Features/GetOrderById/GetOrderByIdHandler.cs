@@ -54,7 +54,6 @@ internal class GetOrderByIdHandler(OrderingDbContext dbContext)
 
         var orderDto = new OrderDto(
             order.CustomerId,
-            /*order.OrderName*/ "",   // Vendos sipas modelit tënd, nëse ke fushën OrderName
             order.Items.Select(i => new OrderItemDto(i.ProductId, i.Quantity, i.Price)).ToList(),
             shipment?.ShippingMethodId ?? Guid.Empty,
             shipment?.SavedAddressId,
