@@ -146,6 +146,7 @@ export default function CreateOrderPage() {
       if (!token) throw new Error("Not authenticated");
 
       const decoded = parseJwt(token);
+      const username = decoded.name || decoded.sub;
       const customerId =
         decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
         decoded.sub;
@@ -163,6 +164,18 @@ export default function CreateOrderPage() {
         savedAddressId: null,
         shippingAddress: address
       };
+
+
+     // Clear entire basket (using stored username)
+      const storedUser = localStorage.getItem("username");
+      if (storedUser) {
+        const delResp = await fetch(`https://localhost:5050/basket/${storedUser}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!delResp.ok) console.warn("Basket delete failed:", delResp.status);
+      }
+      setItems([]);
 
       if (paymentMethod === 0 /* Stripe */) {
         navigate("/checkout", { state: { order: orderPayload, subtotal, shippingCost, total } });
@@ -198,7 +211,7 @@ export default function CreateOrderPage() {
     <div className="create-order-container">
       <div className="card">
         <div className="card-header">
-          <h3>Create New Order</h3>
+          <h3>Order Placement</h3>
         </div>
         <div className="card-body">
           {error && <div className="alert alert-danger">{error}</div>}
@@ -212,7 +225,6 @@ export default function CreateOrderPage() {
 
           {!isLoadingBasket && items.length > 0 && (
             <>
-              <h5>Order Summary</h5>
               <ul className="list-group mb-2">
                 {items.map((i, idx) => {
                   const p = typeof i.price === "number" ? i.price : parseFloat(i.price) || 0;
