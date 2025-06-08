@@ -1,7 +1,4 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using Carter;
 
 namespace Catalog.Categories.Features.CreateCategory
 {
@@ -21,11 +18,6 @@ namespace Catalog.Categories.Features.CreateCategory
                 ISender sender,
                 ClaimsPrincipal user) =>
             {
-                foreach (var claim in user.Claims)
-                {
-                    Console.WriteLine($"CLAIM: {claim.Type} = {claim.Value}");
-                }
-
                 if (!user.IsInRole("admin"))
                 {
                     return Results.Forbid();
@@ -40,7 +32,7 @@ namespace Catalog.Categories.Features.CreateCategory
             .WithName("Create Category")
             .Produces<CreateCategoryResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status403Forbidden) 
+            .Produces(StatusCodes.Status403Forbidden)
             .WithSummary("Create Category")
             .WithDescription("Creates a new product category, accessible only by admin.");
         }

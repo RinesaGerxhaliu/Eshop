@@ -3,6 +3,7 @@ import '../../Styles/AddProduct.css';
 import { useCurrency } from "../../contexts/CurrencyContext";
 
 const BASE = "https://localhost:5050";
+const token = localStorage.getItem("token"); 
 
 export default function EditProduct({
     isOpen,
@@ -115,37 +116,48 @@ export default function EditProduct({
             const conversionRate = convert(1);
             const basePrice = parseFloat(raw) / conversionRate;
 
-            const updateRes = await fetch(`${BASE}/products`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    Product: {
-                        Id: product.id,
-                        Name: form.name,
-                        Price: basePrice,
-                        Description: form.description || null,
-                        CategoryId: form.categoryId,
-                        SubcategoryId: form.subcategoryId || null,
-                        BrandId: form.brandId,
-                    }
-                })
-            });
+           const updateRes = await fetch(`${BASE}/products`, {
+    method: "PUT",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({
+        Product: {
+            Id: product.id,
+            Name: form.name,
+            Price: basePrice,
+            Description: form.description || null,
+            CategoryId: form.categoryId,
+            SubcategoryId: form.subcategoryId || null,
+            BrandId: form.brandId,
+        }
+    })
+});
+
+      
             if (!updateRes.ok) {
                 const text = await updateRes.text();
                 throw new Error(text);
             }
 
-            if (imageFile) {
-                const fd = new FormData();
-                fd.append("file", imageFile);
-                const imgRes = await fetch(
-                    `${BASE}/products/${product.id}/image`,
-                    { method: "POST", body: fd }
-                );
-                if (!imgRes.ok) {
-                    console.warn("Image upload failed:", await imgRes.text());
-                }
-            }
+           if (imageFile) {
+    const fd = new FormData();
+    fd.append("file", imageFile);
+
+    const imgRes = await fetch(`${BASE}/products/${product.id}/image`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        },
+        body: fd
+    });
+
+    if (!imgRes.ok) {
+        console.warn("Image upload failed:", await imgRes.text());
+    }
+}
+
 
             onEdit();
             onClose();

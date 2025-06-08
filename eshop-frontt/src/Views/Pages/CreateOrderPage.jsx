@@ -47,14 +47,22 @@ export default function CreateOrderPage() {
           price: typeof i.price === "number" ? i.price : Number(i.price || 0),
           imageUrl: null
         }));
-        const enriched = await Promise.all(simpleItems.map(async (item) => {
-          try {
-            const prodResp = await fetch(`https://localhost:5050/products/${item.productId}`);
-            if (!prodResp.ok) throw new Error("Product not found");
-            const pd = await prodResp.json();
-            return { ...item, imageUrl: pd.product.imageUrl || null };
-          } catch { return { ...item, imageUrl: null }; }
-        }));
+       const enriched = await Promise.all(simpleItems.map(async (item) => {
+  try {
+    const token = localStorage.getItem("token");
+    const prodResp = await fetch(`https://localhost:5050/products/${item.productId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!prodResp.ok) throw new Error("Product not found");
+    const pd = await prodResp.json();
+    return { ...item, imageUrl: pd.product.imageUrl || null };
+  } catch {
+    return { ...item, imageUrl: null };
+  }
+}));
+
         setItems(enriched);
         setError("");
       } catch (e) {

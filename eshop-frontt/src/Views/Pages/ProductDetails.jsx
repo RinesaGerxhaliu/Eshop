@@ -29,20 +29,29 @@ const ProductDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [averageRating, setAverageRating] = useState(null);
 
-  // Fetch average rating function
-  const fetchAverageRating = async () => {
-    try {
-      const response = await fetch(
-        `https://localhost:5050/products/${id}/average-rating`
-      );
-      if (!response.ok) throw new Error("Failed to fetch average rating");
-      const data = await response.json();
-      setAverageRating(data.averageRating);
-    } catch (err) {
-      console.error("Error fetching average rating:", err);
-      setAverageRating(null);
-    }
-  };
+const fetchAverageRating = async () => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(
+      `https://localhost:5050/products/${id}/average-rating`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to fetch average rating");
+    const data = await response.json();
+    setAverageRating(data.averageRating);
+  } catch (err) {
+    console.error("Error fetching average rating:", err);
+    setAverageRating(null);
+  }
+};
+
 
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -69,18 +78,23 @@ const ProductDetails = () => {
     return data.accessToken;
   };
 
-  const fetchProduct = async () => {
-    try {
-      const response = await fetch(`https://localhost:5050/products/${id}`);
-      if (!response.ok) throw new Error("Product not found");
-      const data = await response.json();
-      setProduct(data.product);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchProduct = async () => {
+  try {
+    const token = localStorage.getItem("token"); // ose nga ku e ke tokenin
+    const response = await fetch(`https://localhost:5050/products/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,  // shton tokenin këtu
+      },
+    });
+    if (!response.ok) throw new Error("Product not found");
+    const data = await response.json();
+    setProduct(data.product);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (id) {
@@ -344,20 +358,37 @@ const ProductDetails = () => {
     }
   };
 
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    setReviewSuccess("");
-    setReviewError("");
+const handleReviewSubmit = async (e) => {
+  e.preventDefault();
+  setReviewSuccess("");
+  setReviewError("");
 
-    let token = localStorage.getItem("token");
+  let token = localStorage.getItem("token");
 
-    if (!token) {
-      setReviewError("You must be logged in to leave a review.");
-      return;
-    }
+  if (!token) {
+    setReviewError("You must be logged in to leave a review.");
+    return;
+  }
 
-    try {
-      let response = await fetch("https://localhost:5050/products/reviews", {
+  try {
+    let response = await fetch("https://localhost:5050/products/reviews", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        productId: id,
+        reviewText,
+        rating: parseInt(rating),
+      }),
+    });
+
+    if (response.status === 401) {
+      token = await refreshToken();
+      localStorage.setItem("token", token);
+
+      response = await fetch("https://localhost:5050/products/reviews", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -369,40 +400,24 @@ const ProductDetails = () => {
           rating: parseInt(rating),
         }),
       });
-
-      if (response.status === 401) {
-        token = await refreshToken();
-        localStorage.setItem("token", token);
-
-        response = await fetch("https://localhost:5050/products/reviews", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            productId: id,
-            reviewText,
-            rating: parseInt(rating),
-          }),
-        });
-      }
-
-      if (!response.ok) throw new Error("Failed to submit review");
-
-      setReviewSuccess("Review submitted successfully!");
-      setReviewText("");
-      setRating(5);
-
-      await fetchAverageRating();
-
-      setIsReviewModalOpen(false);
-      setReviewSuccess("");
-      setRefreshReviewsKey((prev) => prev + 1);
-    } catch (err) {
-      setReviewError(err.message || "An error occurred");
     }
-  };
+
+    if (!response.ok) throw new Error("Failed to submit review");
+
+    setReviewSuccess("Review submitted successfully!");
+    setReviewText("");
+    setRating(5);
+
+    await fetchAverageRating();
+
+    setIsReviewModalOpen(false);
+    setReviewSuccess("");
+    setRefreshReviewsKey((prev) => prev + 1);
+  } catch (err) {
+    setReviewError(err.message || "An error occurred");
+  }
+};
+
 
   const handleStarClick = (star) => {
     setRating(star);

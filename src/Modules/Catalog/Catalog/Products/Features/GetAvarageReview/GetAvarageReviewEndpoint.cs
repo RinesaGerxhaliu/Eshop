@@ -12,9 +12,7 @@ public class GetAverageRatingEndpoint : ICarterModule
         .Produces<GetAverageRatingResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Get Product Average Rating")
-        .WithDescription("Returns only the average rating for a given product.");
+        .WithDescription("Returns only the average rating for a given product.")
+        .RequireAuthorization();
     }
 }
-
-
-

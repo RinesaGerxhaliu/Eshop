@@ -64,26 +64,8 @@ export default function ManageProducts() {
       .catch(() => setSubcategories([]));
   }, []);
 
+const token = localStorage.getItem("token");
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this product?")) return;
-
-    try {
-      const { isSuccessful } = await fetchJson(`${BASE}/products/${id}`, {
-        method: "DELETE",
-      });
-
-      if (isSuccessful) {
-        setSuccessMsg("Product deleted successfully!");
-        loadProducts();
-      } else {
-        setSuccessMsg("Product deletion failed.");
-      }
-    } catch (err) {
-      console.error(err);
-      setSuccessMsg("Failed to delete product: " + err.message);
-    }
-  };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -164,24 +146,36 @@ export default function ManageProducts() {
     });
   }, [safeProducts, sortField, sortAsc]);
 
-  const handleDeleteConfirmed = async () => {
-    const id = deleteTarget.id;
-    setDeleteTarget(null);
-    try {
-      const { isSuccessful } = await fetchJson(`${BASE}/products/${id}`, {
-        method: "DELETE",
-      });
-      if (isSuccessful) {
-        setSuccessMsg("Product deleted successfully!");
-        loadProducts();
-      } else {
-        setSuccessMsg("Product deletion failed.");
-      }
-    } catch (err) {
-      console.error(err);
-      setSuccessMsg("Failed to delete product: " + err.message);
+const handleDeleteConfirmed = async () => {
+  if (!deleteTarget) return;
+  const id = deleteTarget.id;
+  setDeleteTarget(null);
+  try {
+    const res = await fetch(`${BASE}/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const { isSuccessful } = await res.json();
+
+    if (isSuccessful) {
+      setSuccessMsg("Product deleted successfully!");
+      loadProducts();
+    } else {
+      setSuccessMsg("Product deletion failed.");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setSuccessMsg("Failed to delete product: " + err.message);
+  }
+};
+
 
   return (
     <>

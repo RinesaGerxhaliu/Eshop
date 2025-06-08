@@ -16,30 +16,38 @@ const Shop = () => {
   const PAGE_SIZE = 8;
   const [totalCount, setTotalCount] = useState(0);
 
-  useEffect(() => {
-    const params = new URLSearchParams({
-      PageIndex: pageIndex,
-      PageSize: PAGE_SIZE,
+useEffect(() => {
+  const params = new URLSearchParams({
+    PageIndex: pageIndex,
+    PageSize: PAGE_SIZE,
+  });
+
+  const token = localStorage.getItem("token");
+
+  fetch(`${API}/products?${params.toString()}`, {
+    mode: "cors",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((data) => {
+      const items = data.products?.data || [];
+      setProducts(items);
+
+      const count =
+        data.products?.count ?? data.products?.totalItems ?? items.length;
+      setTotalCount(count);
+    })
+    .catch((err) => {
+      console.error("Fetch error:", err);
+      setErrorMsg(err.message);
     });
+}, [pageIndex]);
 
-    fetch(`${API}/products?${params.toString()}`, { mode: "cors" })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        const items = data.products?.data || [];
-        setProducts(items);
-
-        const count =
-          data.products?.count ?? data.products?.totalItems ?? items.length;
-        setTotalCount(count);
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setErrorMsg(err.message);
-      });
-  }, [pageIndex]);
 
   const sortedProducts = [...products].sort((a, b) => {
     if (sortOrder === "low") return a.price - b.price;

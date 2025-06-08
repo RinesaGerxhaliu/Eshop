@@ -3,6 +3,15 @@ import "../../Styles/AddProduct.css";
 
 const BASE = "https://localhost:5050";
 
+// Utility për headers me autorizim
+const authHeaders = (isJson = true) => {
+  const token = localStorage.getItem("token");
+  return {
+    ...(isJson ? { "Content-Type": "application/json" } : {}),
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+};
+
 export default function AddProduct({
   isOpen,
   categories = [],
@@ -99,9 +108,10 @@ export default function AddProduct({
     }
 
     try {
+      // 1. Krijo produktin
       const createRes = await fetch(`${BASE}/products`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(true),
         body: JSON.stringify({
           product: {
             name: form.name,
@@ -113,19 +123,25 @@ export default function AddProduct({
           },
         }),
       });
+
       if (!createRes.ok) {
         const text = await createRes.text();
         throw new Error(text);
       }
+
       const { id: newProductId } = await createRes.json();
 
+      // 2. Upload-i i imazhit (nëse ka)
       if (imageFile) {
         const fd = new FormData();
         fd.append("file", imageFile);
+
         const imgRes = await fetch(`${BASE}/products/${newProductId}/image`, {
           method: "POST",
+          headers: authHeaders(false),
           body: fd,
         });
+
         if (!imgRes.ok) {
           console.warn("Image upload failed:", await imgRes.text());
         }

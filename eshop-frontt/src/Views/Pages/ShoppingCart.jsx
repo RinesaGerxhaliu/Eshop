@@ -16,17 +16,25 @@ const ShoppingCartPage = () => {
     navigate("/order");
   };
 
-  const fetchProductDetails = async (productId) => {
-    try {
-      const response = await fetch(`https://localhost:5050/products/${productId}`);
-      if (!response.ok) throw new Error("Product not found");
-      const data = await response.json();
-      return data.product;
-    } catch (err) {
-      console.error("Error fetching product details:", err);
-      return null;
-    }
-  };
+const fetchProductDetails = async (productId) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`https://localhost:5050/products/${productId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Product not found");
+    const data = await response.json();
+    return data.product;
+  } catch (err) {
+    console.error("Error fetching product details:", err);
+    return null;
+  }
+};
+
 
   useEffect(() => {
     const loadCartWithDetails = async () => {

@@ -14,20 +14,18 @@ export default function ManageReviews() {
   const [totalCount, setTotalCount] = useState(0);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const api = axios.create({
     baseURL: BASE,
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
   });
 
   useEffect(() => {
-    api
-      .get("/products", {
-        params: { pageIndex: 0, pageSize: 1000 }
-      })
-      .then(res => {
+    api.get("/products", { params: { pageIndex: 0, pageSize: 1000 } })
+      .then((res) => {
         const list = res.data.products?.data ?? res.data.products?.items ?? [];
         setProducts(Array.isArray(list) ? list : []);
       })
@@ -36,28 +34,24 @@ export default function ManageReviews() {
 
   useEffect(() => {
     if (!successMsg) return;
-    const t = setTimeout(() => setSuccessMsg(""), 5000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setSuccessMsg(""), 5000);
+    return () => clearTimeout(timer);
   }, [successMsg]);
 
   const loadReviews = () => {
-    api
-      .get("/admin/reviews", {
-        params: {
-          pageIndex,
-          pageSize: PAGE_SIZE,
-          ...(filterProd && { productId: filterProd })
-        }
-      })
-      .then(res => {
+    api.get("/admin/reviews", {
+      params: {
+        pageIndex,
+        pageSize: PAGE_SIZE,
+        ...(filterProd && { productId: filterProd }),
+      },
+    })
+      .then((res) => {
         const page = res.data.reviews ?? {};
-        const items = Array.isArray(page.data) ? page.data : [];
-        const count = typeof page.count === "number" ? page.count : 0;
-        setReviews(items);
-        setTotalCount(count);
+        setReviews(Array.isArray(page.data) ? page.data : []);
+        setTotalCount(typeof page.count === "number" ? page.count : 0);
       })
-      .catch(err => {
-        console.error("Failed loading reviews:", err);
+      .catch(() => {
         setReviews([]);
         setTotalCount(0);
       });
@@ -67,10 +61,14 @@ export default function ManageReviews() {
     loadReviews();
   }, [pageIndex, filterProd]);
 
-  const handleDeleteConfirmed = () => {
-  api
-    .delete(`/products/reviews/${deleteTarget.id}`)
-    .then(res => {
+const handleDeleteConfirmed = () => {
+  if (!deleteTarget) return;
+
+  setIsDeleting(true);
+
+  // Përdor endpointin që përputhet me backend-in
+  api.delete(`/products/reviews/${deleteTarget.id}`)
+    .then((res) => {
       if (res.status === 204) {
         setSuccessMsg("Review deleted successfully!");
         loadReviews();
@@ -78,33 +76,32 @@ export default function ManageReviews() {
         setSuccessMsg("Failed to delete review.");
       }
     })
-    .catch(err => {
-      console.error("Error deleting review:", err);
-      setSuccessMsg("Failed to delete review.");
+    .catch(() => setSuccessMsg("Failed to delete review."))
+    .finally(() => {
+      setIsDeleting(false);
+      setDeleteTarget(null);
     });
-  setDeleteTarget(null);
 };
 
 
+
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-  const productOptions = products.map(p => ({ value: p.id, label: p.name }));
-  const selectedProduct = productOptions.find(o => o.value === filterProd) || null;
+  const productOptions = products.map((p) => ({ value: p.id, label: p.name }));
+  const selectedProduct = productOptions.find((o) => o.value === filterProd) || null;
 
   return (
     <>
       {successMsg && <div className="mr-success">{successMsg}</div>}
 
       <div className="mr-container">
-        <header className="mr-header">
-          <h1>Manage Reviews</h1>
-        </header>
+        <header className="mr-header"><h1>Manage Reviews</h1></header>
 
         <div className="mr-filters">
           <div className="mr-select-wrapper">
             <Select
               options={productOptions}
               value={selectedProduct}
-              onChange={opt => {
+              onChange={(opt) => {
                 setFilterProd(opt?.value || "");
                 setPageIndex(0);
               }}
@@ -138,22 +135,20 @@ export default function ManageReviews() {
             </thead>
             <tbody>
               {reviews.length > 0 ? (
-                reviews.map(r => {
-                  const prodName =
-                    products.find(p => p.id === r.productId)?.name || "–";
+                reviews.map((r) => {
+                  const prodName = products.find((p) => p.id === r.productId)?.name || "–";
                   return (
                     <tr key={r.id}>
                       <td>{r.reviewerUserName}</td>
                       <td>{r.rating}</td>
                       <td>{r.reviewText}</td>
                       <td>{prodName}</td>
-                      <td>
-                        {new Date(r.createdAt).toLocaleString()}
-                      </td>
+                      <td>{new Date(r.createdAt).toLocaleString()}</td>
                       <td>
                         <button
                           className="mr-btn mr-btn-danger"
                           onClick={() => setDeleteTarget(r)}
+                          aria-label={`Delete review by ${r.reviewerUserName}`}
                         >
                           Delete
                         </button>
@@ -163,9 +158,7 @@ export default function ManageReviews() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center" }}>
-                    No reviews found.
-                  </td>
+                  <td colSpan="6" style={{ textAlign: "center" }}>No reviews found.</td>
                 </tr>
               )}
             </tbody>
@@ -176,9 +169,7 @@ export default function ManageReviews() {
           <div className="mr-pagination">
             <button
               className="mr-btn mr-btn-secondary"
-              onClick={() =>
-                setPageIndex(i => Math.max(i - 1, 0))
-              }
+              onClick={() => setPageIndex(i => Math.max(i - 1, 0))}
               disabled={pageIndex === 0}
             >
               ← Prev
@@ -188,9 +179,7 @@ export default function ManageReviews() {
             </span>
             <button
               className="mr-btn mr-btn-secondary"
-              onClick={() =>
-                setPageIndex(i => Math.min(i + 1, totalPages - 1))
-              }
+              onClick={() => setPageIndex(i => Math.min(i + 1, totalPages - 1))}
               disabled={pageIndex + 1 >= totalPages}
             >
               Next →
@@ -199,30 +188,24 @@ export default function ManageReviews() {
         )}
 
         {deleteTarget && (
-          <div
-            className="mr-modal open"
-            onClick={() => setDeleteTarget(null)}
-          >
-            <div
-              className="mr-modal-content"
-              onClick={e => e.stopPropagation()}
-            >
+          <div className="mr-modal open" onClick={() => !isDeleting && setDeleteTarget(null)}>
+            <div className="mr-modal-content" onClick={e => e.stopPropagation()}>
               <h2>Confirm Delete</h2>
-              <p>
-                Delete review by “{deleteTarget.reviewerUserName}”?
-              </p>
+              <p>Delete review by “{deleteTarget.reviewerUserName}”?</p>
               <div className="mr-modal-actions">
                 <button
                   className="mr-btn mr-btn-secondary"
                   onClick={() => setDeleteTarget(null)}
+                  disabled={isDeleting}
                 >
                   Cancel
                 </button>
                 <button
                   className="mr-btn mr-btn-danger"
                   onClick={handleDeleteConfirmed}
+                  disabled={isDeleting}
                 >
-                  Delete
+                  {isDeleting ? "Deleting..." : "Delete"}
                 </button>
               </div>
             </div>

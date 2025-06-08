@@ -51,10 +51,10 @@ export default function AddCategory({ isOpen, onAdd, onError, onClose }) {
             required
           />
           <div className="form-actions">
-            <button type="button" className="mp-btn mp-btn-secondary" onClick={onClose}>
+            <button type="button"  onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="mp-btn mp-btn-primary">
+            <button type="submit" >
               Save
             </button>
           </div>

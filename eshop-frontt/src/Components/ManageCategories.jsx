@@ -1,4 +1,3 @@
-// ManageCategories.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaCheck } from "react-icons/fa";

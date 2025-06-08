@@ -11,18 +11,25 @@ const Wishlist = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Funksion për të marrë detajet e një produkti nga API
-  const fetchProductDetails = async (productId) => {
-    try {
-      const response = await fetch(`https://localhost:5050/products/${productId}`);
-      if (!response.ok) throw new Error("Product not found");
-      const data = await response.json();
-      return data.product;
-    } catch (err) {
-      console.error("Error fetching product details:", err);
-      return null;
-    }
-  };
+const fetchProductDetails = async (productId) => {
+  try {
+    const token = localStorage.getItem("token");  // merr tokenin
+
+    const response = await fetch(`https://localhost:5050/products/${productId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,  // shto tokenin në header
+      },
+    });
+
+    if (!response.ok) throw new Error("Product not found");
+    const data = await response.json();
+    return data.product;
+  } catch (err) {
+    console.error("Error fetching product details:", err);
+    return null;
+  }
+};
+
 
   // Funksion për të marrë wishlist-in
   const getWishlist = async () => {

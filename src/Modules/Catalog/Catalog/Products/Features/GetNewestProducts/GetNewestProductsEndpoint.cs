@@ -13,6 +13,7 @@ public class GetNewestProductsEndpoint : ICarterModule
             var result = await sender.Send(new GetNewestProductsQuery());
             return Results.Ok(result);
         })
+        .RequireAuthorization() 
         .WithName("GetNewestProducts")
         .Produces<List<ProductDTO>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)

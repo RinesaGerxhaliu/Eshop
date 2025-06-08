@@ -15,6 +15,7 @@ public class GetProductsSortedByNameEndpoint : ICarterModule
             var result = await sender.Send(query);
             return Results.Ok(result);
         })
+        .RequireAuthorization() 
         .WithName("Get Products Sorted By Name Ascending")
         .Produces<List<ProductDTO>>(StatusCodes.Status200OK)
         .WithSummary("Get Products Sorted A-Z")

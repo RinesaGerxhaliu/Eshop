@@ -13,8 +13,14 @@ const Homepage = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
+  const token = localStorage.getItem('token'); 
+
   fetch(`${API}/products/newest`, {
-    mode: 'cors'
+    mode: 'cors',
+    headers: {
+      'Authorization': `Bearer ${token}`, 
+      'Content-Type': 'application/json'   
+    }
   })
     .then(res => {
       console.log('⬅️ Status:', res.status);

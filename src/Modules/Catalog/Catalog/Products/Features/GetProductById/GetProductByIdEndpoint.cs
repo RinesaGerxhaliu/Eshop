@@ -1,12 +1,9 @@
 ﻿namespace Catalog.Products.Features.GetProductById
 {
-    //public record GetProductByIdRequest(Guid id);
-
     public record GetProductByIdResponse
     {
         public ProductDTO Product { get; init; } = default!;
     }
-
 
     public class GetProductByIdEndpoint : ICarterModule
     {
@@ -15,17 +12,16 @@
             app.MapGet("/products/{id}", async (Guid id, ISender sender) =>
             {
                 var result = await sender.Send(new GetProductByIdQuery(id));
-
                 var response = result.Adapt<GetProductByIdResponse>();
-
                 return Results.Ok(response);
             })
-                .WithName("Get Product By Id")
-                .Produces<GetProductByIdResponse>(StatusCodes.Status200OK)
-                .ProducesProblem(StatusCodes.Status400BadRequest)
-                .ProducesProblem(StatusCodes.Status404NotFound)
-                .WithSummary("Get Product By Id")
-                .WithDescription("Get Product By Id");
+            .RequireAuthorization()   
+            .WithName("Get Product By Id")
+            .Produces<GetProductByIdResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Get Product By Id")
+            .WithDescription("Get Product By Id");
         }
     }
 }
