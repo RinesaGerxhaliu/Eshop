@@ -33,9 +33,9 @@ const UserOrders = () => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
 
-        const enrichedOrders = await Promise.all(
+        const enriched = await Promise.all(
           (data.orders || []).map(async (order) => {
-            const itemsWithDetails = await Promise.all(
+            const items = await Promise.all(
               order.items.map(async (item) => {
                 const details = await fetchProductDetails(item.productId);
                 return {
@@ -45,11 +45,11 @@ const UserOrders = () => {
                 };
               })
             );
-            return { ...order, items: itemsWithDetails };
+            return { ...order, items };
           })
         );
 
-        setOrders(enrichedOrders);
+        setOrders(enriched);
       } catch (err) {
         setErrorMsg(err.message);
       } finally {
@@ -60,90 +60,83 @@ const UserOrders = () => {
     loadOrdersWithImages();
   }, [userId]);
 
-  if (loading) return <p className="text-center mt-4">Loading orders...</p>;
-  if (errorMsg) return <p className="text-danger text-center mt-4">Error: {errorMsg}</p>;
-  if (orders.length === 0) return <p className="text-center mt-4">No orders found.</p>;
-
   return (
-    
-    <div className="container mt-5">
-      <h2 className="text-center mb-4" style={{ color: "#e83e8c",position: "sticky" }}>Your Orders</h2>
-
-      <div className="mx-auto w-100 order-accordion-wrapper" style={{ maxWidth: "800px", marginBottom: "80px" }}>
-        <div className="accordion accordion-flush" id="ordersAccordion">
-          {orders.map((order, index) => (
-            <div className="accordion-item border" key={index}>
-              <h2 className="accordion-header" id={`heading-${index}`}>
-                <button
-                  className="accordion-button collapsed bg-light text-dark"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target={`#collapse-${index}`}
-                  aria-expanded="false"
-                  aria-controls={`collapse-${index}`}
-                  style={{ borderBottom: "1px solid #dee2e6" }}
-                >
-                  Order #{index + 1}
-                </button>
-              </h2>
-              <div
-                id={`collapse-${index}`}
-                className="accordion-collapse collapse"
-                aria-labelledby={`heading-${index}`}
-                data-bs-parent="#ordersAccordion"
-              >
-                <div className="accordion-body p-3">
-                  <ul className="list-group">
-                    {order.items.map((item, idx) => (
-                      <li key={idx} className="list-group-item d-flex align-items-center gap-3">
-                        {item.imageUrl ? (
-                          <img
-                            src={`https://localhost:5050${item.imageUrl}`}
-                            alt={item.productName}
-                            style={{
-                              width: "60px",
-                              height: "60px",
-                              objectFit: "cover",
-                              borderRadius: "8px"
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: "60px",
-                              height: "60px",
-                              backgroundColor: "#eee",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              borderRadius: "8px"
-                            }}
-                          >
-                            No Image
-                          </div>
-                        )}
-                        <div>
-                          <strong>{item.productName}</strong> <br />
-                          Quantity: {item.quantity} <br />
-                          Price: ${item.price.toFixed(2)}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-3 fw-bold" style={{ color: "#e83e8c" }}>
-                    Total: ${order.total.toFixed(2)}
-                  </p>
-                </div>
+    <div className="orders-page d-flex flex-column min-vh-100 bg-trendora">
+      <main className="flex-grow-1 d-flex flex-column justify-content-center align-items-center p-3">
+        {loading ? (
+          <p className="text-center mb-0">Loading orders...</p>
+        ) : errorMsg ? (
+          <p className="text-danger text-center mb-0">Error: {errorMsg}</p>
+        ) : orders.length === 0 ? (
+          <p className="text-center mb-0">No orders found.</p>
+        ) : (
+          <div className="container">
+            <h2 className="text-center mb-4 orders-heading">My Orders</h2>
+            <div className="mx-auto w-100" style={{ maxWidth: "800px", marginBottom: "80px" }}>
+              <div className="accordion" id="ordersAccordion">
+                {orders.map((order, idx) => (
+                  <div className="accordion-item mb-3 bg-light bg-opacity-25" key={idx}>
+                    <h2 className="accordion-header" id={`heading-${idx}`}>                        
+                      <button
+                        className="accordion-button collapsed bg-transparent text-dark border-0"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target={`#collapse-${idx}`}
+                        aria-expanded="false"
+                        aria-controls={`collapse-${idx}`}
+                        style={{ boxShadow: 'none' }}
+                      >
+                        Order #{idx + 1}
+                      </button>
+                    </h2>
+                    <div
+                      id={`collapse-${idx}`}
+                      className="accordion-collapse collapse"
+                      aria-labelledby={`heading-${idx}`}
+                      data-bs-parent="#ordersAccordion"
+                    >
+                      <div className="accordion-body p-3">
+                        <ul className="list-group list-group-flush">
+                          {order.items.map((item, i) => (
+                            <li key={i} className="list-group-item bg-transparent d-flex align-items-center gap-3">
+                              {item.imageUrl ? (
+                                <img
+                                  src={`${API}${item.imageUrl}`}
+                                  alt={item.productName}
+                                  className="img-fluid"
+                                  style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px" }}
+                                />
+                              ) : (
+                                <div className="no-image-placeholder">
+                                  No Image
+                                </div>
+                              )}
+                              <div>
+                                <strong>{item.productName}</strong><br/>
+                                Quantity: {item.quantity}<br/>
+                                Price: ${item.price.toFixed(2)}
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="mt-3 fw-bold text-trendora mb-0">
+                          Total: ${order.total.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        )}
+      </main>
+
+      <footer className="bg-light text-center py-3 mt-auto">
+        © 2025 Trendora. All rights reserved.
+      </footer>
     </div>
   );
 };
 
 export default UserOrders;
-
-
-

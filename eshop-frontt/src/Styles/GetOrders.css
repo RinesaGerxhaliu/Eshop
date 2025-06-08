@@ -1,5 +1,5 @@
 .accordion .accordion-item {
-  margin: 0; /* removes vertical space between items */
+  margin: 0;
   border-radius: 0;
   border-top: 1px solid #dee2e6;
   border-bottom: none;
@@ -7,4 +7,16 @@
 
 .accordion .accordion-item:last-child {
   border-bottom: 1px solid #dee2e6;
+}
+
+.orders-heading {
+  color: #ab6c93;              
+  font-family: 'Poppins', sans-serif;
+}
+.orders-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh;         
+  background: linear-gradient(to bottom, #fff0f6, #ffffff);
+  font-family: 'Poppins', sans-serif;
 }

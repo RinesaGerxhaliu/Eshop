@@ -61,20 +61,15 @@ namespace Ordering.Orders.Features.CreatePayment
                     PaymentMethod = PaymentMethodType.CashOnDelivery,
                     CurrencyCode = cmd.CurrencyCode
                 };
-                await _mediator.Send(createOrderCmd, ct);
 
-                var payment = Payment.CreateCashOnDeliveryPayment(
-                    Guid.NewGuid(),
-                    createOrderCmd.Order.CustomerId,
-                    total,
-                    cmd.CurrencyCode?.ToUpper() ?? "EUR"
-                );
-                payment.MarkAsSucceeded();
-                _db.Payments.Add(payment);
-                await _db.SaveChangesAsync(ct);
+                var orderCreated = await _mediator.Send(createOrderCmd, ct);
+                if (!orderCreated)
+                    return new CreatePaymentResult(false, null, null, "Failed to create COD order");
 
-                return new(true, null, null, null);
+                // order + payment have already been persisted by CreateOrderHandler
+                return new CreatePaymentResult(true, null, null, null);
             }
+
 
             var dtoJson = JsonSerializer.Serialize(new DraftOrderDto(
                 d.CustomerId, d.Items, d.ShippingMethodId, d.SavedAddressId, d.ShippingAddress,
