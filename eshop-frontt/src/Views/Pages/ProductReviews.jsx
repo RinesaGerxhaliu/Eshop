@@ -18,18 +18,36 @@ const ProductReviews = ({ onReviewsChange }) => {
   const [showModal, setShowModal] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [editingReviewId, setEditingReviewId] = useState(null);
+  const [averageRating, setAverageRating] = useState(null);
 
+  const fetchAverageRating = async () => {
+    try {
+      const res = await fetch(`${API}/products/${id}/average-rating`);
+      if (!res.ok) throw new Error("Failed to fetch average rating");
+      const data = await res.json();
+      setAverageRating(data.averageRating);
+    } catch (err) {
+      console.error("❌ Error fetching average rating:", err);
+      setAverageRating(null);
+    }
+  };
   const handleReviewUpdate = (updatedReview) => {
     setReviews((prev) =>
       prev.map((r) => (r.id === updatedReview.id ? updatedReview : r))
     );
+    if (onReviewsChange) onReviewsChange();
+    fetchAverageRating();
   };
+  useEffect(() => {
+    fetchAverageRating();
+  }, [id]);
 
   const handleReviewDelete = (reviewId) => {
     setReviews((prevReviews) =>
       prevReviews.filter((review) => review.id !== reviewId)
     );
-    if(onReviewsChange) onReviewsChange();
+    if (onReviewsChange) onReviewsChange();
+    fetchAverageRating();
   };
 
   useEffect(() => {
@@ -62,13 +80,6 @@ const ProductReviews = ({ onReviewsChange }) => {
       .catch((err) => setErrorMsg(err.message))
       .finally(() => setLoading(false));
   }, [id]);
-
-  const handleAddReview = (newReview) => {
-    setReviews((prevReviews) => [newReview, ...prevReviews]);
-    if(onReviewsChange) onReviewsChange();
-  };
-
-  const currentlyEditingReview = reviews.find((r) => r.id === editingReviewId);
 
   if (loading) return <p>Loading reviews...</p>;
   if (errorMsg) return <p>Error: {errorMsg}</p>;
@@ -171,7 +182,9 @@ const ProductReviews = ({ onReviewsChange }) => {
         showModal={showModal}
         setShowModal={setShowModal}
         reviewId={reviewToDelete}
+        productId={id}
         onDeleteSuccess={handleReviewDelete}
+        setAverageRating={setAverageRating}
       />
     </div>
   );

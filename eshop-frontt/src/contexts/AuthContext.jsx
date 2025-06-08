@@ -7,10 +7,10 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-  const [username, setUsername] = useState(localStorage.getItem("username") || "");
-  const [userId, setUserId] = useState(localStorage.getItem("userId") || "");
-  const [roles, setRoles] = useState(JSON.parse(localStorage.getItem("roles")) || []);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState("");
+  const [roles, setRoles] = useState([]);
 
   const parseJwt = (token) => {
     try {
@@ -40,37 +40,36 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // 1. Tell the server to expire the HttpOnly refreshToken cookie
     fetch("https://localhost:5050/auth/logout", {
       method: "POST",
-      credentials: "include", // send along the existing refreshToken cookie
-    })
-      .finally(() => {
-        // 2. Clear all client‐side state
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("roles");
+      credentials: "include",
+    }).finally(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("roles");
 
-        setUsername("");
-        setUserId("");
-        setRoles([]);
-        setIsLoggedIn(false);
+      setUsername("");
+      setUserId("");
+      setRoles([]);
+      setIsLoggedIn(false);
 
-        // 3. Redirect to /login
-        navigate("/login");
-      });
+      navigate("/login");
+    });
   };
 
   const refreshAccessToken = useCallback(async () => {
     try {
       const response = await fetch("https://localhost:5050/auth/refresh", {
         method: "POST",
-        credentials: "include", // send HttpOnly cookie with refresh token
+        credentials: "include",
       });
+
+      console.log("refreshAccessToken response status:", response.status);
 
       if (response.ok) {
         const data = await response.json();
+        console.log("refreshAccessToken data:", data);
         if (data.accessToken) {
           login(data.accessToken);
         } else {
@@ -79,31 +78,41 @@ export const AuthProvider = ({ children }) => {
       } else {
         logout();
       }
-    } catch {
+    } catch (error) {
+      console.error("refreshAccessToken error:", error);
       logout();
     }
   }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    console.log("AuthProvider: token from localStorage =", token);
 
-    const parsedToken = parseJwt(token);
-    if (!parsedToken) return;
-
-    const tokenExpiresIn = parsedToken.exp - Date.now() / 1000;
-    if (tokenExpiresIn <= 0) {
+    if (!token) {
       refreshAccessToken();
       return;
     }
 
-    const refreshTime = (tokenExpiresIn - 60) * 1000;
+    const parsedToken = parseJwt(token);
+    console.log("AuthProvider: parsedToken =", parsedToken);
 
-    const refreshTimeout = setTimeout(() => {
+    if (!parsedToken) {
       refreshAccessToken();
-    }, refreshTime);
+      return;
+    }
 
-    return () => clearTimeout(refreshTimeout);
+    const isExpired = parsedToken.exp < Date.now() / 1000;
+    console.log("AuthProvider: token isExpired =", isExpired);
+
+    if (isExpired) {
+      refreshAccessToken();
+      return;
+    }
+
+    setUsername(localStorage.getItem("username") || "");
+    setUserId(localStorage.getItem("userId") || "");
+    setRoles(JSON.parse(localStorage.getItem("roles")) || []);
+    setIsLoggedIn(true);
   }, [refreshAccessToken]);
 
   return (

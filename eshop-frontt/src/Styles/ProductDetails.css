@@ -73,38 +73,15 @@
   box-shadow: 0 6px 30px rgba(59, 59, 59, 0.2);
 }
 
-.review-section {
-  margin-top: 40px;
-  border-top: 1px solid #eee;
-  padding-top: 20px;
-}
-
-.review-section h3 {
-  font-size: 20px;
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.review-form .form-group {
-  margin-bottom: 15px;
-}
-
-.review-form textarea {
-  margin-left: 10px;
-  width: 100%;
-  resize: vertical;
-}
-
 .review-modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* pak më e errët dhe elegante */
   justify-content: center;
   align-items: center;
+  z-index: 9999;
 }
 
 .review-modal.open {
@@ -112,63 +89,130 @@
 }
 
 .review-modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 600px;
-  width: 100%;
-  box-shadow: 0 6px 30px rgba(59, 59, 59, 0.2);
+  background-color: #f9f9f9; /* ngjyrë shumë e lehtë, e pastër */
+  padding: 30px 40px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  position: relative;
+}
+
+.review-modal-content h3 {
+  margin-bottom: 20px;
+  font-weight: 700;
+  font-size: 24px;
+  color: #2c3e50;
+  text-align: center;
 }
 
 .review-modal-content .star-rating {
   display: flex;
-  gap: 5px;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 25px;
 }
 
-
 .review-modal-content .star-btn {
-  font-size: 30px;
+  font-size: 32px;
   background: none;
   border: none;
-  color: #ccc;
+  color: #bbb;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
-.review-modal-content .star-btn.selected {
-  color: #f39c12;
-}
-
+.review-modal-content .star-btn.selected,
 .review-modal-content .star-btn:hover {
-  color: #f39c12;
+  color: #f1c40f; /* gold/yellow e pastër */
 }
 
 .review-modal-content .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.review-modal-content .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #34495e;
 }
 
 .review-modal-content textarea {
   width: 100%;
+  min-height: 120px;
+  padding: 12px 15px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1.8px solid #dcdcdc;
   resize: vertical;
+  transition: border-color 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
 }
 
-.review-modal-content .form-group label {
-  margin-left: 20px;
-  font-weight: bold;
+.review-modal-content textarea:focus {
+  outline: none;
+  border-color:#c16696; /* ngjyrë lila elegante */
+  box-shadow: 0 0 8px#c16696;
+  background-color: #fff;
 }
 
-.review-modal-content button {
-  padding: 10px 20px;
-  background-color: rgba(209, 171, 183, 0.7);
-  color: #040303;
+.review-modal-content button[type="submit"] {
+  width: 100%;
+  padding: 14px 0;
+  background: #c16696;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
 }
 
-.review-modal-content button:hover {
-  background-color: rgba(192, 156, 167, 0.7);
+.review-modal-content button[type="submit"]:hover {
+  background: #c16696;
 }
+
+.review-modal-content .btn.btn-secondary {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px 0;
+  border-radius: 10px;
+  border: 1.5px solid #ccc;
+  background: #fff;
+  color: #555;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.review-modal-content .btn.btn-secondary:hover {
+  background: #f5f5f5;
+  border-color: #c16696;
+  color: #c16696;
+}
+
+/* Mesazhet e gabimit dhe suksesit */
+.text-danger {
+  color: #e74c3c;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.text-success {
+  color: #27ae60;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
 
 .product-infoo {
   flex: 1;
