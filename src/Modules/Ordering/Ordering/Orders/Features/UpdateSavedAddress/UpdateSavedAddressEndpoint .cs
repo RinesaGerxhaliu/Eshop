@@ -10,13 +10,13 @@ using Microsoft.AspNetCore.Routing;
         {
             app.MapPut("/saved-addresses/{id:guid}", async (Guid id, UpdateSavedAddressCommand command, ISender sender) =>
             {
-                // Siguro që ID nga route dhe body përputhen
                 if (id != command.SavedAddress.Id)
                     return Results.BadRequest("Mismatched ID");
 
                 await sender.Send(command);
                 return Results.NoContent();
             })
+            .RequireAuthorization()
             .WithName("UpdateSavedAddress")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)

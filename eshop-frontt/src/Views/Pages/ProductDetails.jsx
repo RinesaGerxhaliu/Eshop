@@ -31,17 +31,10 @@ const ProductDetails = () => {
 
 const fetchAverageRating = async () => {
   try {
-    const token = localStorage.getItem('token');
-
     const response = await fetch(
-      `https://localhost:5050/products/${id}/average-rating`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`, 
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+  `https://localhost:5050/products/${id}/average-rating`
+);
+
 
     if (!response.ok) throw new Error("Failed to fetch average rating");
     const data = await response.json();
@@ -80,12 +73,8 @@ const fetchAverageRating = async () => {
 
 const fetchProduct = async () => {
   try {
-    const token = localStorage.getItem("token"); // ose nga ku e ke tokenin
-    const response = await fetch(`https://localhost:5050/products/${id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,  // shton tokenin këtu
-      },
-    });
+    const token = localStorage.getItem("token"); 
+const response = await fetch(`https://localhost:5050/products/${id}`);
     if (!response.ok) throw new Error("Product not found");
     const data = await response.json();
     setProduct(data.product);
@@ -131,10 +120,7 @@ const fetchProduct = async () => {
     return response.ok;
   };
 
-  const handleDeleteReview = (deletedReviewId) => {
-    setRefreshReviewsKey((prev) => prev + 1); // rifreskon listën e review-ve
-    fetchAverageRating(); // rifreskon average rating
-  };
+  
   const handleAddToCart = async (e) => {
     e.preventDefault();
 

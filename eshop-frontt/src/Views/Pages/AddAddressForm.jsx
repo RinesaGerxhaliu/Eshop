@@ -15,6 +15,8 @@ function AddAddressForm({ customerId, token, onSuccess, onCancel }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const token = localStorage.getItem("token");
+
     const newAddress = {
       savedAddress: {
         customerId,

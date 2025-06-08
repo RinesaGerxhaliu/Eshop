@@ -1,11 +1,4 @@
-﻿using Carter;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Mapster;
-using MediatR;
-using Ordering.Orders.Dtos;
-
-public record CreateSavedAddressRequest(SavedAddressDto SavedAddress);
+﻿public record CreateSavedAddressRequest(SavedAddressDto SavedAddress);
 public record CreateSavedAddressResponse(Guid Id);
 
 public class CreateSavedAddressEndpoint : ICarterModule
@@ -20,6 +13,7 @@ public class CreateSavedAddressEndpoint : ICarterModule
 
             return Results.Created($"/saved-addresses/{response.Id}", response);
         })
+        .RequireAuthorization() 
         .WithName("CreateSavedAddress")
         .Produces<CreateSavedAddressResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -27,4 +21,3 @@ public class CreateSavedAddressEndpoint : ICarterModule
         .WithDescription("Creates a new saved address for the customer.");
     }
 }
-

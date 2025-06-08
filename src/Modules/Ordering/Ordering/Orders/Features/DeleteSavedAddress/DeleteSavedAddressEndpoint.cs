@@ -13,6 +13,7 @@
                     ? Results.NoContent()
                     : Results.NotFound(new { Message = "Saved address not found." });
             })
+            .RequireAuthorization() 
             .WithName("DeleteSavedAddress")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
@@ -20,5 +21,4 @@
             .WithDescription("Deletes a saved address by Id.");
         }
     }
-
 }

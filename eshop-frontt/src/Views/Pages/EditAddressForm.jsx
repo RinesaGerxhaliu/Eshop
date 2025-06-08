@@ -55,7 +55,8 @@ function EditAddressForm({ address, token, onSuccess, onCancel }) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update address");
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || "Failed to update address");
       }
       onSuccess();
     } catch (err) {

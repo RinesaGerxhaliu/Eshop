@@ -15,13 +15,9 @@ const Homepage = () => {
   useEffect(() => {
   const token = localStorage.getItem('token'); 
 
-  fetch(`${API}/products/newest`, {
-    mode: 'cors',
-    headers: {
-      'Authorization': `Bearer ${token}`, 
-      'Content-Type': 'application/json'   
-    }
-  })
+fetch(`${API}/products/newest`, {
+  mode: 'cors'
+})
     .then(res => {
       console.log('⬅️ Status:', res.status);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
