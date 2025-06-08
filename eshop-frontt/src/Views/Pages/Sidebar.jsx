@@ -77,27 +77,16 @@ export default function Sidebar({ onClose }) {
           <h3>All Categories</h3>
           <ul>
             {loadingCats && <li>Loading categories…</li>}
-            {!loadingCats && categories.length === 0 && (
-              <li>No categories available</li>
-            )}
+            {!loadingCats && categories.length === 0 && <li>No categories available</li>}
             {!loadingCats && categories.map(cat => (
               <React.Fragment key={cat.id}>
-                <li onClick={() => toggleCat(cat.id)}>
-                  {cat.name}
-                </li>
+                <li onClick={() => toggleCat(cat.id)}>{cat.name}</li>
                 {expandedCats.includes(cat.id) && (
                   <ul className="sidebar-sublist">
                     {loadingSubs[cat.id] && <li>Loading…</li>}
-                    {!loadingSubs[cat.id] && subMap[cat.id]?.length === 0 && (
-                      <li>No subcategories</li>
-                    )}
+                    {!loadingSubs[cat.id] && subMap[cat.id]?.length === 0 && <li>No subcategories</li>}
                     {!loadingSubs[cat.id] && subMap[cat.id].map(sub => (
-                      <li
-                        key={sub.id}
-                        onClick={() => handleFilter("subcategory", sub.id)}
-                      >
-                        {sub.name}
-                      </li>
+                      <li key={sub.id} onClick={() => handleFilter("subcategory", sub.id)}>{sub.name}</li>
                     ))}
                   </ul>
                 )}
@@ -110,13 +99,9 @@ export default function Sidebar({ onClose }) {
           <h3>All Brands</h3>
           <ul>
             {loadingBrands && <li>Loading brands…</li>}
-            {!loadingBrands && brands.length === 0 && (
-              <li>No brands available</li>
-            )}
+            {!loadingBrands && brands.length === 0 && <li>No brands available</li>}
             {!loadingBrands && brands.map(br => (
-              <li key={br.id} onClick={() => handleFilter("brand", br.id)}>
-                {br.name}
-              </li>
+              <li key={br.id} onClick={() => handleFilter("brand", br.id)}>{br.name}</li>
             ))}
           </ul>
         </div>

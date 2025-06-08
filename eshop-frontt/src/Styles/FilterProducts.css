@@ -21,6 +21,25 @@
     right: 160px;
     z-index: 20;
   }
+  .filter-heading {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  text-transform: capitalize;
+  font-weight: 600;
+  font-size: 1.8rem;
+  letter-spacing: 0.05em;
+  background: linear-gradient(90deg,  #f48fb1 0%, #833967 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.filter-heading h2 {
+  margin: 0;
+}
+
   .pagination {
     max-width: 400px;
     margin: 44px auto 0 auto;

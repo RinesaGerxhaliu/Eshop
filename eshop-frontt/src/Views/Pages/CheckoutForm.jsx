@@ -8,6 +8,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../../Styles/StripeElements.css";
+import { useCurrency } from '../../contexts/CurrencyContext';  // import
 
 const ELEMENT_OPTIONS = {
   style: {
@@ -28,7 +29,8 @@ export default function CheckoutForm() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Draft order & totals nga navigate
+  const { convert, format } = useCurrency(); // hook
+
   const draftOrder = location.state?.order;
   const subtotal = location.state?.subtotal ?? 0;
   const shippingCost = location.state?.shippingCost ?? 0;
@@ -89,7 +91,6 @@ export default function CheckoutForm() {
       setErrorMsg(error.message);
       setProcessing(false);
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
-      // Backend krijon order nga webhook!
       navigate(`/order-confirmation`);
     }
   };
@@ -101,15 +102,15 @@ export default function CheckoutForm() {
         <div className="summary-totals">
           <div className="totals-row">
             <span>Subtotal:</span>
-            <span>€{(subtotal ?? 0).toFixed(2)}</span>
+            <span>{format(convert(subtotal ?? 0))}</span>
           </div>
           <div className="totals-row">
             <span>Shipping:</span>
-            <span>€{(shippingCost ?? 0).toFixed(2)}</span>
+            <span>{format(convert(shippingCost ?? 0))}</span>
           </div>
           <div className="totals-row total-final">
             <span>Total:</span>
-            <span>€{(total ?? 0).toFixed(2)}</span>
+            <span>{format(convert(total ?? 0))}</span>
           </div>
         </div>
       </aside>

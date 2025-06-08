@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+.manage-categories-container {
+  font-family: 'Poppins', sans-serif;
+  padding: 24px;
+  background: #fff5f8;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #333;
+}
+
+.manage-categories-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.manage-categories-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.manage-categories-header .manage-categories-btn-primary {
+  font-size: 1rem;
+  padding: 8px 16px;
+  min-width: auto;
+  flex: 0 0 auto;
+}
+
+.manage-categories-btn {
+  width: auto !important;
+  max-width: none !important;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+}
+
+.manage-categories-btn:active {
+  transform: scale(0.97);
+}
+
+.manage-categories-btn-primary {
+  background: #e83e8c;
+  color: #fff;
+}
+
+.manage-categories-btn-primary:hover {
+  background: #d6336c;
+}
+
+.manage-categories-btn-secondary {
+  background: #f8d7e9;
+  color: #d6336c;
+}
+
+.manage-categories-btn-secondary:hover {
+  background: #f1c2da;
+}
+
+.manage-categories-btn-action {
+  background: #f06595;
+  color: #fff;
+}
+
+.manage-categories-btn-action:hover {
+  background: #d6336c;
+}
+
+.manage-categories-btn-danger {
+  background: #ff6b81;
+  color: #fff;
+}
+
+.manage-categories-btn-danger:hover {
+  background: #e55370;
+}
+
+.manage-categories-filters {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.manage-categories-filters > button {
+  margin-top: 7px;
+}
+
+.manage-categories-filters > .manage-categories-btn-secondary {
+  font-size: 0.9rem;
+  padding: 7px 15px;
+}
+
+.manage-categories-select {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border: 1px solid #f1c2da;
+  border-radius: 6px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.manage-categories-table-wrap {
+  flex: 1;
+  overflow: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.manage-categories-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.manage-categories-table th,
+.manage-categories-table td {
+  padding: 10px 6px;
+  text-align: left;
+  border-bottom: 1px solid #f1ecf1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.manage-categories-table thead {
+  background: #fde8f2;
+}
+
+.manage-categories-table tr:hover {
+  background: #ffeef8;
+}
+
+.manage-categories-image {
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.manage-categories-no-image {
+  color: #bbb;
+}
+
+.manage-categories-success {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e91e63;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 1100;
+  opacity: 0.95;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.manage-categories-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.manage-categories-pagination .manage-categories-btn {
+  flex: 0 0 auto;
+}
+
+.manage-categories-table td .manage-categories-btn + .manage-categories-btn {
+  margin-left: 12px;
+}
+
+.manage-categories-table td .manage-categories-btn-action,
+.manage-categories-table td .manage-categories-btn-danger {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+}
+.manage-categories-table td .manage-categories-btn-secondary {
+  font-size: 15px; 
+  padding: 5.5px 17px;
+}
+
+.manage-categories-table td .manage-categories-btn-danger {
+  font-size: 0.85rem; 
+  padding: 6px 10px;
+}
+
+
+.manage-categories-pagination > span {
+  display: inline-block !important;
+  margin: 16px 24px 0 !important;
+}
+
+.manage-categories-pagination > button {
+  margin-top: 8px !important;
+}
+
+.manage-categories-table th:nth-child(1),
+.manage-categories-table td:nth-child(1) {
+  width: 50%;
+}
+
+.manage-categories-table th:nth-child(2),
+.manage-categories-table td:nth-child(2) {
+  width: 20%;
+}
+
+.manage-categories-table th:nth-child(3),
+.manage-categories-table td:nth-child(3) {
+  width: 30%;
+  text-align: right;
+}

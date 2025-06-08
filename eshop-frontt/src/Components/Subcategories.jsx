@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import "../Styles/ManageCategories.css";
+import "../Styles/Subcategories.css";
 import AddSubcategory from "./UI/AddSubcategory";
 import EditSubcategory from "./UI/EditSubcategory";
 

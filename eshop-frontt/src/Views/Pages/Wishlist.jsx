@@ -2,36 +2,34 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "../../Styles/ShoppingCart.css";
+import { useCurrency } from "../../contexts/CurrencyContext";
 
 const Wishlist = () => {
   const { refreshAccessToken } = useAuth();
   const [wishlist, setWishlist] = useState({ items: [] });
-  const [loadedItems, setLoadedItems] = useState([]); // items + images
+  const [loadedItems, setLoadedItems] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { convert, format } = useCurrency();
 
-const fetchProductDetails = async (productId) => {
-  try {
-    const token = localStorage.getItem("token");  // merr tokenin
+  const fetchProductDetails = async (productId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://localhost:5050/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Product not found");
+      const data = await response.json();
+      return data.product;
+    } catch (err) {
+      console.error("Error fetching product details:", err);
+      return null;
+    }
+  };
 
-    const response = await fetch(`https://localhost:5050/products/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,  // shto tokenin në header
-      },
-    });
-
-    if (!response.ok) throw new Error("Product not found");
-    const data = await response.json();
-    return data.product;
-  } catch (err) {
-    console.error("Error fetching product details:", err);
-    return null;
-  }
-};
-
-
-  // Funksion për të marrë wishlist-in
   const getWishlist = async () => {
     setIsLoading(true);
     setError("");
@@ -39,7 +37,6 @@ const fetchProductDetails = async (productId) => {
     const username = localStorage.getItem("username");
     let token = localStorage.getItem("token");
 
-    // Nëse përdoruesi nuk është i loguar, merr wishlist nga localStorage dhe përfundo loading
     if (!username || !token) {
       const wishlistItems = JSON.parse(localStorage.getItem("wishlist")) || [];
       setWishlist({ items: wishlistItems });
@@ -55,7 +52,6 @@ const fetchProductDetails = async (productId) => {
         },
       });
 
-      // Nëse token ka skaduar, provo të rifreskosh
       if (response.status === 401) {
         token = await refreshAccessToken();
         if (!token) {
@@ -71,7 +67,6 @@ const fetchProductDetails = async (productId) => {
         });
       }
 
-      // Nëse wishlist nuk ekziston, krijo një të re dhe bëj retry
       if (response.status === 404) {
         const createResponse = await fetch("https://localhost:5050/wishlist", {
           method: "POST",
@@ -87,18 +82,16 @@ const fetchProductDetails = async (productId) => {
             },
           }),
         });
-
         if (!createResponse.ok) {
           throw new Error("Failed to create wishlist");
         }
-
-        return await getWishlist(); // Retry pas krijimit
+        return await getWishlist(); 
       }
 
       if (!response.ok) throw new Error("Failed to fetch wishlist");
 
       const data = await response.json();
-      setWishlist({ items: data.wishlist.items });
+      setWishlist({ items: data.wishlist.items || [] });
     } catch (err) {
       console.error("Error fetching wishlist:", err);
       setError(err.message || "An unknown error occurred.");
@@ -107,15 +100,12 @@ const fetchProductDetails = async (productId) => {
     }
   };
 
-  // Funksion për të marrë të gjitha detajet (produkt + imazh) dhe më pas i vendos në state
   const loadFullProductData = async (items) => {
     if (!items.length) {
       setLoadedItems([]);
       return;
     }
-
     try {
-      // Merr të gjitha produktet me detaje në një batch async
       const productsWithDetails = await Promise.all(
         items.map(async (item) => {
           const product = await fetchProductDetails(item.productId);
@@ -123,12 +113,10 @@ const fetchProductDetails = async (productId) => {
             ...item,
             imageUrl: product?.imageUrl || null,
             productName: product?.name || item.productName || "Unnamed Product",
-            price: product?.price || item.price || 0,
+            price: product?.price ?? item.price ?? 0,
           };
         })
       );
-
-      // Vendosim produktet me të dhëna të plota në state (UI shfaqet 100% gati)
       setLoadedItems(productsWithDetails);
     } catch (err) {
       console.error("Error loading product details:", err);
@@ -136,13 +124,11 @@ const fetchProductDetails = async (productId) => {
     }
   };
 
-  // Funksion për të hequr një item nga wishlist
   const removeItemFromWishlist = async (productId) => {
     const username = localStorage.getItem("username");
     const token = localStorage.getItem("token");
 
     if (!username || !token) {
-      // Nëse nuk jemi loguar, heqim lokal
       const updatedItems = wishlist.items.filter((item) => item.productId !== productId);
       localStorage.setItem("wishlist", JSON.stringify(updatedItems));
       setWishlist({ items: updatedItems });
@@ -173,7 +159,6 @@ const fetchProductDetails = async (productId) => {
     }
   };
 
-  // Kur wishlist ndryshon, ngarko detajet e plotë të produkteve (produkt + imazh)
   useEffect(() => {
     if (wishlist.items.length > 0) {
       loadFullProductData(wishlist.items);
@@ -182,7 +167,6 @@ const fetchProductDetails = async (productId) => {
     }
   }, [wishlist.items]);
 
-  // Kur komponenti mount-ohet, marr wishlist
   useEffect(() => {
     getWishlist();
   }, []);
@@ -193,7 +177,6 @@ const fetchProductDetails = async (productId) => {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {isLoading ? (
-        // Loading spinner / skeleton i thjeshtë
         <div style={{ fontSize: 18, fontWeight: "bold" }}>Loading your wishlist...</div>
       ) : loadedItems.length === 0 ? (
         <div>
@@ -220,7 +203,7 @@ const fetchProductDetails = async (productId) => {
                 <p>
                   <strong>{item.productName}</strong>
                 </p>
-                <p>Price: €{item.price}</p>
+                <p>Price: {format ? format(convert(item.price)) : item.price.toFixed(2)}</p>
                 <p>Color: {item.color}</p>
               </div>
 

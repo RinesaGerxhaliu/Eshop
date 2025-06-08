@@ -15,23 +15,18 @@ public class GetSubcategoryByIdEndpoint : ICarterModule
     {
         app.MapGet("/subcategories/{id:guid}", async (
                 [AsParameters] GetSubcategoryByIdRequest req,
-                ISender sender,
-                ClaimsPrincipal user) =>
+                ISender sender) =>
         {
-            if (!user.IsInRole("admin"))
-                return Results.Forbid();
-
             var result = await sender.Send(new GetSubcategoryByIdQuery(req.Id));
             if (result is null)
                 return Results.NotFound();
 
             return Results.Ok(new GetSubcategoryByIdResponse(result.Subcategory));
         })
-        .WithName("Get Subcategory By Id (Admin only)")
+        .WithName("Get Subcategory By Id")
         .Produces<GetSubcategoryByIdResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithSummary("Fetch a single subcategory by its ID (admin only)")
-        .WithDescription("Requires admin role. Returns 404 if not found.");
+        .WithSummary("Fetch a single subcategory by its ID")
+        .WithDescription("Returns 404 if not found.");
     }
 }

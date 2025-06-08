@@ -40,7 +40,7 @@ const DeleteReviewModal = ({
 
    if (res.ok) {
   setShowModal(false);
-  if (onDeleteSuccess) onDeleteSuccess(reviewId); // Parent do e thërrasë fetchAverageRating
+  if (onDeleteSuccess) onDeleteSuccess(reviewId); 
   setMessage({ type: "success", text: "Review deleted successfully!" });
 }
  else {
