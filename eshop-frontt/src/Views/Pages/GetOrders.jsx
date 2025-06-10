@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../Styles/GetOrders.css";
+import { useCurrency } from "../../contexts/CurrencyContext";
 
 const API = "https://localhost:5050";
 
@@ -22,6 +23,7 @@ const UserOrders = () => {
   const [orders, setOrders] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(true);
+    const { convert, format } = useCurrency(); 
 
   useEffect(() => {
     const loadOrdersWithImages = async () => {
@@ -114,13 +116,15 @@ const UserOrders = () => {
                               <div>
                                 <strong>{item.productName}</strong><br/>
                                 Quantity: {item.quantity}<br/>
-                                Price: ${item.price.toFixed(2)}
+                               Price: {format(convert(item.price))}
+
                               </div>
                             </li>
                           ))}
                         </ul>
                         <p className="mt-3 fw-bold text-trendora mb-0">
-                          Total: ${order.total.toFixed(2)}
+                         Total: {format(convert(order.total))}
+
                         </p>
                       </div>
                     </div>

@@ -194,7 +194,7 @@ export default function ManageCategories() {
                         className="manage-categories-btn manage-categories-btn-action"
                         style={{ marginLeft: 8 }}
                         onClick={() =>
-                          navigate(`/categories/${c.id}/subcategories`)
+                           navigate(`/admin-dashboard/categories/${c.id}/subcategories`)
                         }
                       >
                         View Subcategories

@@ -18,7 +18,6 @@ import Sidebar from './Views/Pages/Sidebar';
 import FilteredProducts from './Views/Pages/FilteredProducts';
 import ProductSearchResults from './Components/UI/ProductSearchResults '
 import CreateOrderPage from './Views/Pages/CreateOrderPage';
-import Subcategories from "./Components/Subcategories";
 import StripeProvider from "./StripeProvider";
 import CheckoutForm from './Views/Pages/CheckoutForm';
 import GetOrders from './Views/Pages/GetOrders.jsx';
@@ -65,17 +64,19 @@ function AppContent() {
         <Route path="/products/sorted/by-price" element={<FilteredProducts />} />
         <Route path="/products/sorted/by-price-descending" element={<FilteredProducts />} />
         <Route path="/products" element={<ProductSearchResults />} />
-        <Route path="/categories/:categoryId/subcategories" element={<Subcategories />} />
+     
         <Route path="/user-orders/:userId" element={<GetOrders />} />
         <Route
           path="/admin-dashboard/*"
           element={
             <PrivateRoute roles={['admin']}>
               <Dashboard />
+              
             </PrivateRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
+        
       </Routes>
 
       {!isAdminDashboard && !shouldHideNavbar && <Footer />}
