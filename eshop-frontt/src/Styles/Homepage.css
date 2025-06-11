@@ -37,15 +37,17 @@ body {
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap');
 
 :root {
- 
 
+  --primary-color: #af4889;               /* deep purple for contrast */
   --font-script: 'Pacifico', cursive;
   --font-sans: 'Quicksand', sans-serif;
 }
-
 .hero-section {
   position: relative;
-  background: center/cover no-repeat;
+  background-image: var(--bg-img);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   min-height: 80vh;
   display: flex;
   align-items: center;
@@ -57,6 +59,8 @@ body {
   position: absolute;
   inset: 0;
   background: var(--overlay-color);
+  /* subtle blur for extra pop */
+  backdrop-filter: blur(4px);
 }
 
 .hero-content {
@@ -72,18 +76,17 @@ body {
   font-size: 3rem;
   margin-bottom: 0.5rem;
   color: var(--primary-color);
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
 }
 
 .hero-content p {
   font-family: var(--font-sans);
   font-size: 1.25rem;
   margin-bottom: 1.5rem;
-  color: #fff;
+  color: #f0f0f0;   /* slightly off-white for readability */
 }
 
 .hero-btn {
-  display: inline-block;
   font-family: var(--font-sans);
   font-weight: 600;
   background-color: var(--primary-color);
@@ -95,7 +98,7 @@ body {
 }
 
 .hero-btn:hover {
-  background-color: #d17fb0;
+  background-color: #5a0070;
   transform: translateY(-2px);
 }
 

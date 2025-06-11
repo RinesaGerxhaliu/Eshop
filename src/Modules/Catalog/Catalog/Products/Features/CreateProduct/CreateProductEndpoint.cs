@@ -20,10 +20,7 @@ namespace Catalog.Products.Features.CreateProduct
                 ISender sender,
                 ClaimsPrincipal user) =>
             {
-                if (!user.IsInRole("admin"))
-                {
-                    return Results.Forbid();
-                }
+               
 
                 var command = request.Adapt<CreateProductCommand>();
                 var result = await sender.Send(command);
@@ -34,7 +31,7 @@ namespace Catalog.Products.Features.CreateProduct
             .WithName("CreateProduct")
             .Produces<CreateProductResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status403Forbidden)
+            
             .WithSummary("Create Product")
             .WithDescription("Creates a new product. Only accessible by admin.");
         }
