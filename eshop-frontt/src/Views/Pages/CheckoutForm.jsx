@@ -50,14 +50,20 @@ export default function CheckoutForm() {
     let cs = clientSecret;
     if (!cs) {
       try {
+        const token = localStorage.getItem("token");
+
         const resp = await fetch("https://localhost:5050/payments/create", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             order: draftOrder,
             currencyCode: "eur",
           }),
         });
+
         if (!resp.ok) {
           throw new Error((await resp.json()).error || "Failed to get client secret");
         }

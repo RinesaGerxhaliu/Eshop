@@ -54,32 +54,15 @@ const ShoppingCartPage = () => {
           );
         }
 
-        if (response.status === 404) {
-          const createResponse = await fetch("https://localhost:5050/basket", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              shoppingCart: {
-                id: crypto.randomUUID(),
-                userName: username,
-                items: [],
-              },
-            }),
-          });
+        const data = await response.json();
+        const rawItems = data?.shoppingCart?.items;
 
-          if (!createResponse.ok) throw new Error("Failed to create shopping cart");
-
-          // 🌀 Try again now that the cart exists
-          return await loadCartWithDetails();
+        if (!Array.isArray(rawItems) || rawItems.length === 0) {
+          setCart({ items: [] });
+          setIsLoading(false);
+          return;
         }
 
-        if (!response.ok) throw new Error("Failed to fetch cart.");
-
-        const data = await response.json();
-        const rawItems = data.shoppingCart.items;
 
         const productsDetails = await Promise.all(
           rawItems.map((item) => fetchProductDetails(item.productId))
