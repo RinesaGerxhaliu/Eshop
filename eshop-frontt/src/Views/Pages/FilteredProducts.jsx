@@ -129,7 +129,7 @@ export default function FilteredProducts() {
           <h2>
             {headingLabel} - {filterName}
           </h2>
-          {categoryName && <h3>Category - {categoryName}</h3>}
+          {categoryName && <h3>Category: {categoryName}</h3>}
         </header>
       ) : (
         <p>Loading filter name...</p>

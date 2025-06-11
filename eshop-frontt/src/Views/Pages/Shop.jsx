@@ -85,7 +85,7 @@ useEffect(() => {
         )}
       </div>
 
-      <h2 className="section-title">Popular Products</h2>
+      <h2 className="section-title">All Products</h2>
       {errorMsg && (
         <div style={{ color: "red", marginBottom: "1rem" }}>
           Error loading products: {errorMsg}

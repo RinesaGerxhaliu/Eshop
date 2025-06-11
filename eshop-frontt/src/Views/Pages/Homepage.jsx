@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../../Components/UI/ProductCard';
-import bgImg from '../../assets/images/IMG_2075.jpeg';
 
 
 
@@ -35,7 +34,6 @@ export default function Homepage() {
       <div style={{ fontFamily: 'Poppins, sans-serif' }}>
    <section
       className="hero-section"
-      style={{ backgroundImage: `url(${bgImg})` }}
     >
       <div className="hero-overlay" />
       <div className="hero-content">
