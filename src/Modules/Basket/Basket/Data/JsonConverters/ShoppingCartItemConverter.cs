@@ -14,7 +14,6 @@ public class ShoppingCartItemConverter : JsonConverter<ShoppingCartItem>
         var shoppingCartId = rootElement.GetProperty("shoppingCartId").GetGuid();
         var productId = rootElement.GetProperty("productId").GetGuid();
         var quantity = rootElement.GetProperty("quantity").GetInt32();
-        var color = rootElement.GetProperty("color").GetString()!;
         var price = rootElement.GetProperty("price").GetDecimal();
         var productName = rootElement.GetProperty("productName").GetString()!;
 
