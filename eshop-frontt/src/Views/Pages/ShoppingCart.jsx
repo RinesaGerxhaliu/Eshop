@@ -15,7 +15,6 @@ const ShoppingCartPage = () => {
   const handleProcessOrder = () => {
     navigate("/order");
   };
-
   const fetchProductDetails = async (productId) => {
     try {
       const token = localStorage.getItem("token");
@@ -56,10 +55,27 @@ const ShoppingCartPage = () => {
         }
 
         if (response.status === 404) {
-          setCart({ items: [] });
-          setIsLoading(false);
-          return;
+          const createResponse = await fetch("https://localhost:5050/basket", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              shoppingCart: {
+                id: crypto.randomUUID(),
+                userName: username,
+                items: [],
+              },
+            }),
+          });
+
+          if (!createResponse.ok) throw new Error("Failed to create shopping cart");
+
+          // 🌀 Try again now that the cart exists
+          return await loadCartWithDetails();
         }
+
         if (!response.ok) throw new Error("Failed to fetch cart.");
 
         const data = await response.json();

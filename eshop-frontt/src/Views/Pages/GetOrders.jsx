@@ -175,10 +175,6 @@ const UserOrders = () => {
           </div>
         )}
       </main>
-
-      <footer className="bg-light text-center py-3 mt-auto">© 2025 Trendora. All rights reserved.</footer>
-
-
     </div>
   );
 };

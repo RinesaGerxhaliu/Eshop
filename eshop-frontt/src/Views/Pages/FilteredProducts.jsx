@@ -119,8 +119,8 @@ export default function FilteredProducts() {
     filterType === "subcategory"
       ? "Subcategory"
       : filterType === "brand"
-      ? "Brand"
-      : "";
+        ? "Brand"
+        : "";
 
   return (
     <section className="product-section">
@@ -171,8 +171,17 @@ export default function FilteredProducts() {
             >
               Products: A-Z
             </button>
+            <button
+              onClick={() => {
+                setSortOrder(null);
+                setShowSortOptions(false);
+              }}
+            >
+              Reset Sort
+            </button>
           </div>
         )}
+
       </div>
 
       <div className="product-list">

@@ -82,10 +82,13 @@ const Wishlist = () => {
             },
           }),
         });
+
         if (!createResponse.ok) {
           throw new Error("Failed to create wishlist");
         }
-        return await getWishlist(); 
+
+        // 🔁 Try again now that wishlist is created
+        return await getWishlist();
       }
 
       if (!response.ok) throw new Error("Failed to fetch wishlist");
@@ -99,6 +102,7 @@ const Wishlist = () => {
       setIsLoading(false);
     }
   };
+
 
   const loadFullProductData = async (items) => {
     if (!items.length) {

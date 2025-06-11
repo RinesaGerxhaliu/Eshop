@@ -192,3 +192,7 @@
   min-width: auto;
   margin-top: 8px;
 }
+.mr-select-wrapper {
+  min-width: 200px;
+  margin-top: 7px;
+}

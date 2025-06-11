@@ -225,3 +225,14 @@
   width: 160px;
   white-space: nowrap;
 }
+.mp-filters .mp-select-wrapper {
+  margin-top: 7px;
+}
+
+.mp-select-wrapper .mp-select {
+  font-size: 0.9rem;
+  padding: 7px 15px;
+  height: 40px;
+  line-height: 1.2;
+  border-radius: 6px;
+}

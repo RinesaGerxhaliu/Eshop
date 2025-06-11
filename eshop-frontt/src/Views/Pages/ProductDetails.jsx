@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../../Styles/ProductDetails.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
-import ProductReviews from "./ProductReviews"; 
-import { useAuth } from "../../contexts/AuthContext"; 
+import ProductReviews from "./ProductReviews";
+import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 import { FaHeart } from "react-icons/fa";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
@@ -11,7 +11,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 const ProductDetails = () => {
   const { id } = useParams();
   const { convert, format } = useCurrency();
-  const { roles } = useAuth(); 
+  const { roles } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -100,13 +100,13 @@ const ProductDetails = () => {
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={"full-" + i} color="#FFD700" />); 
+      stars.push(<FaStar key={"full-" + i} color="#FFD700" />);
     }
     if (hasHalfStar) {
-      stars.push(<FaStarHalfAlt key="half" color="#FFD700" />); 
+      stars.push(<FaStarHalfAlt key="half" color="#FFD700" />);
     }
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaRegStar key={"empty-" + i} color="#FFD700" />); 
+      stars.push(<FaRegStar key={"empty-" + i} color="#FFD700" />);
     }
     return stars;
   };
@@ -208,8 +208,35 @@ const ProductDetails = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
+
+      if (response.status === 404) {
+        const createResponse = await fetch("https://localhost:5050/wishlist", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            wishlist: {
+              id: crypto.randomUUID(),
+              userName: username,
+              items: [],
+            },
+          }),
+        });
+
+        if (!createResponse.ok) throw new Error("Failed to create wishlist");
+
+        // Re-call the fetch
+        response = await fetch(`https://localhost:5050/wishlist/${username}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+
 
       if (response.status === 401) {
         token = await refreshToken();

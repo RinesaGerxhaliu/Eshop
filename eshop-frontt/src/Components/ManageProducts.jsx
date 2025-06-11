@@ -249,7 +249,7 @@ const handleDeleteConfirmed = async () => {
               setPageIndex(0);
             }}
           >
-            Sort by Name: {sortAsc ? "A → Z" : null}
+            Sort by Name: {sortAsc ? "A → Z" : " Z → A"}
           </button>
           <div className="mp-select-wrapper">
             <Select
