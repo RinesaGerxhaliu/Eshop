@@ -6,7 +6,6 @@ import { useCurrency } from "../../contexts/CurrencyContext";
 
 const API = "https://localhost:5050";
 
-// Map numeric status codes to human-readable strings
 const shipmentStatusNames = {
   0: "Pending",
   1: "Shipped",
@@ -58,7 +57,6 @@ const UserOrders = () => {
 
         const enriched = await Promise.all(
           (data.orders || []).map(async (order) => {
-            console.log("Order id:", order.id, "Order object:", order);
             const items = await Promise.all(
               order.items.map(async (item) => {
                 const details = await fetchProductDetails(item.productId);
@@ -69,9 +67,7 @@ const UserOrders = () => {
                 };
               })
             );
-            // Use order.id here as orderId for shipment fetch
-            const shipmentStatus = await fetchShipmentStatus(order.id);
-            return { ...order, items, shipmentStatus };
+            return { ...order, items };
           })
         );
 
@@ -104,27 +100,26 @@ const UserOrders = () => {
                   <div className="accordion-item mb-3 bg-light bg-opacity-25" key={idx}>
                     <h2 className="accordion-header" id={`heading-${idx}`}>
                       <button
-                        className="accordion-button collapsed bg-transparent text-dark border-0 d-flex justify-content-between align-items-center"
+                        className="accordion-button collapsed bg-transparent text-dark border-0"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target={`#collapse-${idx}`}
                         aria-expanded="false"
                         aria-controls={`collapse-${idx}`}
-                        style={{ boxShadow: "none" }}
+                        style={{ boxShadow: 'none' }}
                       >
                         <span>Order #{idx + 1}</span>
                         <span
-                          className={`badge ms-auto ${
-                            order.shipmentStatus === "Delivered"
-                              ? "bg-success"
-                              : order.shipmentStatus === "Shipped"
+                          className={`badge ms-auto ${order.shipmentStatus === "Delivered"
+                            ? "bg-success"
+                            : order.shipmentStatus === "Shipped"
                               ? "bg-info text-dark"
                               : order.shipmentStatus === "Pending"
-                              ? "bg-warning text-dark"
-                              : order.shipmentStatus === "Cancelled"
-                              ? "bg-danger"
-                              : "bg-secondary"
-                          }`}
+                                ? "bg-warning text-dark"
+                                : order.shipmentStatus === "Cancelled"
+                                  ? "bg-danger"
+                                  : "bg-secondary"
+                            }`}
                         >
                           {order.shipmentStatus}
                         </span>
@@ -148,13 +143,13 @@ const UserOrders = () => {
                                   style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px" }}
                                 />
                               ) : (
-                                <div className="no-image-placeholder">No Image</div>
+                                <div className="no-image-placeholder">
+                                  No Image
+                                </div>
                               )}
                               <div>
-                                <strong>{item.productName}</strong>
-                                <br />
-                                Quantity: {item.quantity}
-                                <br />
+                                <strong>{item.productName}</strong><br />
+                                Quantity: {item.quantity}<br />
                                 Price: {format(convert(item.price))}
                               </div>
                             </li>
@@ -170,8 +165,6 @@ const UserOrders = () => {
           </div>
         )}
       </main>
-
-      <footer className="bg-light text-center py-3 mt-auto">© 2025 Trendora. All rights reserved.</footer>
     </div>
   );
 };

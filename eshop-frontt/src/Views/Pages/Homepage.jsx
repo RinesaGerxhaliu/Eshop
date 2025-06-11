@@ -1,212 +1,133 @@
-// src/Views/Pages/Homepage.jsx
 import React, { useEffect, useState } from 'react';
-import '../../Styles/Homepage.css';
 import ProductCard from '../../Components/UI/ProductCard';
-import { useAuth } from '../../contexts/AuthContext';
+
 
 const API = 'https://localhost:5050';
 
-
-const Homepage = () => {
-  const { refreshAccessToken } = useAuth();
+export default function Homepage() {
   const [products, setProducts] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-  const token = localStorage.getItem('token'); 
-
-fetch(`${API}/products/newest`, {
-  mode: 'cors'
-})
+  fetch(`${API}/products/newest`)
     .then(res => {
-      console.log('⬅️ Status:', res.status);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}`);
+      }
       return res.json();
     })
-    .then(data => {
-      console.log('⬅️ JSON payload:', data);
-      setProducts(data); 
-    })
+    .then(setProducts)
     .catch(err => {
-      console.error('Fetch error:', err);
-      setErrorMsg(err.message);
+      setErrorMsg(
+        err instanceof Error
+          ? err.message
+          : String(err)
+      );
     });
 }, []);
 
 
   return (
     <>
-      <div>
-        <section
-          className="hero"
-          style={{ backgroundImage: `url("/Assets/Hero.png")` }}
-        >
-          <div className="hero-text">
-            <h1>Skincare Essentials</h1>
-            <p>Explore products from top wellness brands.</p>
-            <button className='explore'>EXPLORE TOP BRANDS</button>
+      
+      <div style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <section className="text-center text-white" style={{
+          background: 'linear-gradient(135deg, #ffe6f0 0%, #ffd1dc 100%)',
+          padding: '4rem 0'
+        }}>
+          <div className="container d-flex flex-column flex-md-row align-items-center justify-content-between">
+            <div>
+              <h1 className="display-4 fw-extrabold mb-2 mb-md-0" style={{
+                textShadow: '2px 2px rgba(0,0,0,0.2)',
+                color: '#ab6c93'
+              }}>
+                Skincare Essentials
+              </h1>
+              <span className="lead text-muted ms-md-3">Treat your skin with love and care.</span>
+            </div>
+            <a href="#products" className="btn btn-pink btn-lg shadow-lg rounded-pill px-5 mt-3 mt-md-0">
+              🛍️ Shop Now
+            </a>
           </div>
-          <button onClick={() => refreshAccessToken()}>
-        Refresh Token Now (Test)
-      </button>
         </section>
 
-          <section className="product-section">
-                <h2>Latest Products</h2>
-
-                {errorMsg && (
-                  <div style={{ color: 'red', marginBottom: '1rem' }}>
-                    Error loading products: {errorMsg}
-                  </div>
-                )}
-
-                <div className="product-grid">
-                  {products.map(prod => (
-                    <ProductCard
-                      key={prod.id}
-                      id={prod.id}
-                      name={prod.name}
-                      description={prod.description}
-                      price={prod.price}
-                      imageUrl={prod.imageUrl}
-                      reviews={prod.reviews}
-                    />
-                  ))}
-                </div>
-          </section>
-
-
-        {/* Benefit Section */}
-        <div className="benefit-container">
-          <div className="benefit-left">
-            <div className="photo-wrapper">
-              <img src="./Assets/benefit1.jpg" alt="Main Product" className="big-photo" />
-              <img src="./Assets/benefit2.jpg" alt="Small Product" className="small-photo" />
-            </div>
-          </div>
-
-          <div className="benefit-right">
-            <h2 className="benefit-title">Benefits of using our products</h2>
-            <div className="benefit-grid">
-              <div className="benefit-item">
-                <div className="icon">
-                  <i className="fa fa-leaf" style={{ color: '#f5c99a' }}></i>
-                </div>
-                <h3>100% Natural</h3>
-                <p>Our products offer advanced formulas designed to support your well-being with natural ingredients.</p>
-              </div>
-              <div className="benefit-item">
-                <div className="icon">
-                  <i className="fa fa-shield-alt" style={{ color: '#f5c99a' }}></i>
-                </div>
-                <h3>No Side Effects</h3>
-                <p>Gentle on the skin without any harsh side effects.</p>
-              </div>
-              <div className="benefit-item">
-                <div className="icon">
-                  <i className="fa fa-smile" style={{ color: '#f5c99a' }}></i>
-                </div>
-                <h3>For all Skin Types</h3>
-                <p>Products suitable across a range of skin types.</p>
-              </div>
-              <div className="benefit-item">
-                <div className="icon">
-                  <i className="fas fa-sync-alt"></i>
-                </div>
-                <h3>Product Replacement</h3>
-                <p>Guaranteed satisfaction with easy replacement policy.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <section className="lifestyle">
+        <section id="products" className="py-5" style={{ background: '#fff0f6' }}>
           <div className="container">
-            <div className="lifestyle-content">
-              <h2>
-                Elevate Your Lifestyle by Bringing Balance and Well Being Into Your Life
-              </h2>
-              <p>
-                Take the time to care for your body and mind. Our experts are here to provide the highest quality service to bring balance and wellness to your lifestyle.
-              </p>
-              <div className="icons">
-                <div className="icon-item">
-                  <img src="./Assets/Capture.PNG" alt="Experts" />
-                  <p>Beauty Experts</p>
+            <h2 className="text-center fw-bold mb-5" style={{ color: '#ab6c93', fontFamily: 'Poppins, sans-serif' }}>
+              ✨ New Arrivals ✨
+            </h2>
+            {errorMsg && <div className="alert alert-danger text-center">{errorMsg}</div>}
+            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+              {products.map(p => (
+                <div key={p.id} className="col">
+                  <ProductCard
+                    {...p}
+                    className="bg-white p-3 rounded shadow-sm hover-grow"
+                    style={{ transition: 'transform .2s' }}
+                  />
                 </div>
-                <div className="icon-item">
-                  <img src="./Assets/Capture2.PNG" alt="Quality Services" />
-                  <p>Quality Services</p>
-                </div>
-                <div className="icon-item">
-                  <img src="./Assets/Capture3.PNG" alt="More" />
-                  <p>And More...</p>
-                </div>
-              </div>
-            </div>
-            <div className="lifestyle-image">
-              <img src="./Assets/images.jpg" alt="Lifestyle Image" />
+              ))}
             </div>
           </div>
         </section>
 
-      {/*
-        <section className="review" id="review">
-          <div className="review-box">
-            <h2 className="heading">
-              Client <span>Reviews</span>
-            </h2>
-            <div className="wrapper">
-              <div className="review-item">
-                <img src="./Assets/person1.avif" alt="" />
-                <h2>Lea</h2>
-                <div className="rating">
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                </div>
-                <p>
-                  I ordered the skincare set, and my skin has never looked better! The serum works wonders,
-                  and the moisturizer feels so light. I appreciate the eco-friendly packaging too. Highly recommend!
-                </p>
-              </div>
-              <div className="review-item">
-                <img src="./Assets/person2.jpg" alt="" />
-                <h2>Sara</h2>
-                <div className="rating">
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                </div>
-                <p>
-                  The lipstick bundle is a great value for the price. The colors are vibrant and long-lasting,
-                  though I wish they were a bit more moisturizing. Overall, I’m really happy with my purchase!
-                </p>
-              </div>
-              <div className="review-item">
-                <img src="./Assets/person3.webp" alt="" />
-                <h2>Olivia</h2>
-                <div className="rating">
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                  <i className="bx bxs-star" id="Star"></i>
-                </div>
-                <p>
-                  I am OBSESSED with the eyeshadow palette! The pigment is stunning, and it blends like a dream.
-                  Perfect for creating both subtle and bold looks. This is my go-to store for makeup now!
-                </p>
-              </div>
-            </div>
+        <section className="py-5" style={{ background: '#ffffff' }}>
+  <div className="container d-flex flex-column">
+    <div className="d-flex align-items-start flex-wrap mb-4" style={{ gap: '1.5rem' }}>
+      <h2 className="fw-bold mb-0" style={{ color: '#ab6c93', fontFamily: 'Poppins, sans-serif' }}>
+        Why You&apos;ll Love Us
+      </h2>
+      <div className="d-flex flex-wrap" style={{ gap: '1.5rem' }}>
+        {[
+          ['🌱', 'Natural', 'Plant-based goodness'],
+          ['💧', 'Hydrating', 'Deep moisture boost'],
+          ['🌸', 'Gentle', 'Soft on all skin'],
+          ['✨', 'Radiant', 'Glow from within']
+        ].map(([emoji, title, desc], idx) => (
+          <div key={idx} className="bg-whisper p-5 rounded shadow-light text-center" style={{ width: '200px' }}>
+            <div className="display-2 mb-3">{emoji}</div>
+            <h5 className="fw-semibold mb-2" style={{ color: '#ab6c93' }}>{title}</h5>
+            <p className="text-muted small mb-0">{desc}</p>
           </div>
-        </section>
-        */}
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+        <section className="py-5 text-center" style={{ background: '#fff5f8' }}>
+  <div className="container">
+    <div className="d-flex align-items-start flex-wrap mb-4" style={{ gap: '1.5rem' }}>
+      <h2 className="fw-bold mb-0" style={{ color: '#ab6c93', fontFamily: 'Poppins, sans-serif' }}>
+        Elevate Your Glow
+      </h2>
+      <p className="mb-0" style={{ color: '#666', maxWidth: '400px' }}>
+        Balance your beauty routine with expert care and premium ingredients.
+      </p>
+    </div>
+    <div className="d-flex justify-content-center gap-5">
+      {[
+        ['/Assets/Capture.PNG', 'Expert Tips'],
+        ['/Assets/Capture2.PNG', 'Quality Care'],
+        ['/Assets/Capture3.PNG', 'Love Yourself']
+      ].map(([src, label], idx) => (
+        <div key={idx} className="text-center">
+          <img src={src} alt={label} className="rounded-circle shadow-sm mb-2" style={{ width: 100, height: 100 }} />
+          <p className="small mb-0" style={{ color: '#ab6c93' }}>{label}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+        <style jsx>{`
+          .btn-pink { background-color: #ff66a3; color: white; font-family: 'Poppins', sans-serif; }
+          .btn-pink:hover { background-color: #ff4d8c; }
+          .shadow-light { box-shadow: 0 6px 20px rgba(255, 102, 163, 0.2); }
+          .bg-whisper { background-color: #fff5f8; }
+          .hover-grow:hover { transform: scale(1.05); }
+        `}</style>
       </div>
     </>
   );
-};
-
-export default Homepage;
+}

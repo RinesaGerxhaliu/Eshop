@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../../Styles/ProductDetails.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
-import ProductReviews from "./ProductReviews"; // kjo mund të hiqet për admin
-import { useAuth } from "../../contexts/AuthContext"; // për të marrë rolet
+import ProductReviews from "./ProductReviews"; 
+import { useAuth } from "../../contexts/AuthContext"; 
 import axios from "axios";
 import { FaHeart } from "react-icons/fa";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
@@ -11,7 +11,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 const ProductDetails = () => {
   const { id } = useParams();
   const { convert, format } = useCurrency();
-  const { roles } = useAuth(); // Përdorim rolet për të kontrolluar nëse është admin
+  const { roles } = useAuth(); 
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,8 @@ const ProductDetails = () => {
   const [isAdded, setIsAdded] = useState(false);
 
   const [reviewText, setReviewText] = useState("");
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [reviewSuccess, setReviewSuccess] = useState("");
   const [reviewError, setReviewError] = useState("");
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -29,21 +30,21 @@ const ProductDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [averageRating, setAverageRating] = useState(null);
 
-const fetchAverageRating = async () => {
-  try {
-    const response = await fetch(
-  `https://localhost:5050/products/${id}/average-rating`
-);
+  const fetchAverageRating = async () => {
+    try {
+      const response = await fetch(
+        `https://localhost:5050/products/${id}/average-rating`
+      );
 
 
-    if (!response.ok) throw new Error("Failed to fetch average rating");
-    const data = await response.json();
-    setAverageRating(data.averageRating);
-  } catch (err) {
-    console.error("Error fetching average rating:", err);
-    setAverageRating(null);
-  }
-};
+      if (!response.ok) throw new Error("Failed to fetch average rating");
+      const data = await response.json();
+      setAverageRating(data.averageRating);
+    } catch (err) {
+      console.error("Error fetching average rating:", err);
+      setAverageRating(null);
+    }
+  };
 
 
   const refreshToken = async () => {
@@ -71,19 +72,19 @@ const fetchAverageRating = async () => {
     return data.accessToken;
   };
 
-const fetchProduct = async () => {
-  try {
-    const token = localStorage.getItem("token"); 
-const response = await fetch(`https://localhost:5050/products/${id}`);
-    if (!response.ok) throw new Error("Product not found");
-    const data = await response.json();
-    setProduct(data.product);
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchProduct = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://localhost:5050/products/${id}`);
+      if (!response.ok) throw new Error("Product not found");
+      const data = await response.json();
+      setProduct(data.product);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -99,13 +100,13 @@ const response = await fetch(`https://localhost:5050/products/${id}`);
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={"full-" + i} color="#FFD700" />); // full star gold
+      stars.push(<FaStar key={"full-" + i} color="#FFD700" />); 
     }
     if (hasHalfStar) {
-      stars.push(<FaStarHalfAlt key="half" color="#FFD700" />); // half star
+      stars.push(<FaStarHalfAlt key="half" color="#FFD700" />); 
     }
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaRegStar key={"empty-" + i} color="#FFD700" />); // empty star outline
+      stars.push(<FaRegStar key={"empty-" + i} color="#FFD700" />); 
     }
     return stars;
   };
@@ -120,7 +121,7 @@ const response = await fetch(`https://localhost:5050/products/${id}`);
     return response.ok;
   };
 
-  
+
   const handleAddToCart = async (e) => {
     e.preventDefault();
 
@@ -152,10 +153,10 @@ const response = await fetch(`https://localhost:5050/products/${id}`);
       const body = cartExists
         ? JSON.stringify({ userName: username, ShoppingCartItem: itemPayload })
         : JSON.stringify({
-            shoppingCart: {
-              items: [itemPayload],
-            },
-          });
+          shoppingCart: {
+            items: [itemPayload],
+          },
+        });
 
       let response = await fetch(url, {
         method: "POST",
@@ -344,37 +345,20 @@ const response = await fetch(`https://localhost:5050/products/${id}`);
     }
   };
 
-const handleReviewSubmit = async (e) => {
-  e.preventDefault();
-  setReviewSuccess("");
-  setReviewError("");
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setReviewSuccess("");
+    setReviewError("");
 
-  let token = localStorage.getItem("token");
+    let token = localStorage.getItem("token");
 
-  if (!token) {
-    setReviewError("You must be logged in to leave a review.");
-    return;
-  }
+    if (!token) {
+      setReviewError("You must be logged in to leave a review.");
+      return;
+    }
 
-  try {
-    let response = await fetch("https://localhost:5050/products/reviews", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        productId: id,
-        reviewText,
-        rating: parseInt(rating),
-      }),
-    });
-
-    if (response.status === 401) {
-      token = await refreshToken();
-      localStorage.setItem("token", token);
-
-      response = await fetch("https://localhost:5050/products/reviews", {
+    try {
+      let response = await fetch("https://localhost:5050/products/reviews", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -386,23 +370,40 @@ const handleReviewSubmit = async (e) => {
           rating: parseInt(rating),
         }),
       });
+
+      if (response.status === 401) {
+        token = await refreshToken();
+        localStorage.setItem("token", token);
+
+        response = await fetch("https://localhost:5050/products/reviews", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: id,
+            reviewText,
+            rating: parseInt(rating),
+          }),
+        });
+      }
+
+      if (!response.ok) throw new Error("Failed to submit review");
+
+      setReviewSuccess("Review submitted successfully!");
+      setReviewText("");
+      setRating(5);
+
+      await fetchAverageRating();
+
+      setIsReviewModalOpen(false);
+      setReviewSuccess("");
+      setRefreshReviewsKey((prev) => prev + 1);
+    } catch (err) {
+      setReviewError(err.message || "An error occurred");
     }
-
-    if (!response.ok) throw new Error("Failed to submit review");
-
-    setReviewSuccess("Review submitted successfully!");
-    setReviewText("");
-    setRating(5);
-
-    await fetchAverageRating();
-
-    setIsReviewModalOpen(false);
-    setReviewSuccess("");
-    setRefreshReviewsKey((prev) => prev + 1);
-  } catch (err) {
-    setReviewError(err.message || "An error occurred");
-  }
-};
+  };
 
 
   const handleStarClick = (star) => {
@@ -456,20 +457,11 @@ const handleReviewSubmit = async (e) => {
                   ? format(convert(product.price))
                   : "Price not available"}
               </p>
-              {averageRating !== null && (
-                <div
-                  className="product-rating"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <span>Average Rating:</span>
-                  <div>{renderStars(averageRating)}</div>
-                  <span style={{ marginLeft: "0.5rem" }}>
-                    {averageRating.toFixed(1)}
-                  </span>
+              {averageRating != null && (
+                <div className="product-rating">
+                  <span className="rating-label">Average Rating:</span>
+                  <span className="stars">{renderStars(averageRating)}</span>
+                  <span className="rating-value">{averageRating.toFixed(1)}</span>
                 </div>
               )}
 
@@ -498,8 +490,8 @@ const handleReviewSubmit = async (e) => {
                         {isAdding
                           ? "Adding..."
                           : isAdded
-                          ? "Added"
-                          : "Add to Cart"}
+                            ? "Added"
+                            : "Add to Cart"}
                       </button>
                     </div>
                   </div>
@@ -507,10 +499,11 @@ const handleReviewSubmit = async (e) => {
               )}
 
               {!isAdmin && (
-                <button
-                  className="add-to-cart"
-                  onClick={() => setIsReviewModalOpen(true)}
-                >
+                <button className="add-to-cart" onClick={() => {
+                  setRating(0);
+                  setHoverRating(0);
+                  setIsReviewModalOpen(true);
+                }}>
                   Leave a Review
                 </button>
               )}
@@ -530,20 +523,22 @@ const handleReviewSubmit = async (e) => {
                     <form onSubmit={handleReviewSubmit} className="review-form">
                       <div className="form-group">
                         <label>Rating:</label>
+
                         <div className="star-rating">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <button
                               key={star}
                               type="button"
-                              className={`star-btn ${
-                                rating >= star ? "selected" : ""
-                              }`}
-                              onClick={() => handleStarClick(star)}
+                              className={`star-btn ${(hoverRating || rating) >= star ? 'selected' : ''}`}
+                              onClick={() => setRating(star)}
+                              onMouseEnter={() => setHoverRating(star)}
+                              onMouseLeave={() => setHoverRating(0)}
                             >
                               ★
                             </button>
                           ))}
                         </div>
+
                       </div>
 
                       <div className="form-group">
