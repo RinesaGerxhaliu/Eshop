@@ -111,7 +111,7 @@ export default function AddProduct({
       // 1. Krijo produktin
       const createRes = await fetch(`${BASE}/products`, {
         method: "POST",
-        //headers: authHeaders(true),
+        headers: authHeaders(true),
         body: JSON.stringify({
           product: {
             name: form.name,

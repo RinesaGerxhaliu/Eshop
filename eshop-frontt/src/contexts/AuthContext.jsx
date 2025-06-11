@@ -78,24 +78,34 @@ export const AuthProvider = ({ children }) => {
   }, [login, logout, location.pathname]);
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
+  if (initialized.current) return;
+  initialized.current = true;
 
-    if (location.pathname === "/login") return;
+  if (location.pathname === "/login") return;
 
-    const token = localStorage.getItem("token");
-    if (token) {
-      const parsed = parseJwt(token);
-      if (parsed && parsed.exp >= Date.now() / 1000) {
-        setUsername(localStorage.getItem("username") || "");
-        setUserId(localStorage.getItem("userId") || "");
-        setRoles(JSON.parse(localStorage.getItem("roles")) || []);
-        setIsLoggedIn(true);
-        return;
-      }
+  const token = localStorage.getItem("token");
+  if (token) {
+    const parsed = parseJwt(token);
+    if (parsed && parsed.exp >= Date.now() / 1000) {
+      setUsername(localStorage.getItem("username") || "");
+      setUserId(localStorage.getItem("userId") || "");
+      setRoles(JSON.parse(localStorage.getItem("roles")) || []);
+      setIsLoggedIn(true);
     }
-    refreshAccessToken();
-  }, [refreshAccessToken, location.pathname]);
+  }
+
+  refreshAccessToken();
+
+  // 🔁 Keep session alive by refreshing token every 4 minutes
+  const interval = setInterval(() => {
+    const token = localStorage.getItem("token");
+    if (!token || isAccessTokenExpired(token)) {
+      refreshAccessToken();
+    }
+  }, 4 * 60 * 1000); // 4 minutes
+
+  return () => clearInterval(interval);
+}, [refreshAccessToken, location.pathname]);
 
   const fetchWithAuth = useCallback(async (input, init = {}) => {
     let token = localStorage.getItem("token");
