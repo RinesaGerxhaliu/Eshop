@@ -11,8 +11,6 @@ public class ShoppingCartItemConfiguration : IEntityTypeConfiguration<ShoppingCa
 
         builder.Property(oi => oi.Quantity).IsRequired();
 
-        builder.Property(oi => oi.Color);
-
         builder.Property(oi => oi.Price).IsRequired();
 
         builder.Property(oi => oi.ProductName).IsRequired();

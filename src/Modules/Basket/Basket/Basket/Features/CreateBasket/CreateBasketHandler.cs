@@ -38,7 +38,6 @@ internal class CreateBasketHandler(IBasketRepository repository)
             newBasket.AddItem(
                 item.ProductId,
                 item.Quantity,
-                item.Color,
                 item.Price,
                 item.ProductName);
         });

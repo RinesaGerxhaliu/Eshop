@@ -21,7 +21,7 @@ public class ShoppingCart : Aggregate<Guid>
         return shoppingCart;
     }
 
-    public void AddItem(Guid productId, int quantity, string color, decimal price, string productName)
+    public void AddItem(Guid productId, int quantity, decimal price, string productName)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
@@ -34,7 +34,7 @@ public class ShoppingCart : Aggregate<Guid>
         }
         else
         {
-            var newItem = new ShoppingCartItem(Id, productId, quantity, color, price, productName);
+            var newItem = new ShoppingCartItem(Id, productId, quantity, price, productName);
             _items.Add(newItem);
         }
     }

@@ -204,7 +204,6 @@ const Wishlist = () => {
                   <strong>{item.productName}</strong>
                 </p>
                 <p>Price: {format ? format(convert(item.price)) : item.price.toFixed(2)}</p>
-                <p>Color: {item.color}</p>
               </div>
 
               <div className="remove-button-container">

@@ -28,7 +28,6 @@ internal class AddItemIntoBasketHandler(IBasketRepository repository, ISender se
         shoppingCart.AddItem(
                 command.ShoppingCartItem.ProductId,
                 command.ShoppingCartItem.Quantity,
-                command.ShoppingCartItem.Color,
                 result.Product.Price,
                 result.Product.Name);
 
