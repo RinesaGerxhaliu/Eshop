@@ -53,7 +53,9 @@ internal class GetOrderByIdHandler(OrderingDbContext dbContext)
         }
 
         var orderDto = new OrderDto(
+            order.Id,
             order.CustomerId,
+            order.CreatedAt,
             order.Items.Select(i => new OrderItemDto(i.ProductId,i.ProductName, i.Quantity, i.Price)).ToList(),
             shipment?.ShippingMethodId ?? Guid.Empty,
             shipment?.SavedAddressId,

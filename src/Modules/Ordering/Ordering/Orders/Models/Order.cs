@@ -5,6 +5,8 @@ public class Order : Aggregate<Guid>
     public IReadOnlyList<OrderItem> Items => _items.AsReadOnly();
 
     public Guid CustomerId { get; private set; } = default!;
+
+    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public decimal TotalPrice => Items.Sum(x => x.Price * x.Quantity);
     public string CurrencyCode { get; private set; } = "EUR";
     public decimal ExchangeRate { get; private set; } = 1m;

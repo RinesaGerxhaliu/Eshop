@@ -6,10 +6,11 @@ public record GetUserOrdersQuery(Guid CustomerId)
 public record GetUserOrdersResult(List<UserOrderDto> Orders);
 
 public record UserOrderDto(
+    Guid Id,
     decimal Total,
-    List<OrderItemDto> Items
+    List<OrderItemDto> Items,
+    DateTime CreatedAt
 );
-
 internal class GetUserOrdersHandler(OrderingDbContext dbContext)
     : IQueryHandler<GetUserOrdersQuery, GetUserOrdersResult>
 {
@@ -19,6 +20,7 @@ internal class GetUserOrdersHandler(OrderingDbContext dbContext)
             .AsNoTracking()
             .Where(o => o.CustomerId == query.CustomerId)
             .Include(o => o.Items)
+            .OrderByDescending(o => o.CreatedAt) // 🔥 Sort from newest to oldest
             .ToListAsync(cancellationToken);
 
         var orderDtos = new List<UserOrderDto>();
@@ -49,11 +51,10 @@ internal class GetUserOrdersHandler(OrderingDbContext dbContext)
                 .Select(i => new OrderItemDto(i.ProductId, i.ProductName, i.Quantity, i.Price))
                 .ToList();
 
-            orderDtos.Add(new UserOrderDto(total, itemDtos));
+            orderDtos.Add(new UserOrderDto(order.Id, total, itemDtos, order.CreatedAt)); 
         }
 
         return new GetUserOrdersResult(orderDtos);
     }
 }
-
 

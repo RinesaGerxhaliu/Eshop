@@ -6,6 +6,27 @@ import { useCurrency } from "../../contexts/CurrencyContext";
 
 const API = "https://localhost:5050";
 
+// Map numeric status codes to human-readable strings
+const shipmentStatusNames = {
+  0: "Pending",
+  1: "Shipped",
+  2: "Delivered",
+  3: "Cancelled",
+};
+
+const fetchShipmentStatus = async (orderId) => {
+  try {
+    const response = await fetch(`${API}/shipments/order/${orderId}`);
+    if (response.status === 404) return "Pending";
+    if (!response.ok) throw new Error("Failed to fetch shipment");
+    const data = await response.json();
+    return shipmentStatusNames[data.status] || "Unknown";
+  } catch (err) {
+    console.error("Error fetching shipment status:", err);
+    return "Unknown";
+  }
+};
+
 const fetchProductDetails = async (productId) => {
   try {
     const response = await fetch(`${API}/products/${productId}`);
@@ -23,7 +44,7 @@ const UserOrders = () => {
   const [orders, setOrders] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(true);
-    const { convert, format } = useCurrency(); 
+  const { convert, format } = useCurrency();
 
   useEffect(() => {
     const loadOrdersWithImages = async () => {
@@ -37,6 +58,7 @@ const UserOrders = () => {
 
         const enriched = await Promise.all(
           (data.orders || []).map(async (order) => {
+            console.log("Order id:", order.id, "Order object:", order);
             const items = await Promise.all(
               order.items.map(async (item) => {
                 const details = await fetchProductDetails(item.productId);
@@ -47,7 +69,9 @@ const UserOrders = () => {
                 };
               })
             );
-            return { ...order, items };
+            // Use order.id here as orderId for shipment fetch
+            const shipmentStatus = await fetchShipmentStatus(order.id);
+            return { ...order, items, shipmentStatus };
           })
         );
 
@@ -78,17 +102,32 @@ const UserOrders = () => {
               <div className="accordion" id="ordersAccordion">
                 {orders.map((order, idx) => (
                   <div className="accordion-item mb-3 bg-light bg-opacity-25" key={idx}>
-                    <h2 className="accordion-header" id={`heading-${idx}`}>                        
+                    <h2 className="accordion-header" id={`heading-${idx}`}>
                       <button
-                        className="accordion-button collapsed bg-transparent text-dark border-0"
+                        className="accordion-button collapsed bg-transparent text-dark border-0 d-flex justify-content-between align-items-center"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target={`#collapse-${idx}`}
                         aria-expanded="false"
                         aria-controls={`collapse-${idx}`}
-                        style={{ boxShadow: 'none' }}
+                        style={{ boxShadow: "none" }}
                       >
-                        Order #{idx + 1}
+                        <span>Order #{idx + 1}</span>
+                        <span
+                          className={`badge ms-auto ${
+                            order.shipmentStatus === "Delivered"
+                              ? "bg-success"
+                              : order.shipmentStatus === "Shipped"
+                              ? "bg-info text-dark"
+                              : order.shipmentStatus === "Pending"
+                              ? "bg-warning text-dark"
+                              : order.shipmentStatus === "Cancelled"
+                              ? "bg-danger"
+                              : "bg-secondary"
+                          }`}
+                        >
+                          {order.shipmentStatus}
+                        </span>
                       </button>
                     </h2>
                     <div
@@ -109,23 +148,19 @@ const UserOrders = () => {
                                   style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px" }}
                                 />
                               ) : (
-                                <div className="no-image-placeholder">
-                                  No Image
-                                </div>
+                                <div className="no-image-placeholder">No Image</div>
                               )}
                               <div>
-                                <strong>{item.productName}</strong><br/>
-                                Quantity: {item.quantity}<br/>
-                               Price: {format(convert(item.price))}
-
+                                <strong>{item.productName}</strong>
+                                <br />
+                                Quantity: {item.quantity}
+                                <br />
+                                Price: {format(convert(item.price))}
                               </div>
                             </li>
                           ))}
                         </ul>
-                        <p className="mt-3 fw-bold text-trendora mb-0">
-                         Total: {format(convert(order.total))}
-
-                        </p>
+                        <p className="mt-3 fw-bold text-trendora mb-0">Total: {format(convert(order.total))}</p>
                       </div>
                     </div>
                   </div>
@@ -136,9 +171,7 @@ const UserOrders = () => {
         )}
       </main>
 
-      <footer className="bg-light text-center py-3 mt-auto">
-        © 2025 Trendora. All rights reserved.
-      </footer>
+      <footer className="bg-light text-center py-3 mt-auto">© 2025 Trendora. All rights reserved.</footer>
     </div>
   );
 };
