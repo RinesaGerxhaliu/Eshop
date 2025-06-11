@@ -17,10 +17,7 @@ namespace Catalog.Products.Features.UpdateProduct
                 ISender sender,
                 ClaimsPrincipal user) =>
             {
-                if (!user.IsInRole("admin"))
-                {
-                    return Results.Forbid();
-                }
+               
 
                 var command = request.Adapt<UpdateProductCommand>();
 
@@ -30,12 +27,12 @@ namespace Catalog.Products.Features.UpdateProduct
 
                 return Results.Ok(response);
             })
-            .RequireAuthorization()
+            
             .WithName("UpdateProduct")
             .Produces<UpdateProductResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status403Forbidden)
+           
             .WithSummary("Update Product")
             .WithDescription("Updates a product. Only accessible by admin.");
         }

@@ -124,6 +124,21 @@ export default function ManageBrands() {
       <div className="mr-container">
         <header className="mr-header">
           <h1>Manage Brands</h1>
+              <AddBrand
+            isOpen={showAddModal}
+            onAdd={() => {
+              setShowAddModal(false);
+
+              setSuccessMsg("Brand added successfully!");
+              setPageIndex(0);
+              loadBrands();
+            }}
+            onError={(msg) => setSuccessMsg(msg)}
+            onClose={() => setShowAddModal(false)}
+          />
+
+          {successMsg && <div className="mr-success">{successMsg}</div>}
+
           <button
             className="mp-btn mp-btn-primaryy"
             onClick={() => setShowAddModal(true)}

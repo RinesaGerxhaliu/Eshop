@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../../Components/UI/ProductCard';
+import bgImg from '../../assets/images/IMG_2075.jpeg';
+
 
 
 const API = 'https://localhost:5050';
@@ -31,26 +33,19 @@ export default function Homepage() {
     <>
       
       <div style={{ fontFamily: 'Poppins, sans-serif' }}>
-        <section className="text-center text-white" style={{
-          background: 'linear-gradient(135deg, #ffe6f0 0%, #ffd1dc 100%)',
-          padding: '4rem 0'
-        }}>
-          <div className="container d-flex flex-column flex-md-row align-items-center justify-content-between">
-            <div>
-              <h1 className="display-4 fw-extrabold mb-2 mb-md-0" style={{
-                textShadow: '2px 2px rgba(0,0,0,0.2)',
-                color: '#ab6c93'
-              }}>
-                Skincare Essentials
-              </h1>
-              <span className="lead text-muted ms-md-3">Treat your skin with love and care.</span>
-            </div>
-            <a href="#products" className="btn btn-pink btn-lg shadow-lg rounded-pill px-5 mt-3 mt-md-0">
-              🛍️ Shop Now
-            </a>
-          </div>
-        </section>
-
+   <section
+      className="hero-section"
+      style={{ backgroundImage: `url(${bgImg})` }}
+    >
+      <div className="hero-overlay" />
+      <div className="hero-content">
+        <h1>Skincare Essentials</h1>
+        <p>Treat your skin with love and care.</p>
+        <a href="#products" className="hero-btn">
+          🛍️ Shop Now
+        </a>
+      </div>
+    </section>
         <section id="products" className="py-5" style={{ background: '#fff0f6' }}>
           <div className="container">
             <h2 className="text-center fw-bold mb-5" style={{ color: '#ab6c93', fontFamily: 'Poppins, sans-serif' }}>
