@@ -76,14 +76,17 @@ namespace Api.Identity
                 if (!result.Success)
                     return Results.Unauthorized();
 
-                response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                if (!string.IsNullOrWhiteSpace(result.RefreshToken))
                 {
-                    HttpOnly = true, // to see cookie in dev tools, but for production true is recommended
-                    Secure = true,   // must be false if using HTTP
-                    SameSite = SameSiteMode.None, // to allow cross-site
-                    Path = "/",
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                });
+                    response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Path = "/",
+                        Expires = DateTimeOffset.UtcNow.AddDays(7)
+                    });
+                }
 
 
                 return Results.Ok(new { accessToken = result.AccessToken });

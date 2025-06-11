@@ -16,37 +16,37 @@ const Shop = () => {
   const PAGE_SIZE = 8;
   const [totalCount, setTotalCount] = useState(0);
 
-useEffect(() => {
-  const params = new URLSearchParams({
-    PageIndex: pageIndex,
-    PageSize: PAGE_SIZE,
-  });
-
-  const token = localStorage.getItem("token");
-
-  fetch(`${API}/products?${params.toString()}`, {
-    mode: "cors",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then((data) => {
-      const items = data.products?.data || [];
-      setProducts(items);
-
-      const count =
-        data.products?.count ?? data.products?.totalItems ?? items.length;
-      setTotalCount(count);
-    })
-    .catch((err) => {
-      console.error("Fetch error:", err);
-      setErrorMsg(err.message);
+  useEffect(() => {
+    const params = new URLSearchParams({
+      PageIndex: pageIndex,
+      PageSize: PAGE_SIZE,
     });
-}, [pageIndex]);
+
+    const token = localStorage.getItem("token");
+
+    fetch(`${API}/products?${params.toString()}`, {
+      mode: "cors",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        const items = data.products?.data || [];
+        setProducts(items);
+
+        const count =
+          data.products?.count ?? data.products?.totalItems ?? items.length;
+        setTotalCount(count);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setErrorMsg(err.message);
+      });
+  }, [pageIndex]);
 
 
   const sortedProducts = [...products].sort((a, b) => {
@@ -81,8 +81,15 @@ useEffect(() => {
             <button onClick={() => handleSortOption("az")}>
               Products: A-Z
             </button>
+            <button onClick={() => {
+              setSortOrder(null);
+              setShowSortOptions(false);
+            }}>
+              Reset Sort
+            </button>
           </div>
         )}
+
       </div>
 
       <h2 className="section-title">All Products</h2>

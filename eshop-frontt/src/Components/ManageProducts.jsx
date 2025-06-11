@@ -65,7 +65,14 @@ export default function ManageProducts() {
   }, []);
 
 const token = localStorage.getItem("token");
-
+// Utility për headers me autorizim
+const authHeaders = (isJson = true) => {
+  const token = localStorage.getItem("token");
+  return {
+    ...(isJson ? { "Content-Type": "application/json" } : {}),
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+};
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -153,10 +160,7 @@ const handleDeleteConfirmed = async () => {
   try {
     const res = await fetch(`${BASE}/products/${id}`, {
       method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: authHeaders(true),
       mode: "cors",
     });
 
