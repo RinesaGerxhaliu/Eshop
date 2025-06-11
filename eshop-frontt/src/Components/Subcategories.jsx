@@ -15,107 +15,92 @@ export default function Subcategories() {
   const [pageIndex, setPageIndex] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [error, setError] = useState("");
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editSubcategory, setEditSubcategory] = useState(null);
-
   const [deleteSubcategoryId, setDeleteSubcategoryId] = useState(null);
 
-
- const token = localStorage.getItem("token");
-useEffect(() => {
-  console.log("Using token:", token);
-}, []);
-
-  const axiosInstance = axios.create({
+  // --- single axios instance with baseURL & auth header ---
+  const api = axios.create({
+    baseURL: "https://localhost:5050",
     headers: {
-      Authorization: token ? `Bearer ${token}` : "",
+      Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
     },
   });
 
-  function handleDeleteClick(id) {
-    setDeleteSubcategoryId(id);
-  }
-
-function confirmDeleteSubcategory() {
-  if (!deleteSubcategoryId) return;
-
-  axiosInstance
-    .delete(`https://localhost:5050/subcategories/${deleteSubcategoryId}`)
-    .then(() => {
-      setDeleteSubcategoryId(null);
-
-      if (subcategories.length === 1 && pageIndex > 0) {
-        setPageIndex(pageIndex - 1);
-      } else {
-        fetchSubcategories();
-      }
-    })
-    .catch(() => alert("Error deleting subcategory"));
-}
-
-
+  // load category name
   useEffect(() => {
     if (!categoryId) return;
-    setError(null);
-
-    axiosInstance
-      .get(`https://localhost:5050/categories/${categoryId}`)
-      .then((res) => setCategoryName(res.data.category.name))
+    setError("");
+    api
+      .get(`/categories/${categoryId}`)
+      .then(res => setCategoryName(res.data.category.name))
       .catch(() => setError("Error loading category name"));
   }, [categoryId]);
 
+  // fetch subcategories
   const fetchSubcategories = () => {
     if (!categoryId) return;
-
     setLoading(true);
-    setError(null);
+    setError("");
 
-    axiosInstance
-      .get(`https://localhost:5050/categories/${categoryId}/subcategories`, {
+    api
+      .get(`/categories/${categoryId}/subcategories`, {
         params: { pageIndex, pageSize: PAGE_SIZE },
       })
-      .then((res) => {
-        const subcats = res.data.subcategories;
-        setSubcategories(subcats.data);
-        setTotalCount(subcats.totalCount);
+      .then(res => {
+        const subcats = res.data.subcategories || {};
+        setSubcategories(subcats.data || []);
+        setTotalCount(subcats.totalCount || 0);
       })
       .catch(() => setError("Error loading subcategories"))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    fetchSubcategories();
-  }, [categoryId, pageIndex]);
+  useEffect(fetchSubcategories, [categoryId, pageIndex]);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-  function handlePrev() {
-    setPageIndex((p) => Math.max(p - 1, 0));
-  }
+  function confirmDeleteSubcategory() {
+    if (deleteSubcategoryId == null) return;
 
-  function handleNext() {
-    setPageIndex((p) => Math.min(p + 1, totalPages - 1));
-  }
-
-  function handleAddSubcategory() {
-    setIsAddModalOpen(true);
+    api
+      .delete(`/subcategories/${deleteSubcategoryId}`)
+      .then(res => {
+        console.log("DELETE success:", res.status, res.data);
+        // if your handler returns isSuccessful:
+        if (res.data.isSuccessful === false) {
+          alert("Subcategory was not found or already deleted");
+        } else {
+          // successful delete
+          if (subcategories.length === 1 && pageIndex > 0) {
+            setPageIndex(p => p - 1);
+          } else {
+            fetchSubcategories();
+          }
+        }
+        setDeleteSubcategoryId(null);
+      })
+      .catch(err => {
+        console.error(
+          "DELETE /subcategories error:",
+          err.response?.status,
+          err.response?.data
+        );
+        alert(
+          `Error deleting subcategory: ${
+            err.response?.status || ""
+          } ${JSON.stringify(err.response?.data) || err.message}`
+        );
+        setDeleteSubcategoryId(null);
+      });
   }
 
   function handleAddSuccess() {
     setIsAddModalOpen(false);
-    fetchSubcategories(); 
-  }
-
-  function handleAddError(msg) {
-    alert(msg);
-  }
-
-  function handleEditClick(subcategory) {
-    setEditSubcategory(subcategory);
-    setIsEditModalOpen(true);
+    fetchSubcategories();
   }
 
   function handleEditSuccess() {
@@ -124,72 +109,82 @@ function confirmDeleteSubcategory() {
     fetchSubcategories();
   }
 
-  function handleEditError(msg) {
-    alert(msg);
-  }
-
   return (
     <div className="manage-categories-container">
       <header
         className="manage-categories-header"
-        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
         <h2>Subcategories for: {categoryName || "Loading..."}</h2>
         <button
           className="manage-categories-btn manage-categories-btn-primary"
-          onClick={handleAddSubcategory}
+          onClick={() => setIsAddModalOpen(true)}
         >
           + Add Subcategory
         </button>
       </header>
 
-      {error && <div className="manage-categories-error" style={{ color: "red" }}>{error}</div>}
+      {error && (
+        <div className="manage-categories-error" style={{ color: "red" }}>
+          {error}
+        </div>
+      )}
 
       {loading ? (
         <div>Loading subcategories...</div>
+      ) : subcategories.length === 0 ? (
+        <div>No subcategories found.</div>
       ) : (
         <>
           <div className="manage-categories-table-wrap">
-            {subcategories.length === 0 ? (
-              <div>No subcategories found.</div>
-            ) : (
-              <table className="manage-categories-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th style={{ textAlign: "right" }}>Actions</th>
+            <table className="manage-categories-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subcategories.map(subcat => (
+                  <tr key={subcat.id}>
+                    <td>{subcat.name}</td>
+                    <td style={{ textAlign: "right" }}>
+                      <button
+                        className="manage-categories-btn manage-categories-btn-secondary me-2"
+                        onClick={() => {
+                          setEditSubcategory(subcat);
+                          setIsEditModalOpen(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="manage-categories-btn manage-categories-btn-danger"
+                        onClick={() => setDeleteSubcategoryId(subcat.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {subcategories.map((subcat) => (
-                    <tr key={subcat.id}>
-                      <td>{subcat.name}</td>
-                      <td style={{ textAlign: "right" }}>
-                        <button
-                          className="manage-categories-btn manage-categories-btn-secondary me-2"
-                          onClick={() => handleEditClick(subcat)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="manage-categories-btn manage-categories-btn-danger"
-                          onClick={() => handleDeleteClick(subcat.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          {totalPages >= 1 && (
-            <div className="manage-categories-pagination" style={{ marginTop: 16 }}>
+          {totalPages > 1 && (
+            <div
+              className="manage-categories-pagination"
+              style={{ marginTop: 16 }}
+            >
               <button
                 className="manage-categories-btn manage-categories-btn-secondary"
-                onClick={handlePrev}
+                onClick={() =>
+                  setPageIndex(p => Math.max(p - 1, 0))
+                }
                 disabled={pageIndex === 0}
               >
                 ← Previous
@@ -199,7 +194,9 @@ function confirmDeleteSubcategory() {
               </span>
               <button
                 className="manage-categories-btn manage-categories-btn-secondary"
-                onClick={handleNext}
+                onClick={() =>
+                  setPageIndex(p => Math.min(p + 1, totalPages - 1))
+                }
                 disabled={pageIndex + 1 === totalPages}
               >
                 Next →
@@ -209,27 +206,40 @@ function confirmDeleteSubcategory() {
         </>
       )}
 
+      {/* Add Modal */}
       <AddSubcategory
         isOpen={isAddModalOpen}
         onAdd={handleAddSuccess}
-        onError={handleAddError}
+        onError={msg => alert(msg)}
         onClose={() => setIsAddModalOpen(false)}
         categoryId={categoryId}
       />
 
+      {/* Edit Modal */}
       <EditSubcategory
         isOpen={isEditModalOpen}
         subcategory={editSubcategory}
         onSave={handleEditSuccess}
-        onError={handleEditError}
+        onError={msg => alert(msg)}
         onClose={() => setIsEditModalOpen(false)}
       />
 
-      {deleteSubcategoryId && (
-        <div className="review-modal open" onClick={() => setDeleteSubcategoryId(null)}>
-          <div className="review-modal-content" onClick={e => e.stopPropagation()}>
+      {/* Delete Confirmation */}
+      {deleteSubcategoryId != null && (
+        <div
+          className="review-modal open"
+          onClick={() => setDeleteSubcategoryId(null)}
+        >
+          <div
+            className="review-modal-content"
+            onClick={e => e.stopPropagation()}
+          >
             <h2>Confirm Delete</h2>
-            <p>Delete “{subcategories.find(s => s.id === deleteSubcategoryId)?.name}”?</p>
+            <p>
+              Delete “
+              {subcategories.find(s => s.id === deleteSubcategoryId)?.name}
+              ”?
+            </p>
             <div className="form-actions">
               <button
                 className="manage-categories-btn manage-categories-btn-secondary"

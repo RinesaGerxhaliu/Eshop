@@ -13,13 +13,14 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-
+  align-items: flex-start;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.left-panel, .right-panel {
+.left-panel,
+.right-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -81,8 +82,10 @@ button:hover {
   margin-top: 50px;
 }
 
-.orders-section, .address-book-section {
-  background-color: #fff;
+.orders-section,
+.address-book-section {
+  background-color: transparent !important;
+  box-shadow: none !important;
   padding: 10px;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
@@ -108,7 +111,7 @@ button:hover {
 
 .address-item .field {
   padding: 8px 0;
-  border-bottom: 1px solid #f2d7df; 
+  border-bottom: 1px solid #f2d7df;
   display: flex;
   justify-content: space-between;
   font-size: 16px;
@@ -123,6 +126,7 @@ button:hover {
   color: #d63384;
   font-weight: 600;
 }
+
 .address-card p {
   margin: 4px 0;
   font-size: 17px;
@@ -133,37 +137,50 @@ button:hover {
 .address-card strong {
   color: #d63384;
 }
+
 .section-title {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #050304; 
+  color: #050304;
   font-weight: 700;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
- font-family: 'Times New Roman', Times, serif;
- font-style: initial;
- margin-bottom: 20px;
+  font-family: 'Times New Roman', Times, serif;
+  font-style: initial;
+  margin-bottom: 20px;
 }
+
 .left-panel {
-  margin-top: 20px; 
+  margin-top: 20px;
 }
 
 .address-book-section {
   margin-bottom: 100px;
   padding: 30px 30px 10px 30px;
-  margin-top: 0px; 
+  margin-top: 0px;
   position: relative;
   min-height: 400px;
 }
 
 .address-form-wrapper {
-  margin-top: -120px; 
+  margin-top: -120px;
   transition: margin-top 0.3s ease;
-  z-index: 10; 
+  z-index: 10;
   position: relative;
 }
 
-.edit-btn{
-width: 50%;
+.edit-btn {
+  width: 50%;
+}
+
+/* pull the addresses container up a bit */
+.address-book-section {
+  margin-top: 1rem;
+  /* instead of 20px or larger */
+  min-height: auto;
+  /* let it size to content */
+  padding: 20px 30px 10px;
+  /* trim top padding if you like */
+  margin-top: -115px; 
 }

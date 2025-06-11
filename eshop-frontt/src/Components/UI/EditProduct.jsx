@@ -128,9 +128,11 @@ export default function EditProduct({
             Name: form.name,
             Price: basePrice,
             Description: form.description || null,
-            CategoryId: form.categoryId,
-            SubcategoryId: form.subcategoryId || null,
-            BrandId: form.brandId,
+         CategoryId: form.categoryId,
+SubcategoryId: form.subcategoryId || null,
+BrandId: form.brandId,
+
+
         }
     })
 });

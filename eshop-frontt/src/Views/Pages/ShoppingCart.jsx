@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../../Styles/ShoppingCart.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
 
@@ -16,25 +16,21 @@ const ShoppingCartPage = () => {
     navigate("/order");
   };
 
-const fetchProductDetails = async (productId) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(`https://localhost:5050/products/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) throw new Error("Product not found");
-    const data = await response.json();
-    return data.product;
-  } catch (err) {
-    console.error("Error fetching product details:", err);
-    return null;
-  }
-};
-
+  const fetchProductDetails = async (productId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `https://localhost:5050/products/${productId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!response.ok) throw new Error("Product not found");
+      const data = await response.json();
+      return data.product;
+    } catch (err) {
+      console.error("Error fetching product details:", err);
+      return null;
+    }
+  };
 
   useEffect(() => {
     const loadCartWithDetails = async () => {
@@ -43,20 +39,20 @@ const fetchProductDetails = async (productId) => {
         setError("");
         const username = localStorage.getItem("username");
         let token = localStorage.getItem("token");
+        if (!username || !token) throw new Error("Not logged in.");
 
-        if (!username || !token) throw new Error("User is not logged in or token is missing.");
-
-        let response = await fetch(`https://localhost:5050/basket/${username}`, {
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        });
+        let response = await fetch(
+          `https://localhost:5050/basket/${username}`,
+          { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+        );
 
         if (response.status === 401) {
           token = await refreshAccessToken();
           if (!token) return navigate("/login");
-
-          response = await fetch(`https://localhost:5050/basket/${username}`, {
-            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          });
+          response = await fetch(
+            `https://localhost:5050/basket/${username}`,
+            { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+          );
         }
 
         if (response.status === 404) {
@@ -64,29 +60,26 @@ const fetchProductDetails = async (productId) => {
           setIsLoading(false);
           return;
         }
-
         if (!response.ok) throw new Error("Failed to fetch cart.");
 
         const data = await response.json();
         const rawItems = data.shoppingCart.items;
 
-        // Merret detajet e produkteve PARA se të shfaqë listën
         const productsDetails = await Promise.all(
           rawItems.map((item) => fetchProductDetails(item.productId))
         );
 
-        // Bashkon detajet e produkteve me artikujt e shportës
-        const enrichedItems = rawItems.map((item, index) => ({
+        const enrichedItems = rawItems.map((item, idx) => ({
           ...item,
-          imageUrl: productsDetails[index]?.imageUrl || null,
-          productName: productsDetails[index]?.name || item.productId,
+          imageUrl: productsDetails[idx]?.imageUrl || null,
+          productName: productsDetails[idx]?.name || item.productId,
         }));
 
         setCart({ items: enrichedItems });
-        setIsLoading(false);
       } catch (err) {
-        console.error("Error fetching shopping cart:", err);
-        setError(err.message || "An unknown error occurred.");
+        console.error(err);
+        setError(err.message || "Unknown error");
+      } finally {
         setIsLoading(false);
       }
     };
@@ -98,48 +91,32 @@ const fetchProductDetails = async (productId) => {
     try {
       const username = localStorage.getItem("username");
       const token = localStorage.getItem("token");
-
-      if (!username || !token) {
-        throw new Error("User is not logged in or token is missing.");
-      }
+      if (!username || !token) throw new Error("Not logged in.");
 
       const response = await fetch(
         `https://localhost:5050/basket/${username}/items/${productId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { method: "DELETE", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
+      if (!response.ok) throw new Error("Failed to remove item.");
 
-      if (!response.ok) {
-        throw new Error("Failed to remove item from cart");
-      }
-
-      // Rifresko shportën pas fshirjes
-      // thjesht e thërret përsëri loadCartWithDetails me fetch të plotë
-      // ose e rifreskon me filtrim lokal
       setCart((prev) => ({
-        items: prev.items.filter((item) => item.productId !== productId),
+        items: prev.items.filter((i) => i.productId !== productId),
       }));
-    } catch (error) {
-      console.error("Error removing item from cart:", error);
-      setError(error.message || "An unknown error occurred.");
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Unknown error");
     }
   };
 
   return (
     <div className="shopping-cart-container">
       <h1>Your Shopping Cart</h1>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
       {isLoading ? (
         <div>Loading your cart...</div>
       ) : cart.items.length === 0 ? (
-        <div>
+        <div className="empty-state">
           <p>Your shopping cart is empty.</p>
           <button onClick={() => navigate("/shop")}>Go to Shop</button>
         </div>
@@ -150,11 +127,13 @@ const fetchProductDetails = async (productId) => {
               <li key={item.productId} className="cart-item">
                 <div className="cart-item-image-container">
                   {item.imageUrl ? (
-                    <img
-                      src={`https://localhost:5050${item.imageUrl}`}
-                      alt={item.productName}
-                      className="cart-item-image"
-                    />
+                    <Link to={`/products/${item.productId}`}>
+                      <img
+                        src={`https://localhost:5050${item.imageUrl}`}
+                        alt={item.productName}
+                        className="cart-item-image"
+                      />
+                    </Link>
                   ) : (
                     <div className="image-placeholder">No image</div>
                   )}
@@ -162,21 +141,33 @@ const fetchProductDetails = async (productId) => {
 
                 <div className="cart-item-details">
                   <p>
-                    <strong>{item.productName || item.productId}</strong>
+                    <Link
+                      to={`/products/${item.productId}`}
+                      className="product-link"
+                    >
+                      <strong>{item.productName}</strong>
+                    </Link>
                   </p>
                   <p>Price: {format(convert(item.price))}</p>
                   <p>Quantity: {item.quantity}</p>
                 </div>
 
                 <div className="remove-button-container">
-                  <button onClick={() => removeItemFromCart(item.productId)}>Remove</button>
+                  <button
+                    onClick={() => removeItemFromCart(item.productId)}
+                  >
+                    Remove
+                  </button>
                 </div>
               </li>
             ))}
           </ul>
 
           <div className="process-order-container">
-            <button className="process-order-button" onClick={handleProcessOrder}>
+            <button
+              className="process-order-button"
+              onClick={handleProcessOrder}
+            >
               Proceed to Checkout
             </button>
           </div>

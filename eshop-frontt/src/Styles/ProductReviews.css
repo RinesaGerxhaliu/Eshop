@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.reviews-container,
+.reviews-container * {
+  font-family: 'Poppins', sans-serif;
+}
+
+
 .edit-review-box {
   width: 100%;
   padding: 10px;
@@ -54,7 +62,7 @@
   margin-top: -2px;
   min-width: 100px;
   padding: 8px 16px;
-  margin-top: 10px; /* Adjusts vertical spacing */
+  margin-top: 10px;
   font-size: 1rem;
   background-color: rgba(163, 6, 84, 0.336);
   color: #000;
@@ -83,7 +91,6 @@
 .review-text-block {
   display: flex;
   justify-content: space-between;
-  /* pushes actions to the far right */
   align-items: flex-start;
   width: 100%;
   box-sizing: border-box;
@@ -92,26 +99,19 @@
 .review-content {
   display: flex;
   flex-direction: column;
-  /* stack name, stars, text vertically */
   gap: 4px;
-  /* small space between them */
   flex: 1;
-  /* take up remaining row space */
 }
 
 .review-stars {
   display: flex;
   font-size: 1.2rem;
-  /* Maintain star size */
   margin-bottom: 5px;
-  /* Adjust bottom margin to make space for buttons */
 }
 
 .review-content.editing .review-stars {
   height: 20px;
-  /* Adjust this value as necessary */
   margin-bottom: 0;
-  /* Remove extra space */
 }
 
 .review-actions {
@@ -142,4 +142,39 @@
   margin-top: 10px;
   user-select: none;
   font-weight: bold;
+}
+
+.reviews-column {
+  max-width: 1200px;    
+  margin: 0 auto;       
+  padding-top: 20px;    
+}
+
+.reviews-section {
+  max-width: 1200px;    
+  margin: 0 auto;       
+  padding: 0 20px;      
+}
+.reviews-container {
+  max-width: 1200px;    
+  margin: 0 auto;       
+  padding: 0 20px;      
+}
+.product-reviews-title {
+  /* removed italic */
+  font-style: normal;
+  font-weight: bold;
+  margin-top: 2rem;            
+  color: rgba(185, 9, 62, 0.7);
+}
+
+.product-reviews-title {
+  margin-bottom: 2rem; 
+}
+
+.reviews-container ul,
+.reviews-column ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }

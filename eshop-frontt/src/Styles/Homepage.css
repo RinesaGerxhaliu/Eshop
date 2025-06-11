@@ -33,51 +33,78 @@ body {
 .reservation-btn:hover {
     background-color: #7e00a0;
 }
-.hero {
-    display: flex;
-    padding-left: 30px;
-    justify-content: space-between;
-    align-items: center;
-    padding: 140px;
-    background-color: #fdfaf4;
-    background-size: cover; 
-    background-position: right; 
-    background-repeat: no-repeat; 
+/* HeroSection.css */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap');
+
+:root {
+ 
+
+  --font-script: 'Pacifico', cursive;
+  --font-sans: 'Quicksand', sans-serif;
 }
 
-.hero-text {
-    padding-right: 120px;
-    max-width: 40%;
+.hero-section {
+  position: relative;
+  background: center/cover no-repeat;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }
 
-.hero-text h1 {
-    font-family: 'Pacifico', cursive;   /* playful script */
-    font-size: 48px;
-    font-weight: normal;
-    margin-bottom: 20px;
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-color);
 }
 
-.hero-text p,
-.hero-text button {
-    font-family: 'Quicksand', sans-serif;  /* rounded, friendly sans */
-    font-size: 18px;
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 1rem;
+  max-width: 600px;
 }
 
-.hero-text button {
-    border: 1px solid black;
-    background: none;
-    padding: 10px 20px;
-    font-size: 14px;
-    /* make the button text a bit bolder */
-    font-weight: 600;
-    cursor: pointer;
+.hero-content h1 {
+  font-family: var(--font-script);
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
 }
 
-
-.hero-image img {
-    width: 100%;
-    height: auto;
+.hero-content p {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #fff;
 }
+
+.hero-btn {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.hero-btn:hover {
+  background-color: #d17fb0;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 { font-size: 2.5rem; }
+  .hero-content p  { font-size: 1rem; }
+  .hero-btn        { padding: 0.5rem 1.5rem; }
+}
+
 
   
 .benefit-container {
@@ -430,6 +457,15 @@ header p {
     height: auto;
     margin-left: 0;
 }
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap');
+
+:root {
+  --color-primary: #ab6c93;
+  --color-overlay: rgba(255, 230, 240, 0.7);
+  --font-script: 'Pacifico', cursive;
+  --font-sans: 'Quicksand', sans-serif;
+}
+
 
 .review{
     background: var(--bg-color);

@@ -1,131 +1,98 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
-  const [userId, setUserId] = useState("");
-  const [roles, setRoles] = useState([]);
+  const [username, setUsername]   = useState("");
+  const [userId, setUserId]       = useState("");
+  const [roles, setRoles]         = useState([]);
+  const initialized = useRef(false);
 
   const parseJwt = (token) => {
-    try {
-      return JSON.parse(atob(token.split(".")[1]));
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(atob(token.split(".")[1])); }
+    catch { return null; }
   };
 
-  const login = (accessToken) => {
-    const parsedToken = parseJwt(accessToken);
-    if (!parsedToken) return;
+  const login = useCallback((accessToken) => {
+    const parsed = parseJwt(accessToken);
+    if (!parsed) return;
 
-    const usernameFromToken = parsedToken?.preferred_username || parsedToken?.sub;
-    const userIdFromToken = parsedToken?.sub;
-    const rolesFromToken = parsedToken?.resource_access?.myclient?.roles || [];
+    const name = parsed.preferred_username || parsed.sub;
+    const id   = parsed.sub;
+    const r    = parsed.resource_access?.myclient?.roles || [];
 
     localStorage.setItem("token", accessToken);
-    localStorage.setItem("username", usernameFromToken);
-    localStorage.setItem("userId", userIdFromToken);
-    localStorage.setItem("roles", JSON.stringify(rolesFromToken));
+    localStorage.setItem("username", name);
+    localStorage.setItem("userId", id);
+    localStorage.setItem("roles", JSON.stringify(r));
 
-    setUsername(usernameFromToken);
-    setUserId(userIdFromToken);
-    setRoles(rolesFromToken);
+    setUsername(name);
+    setUserId(id);
+    setRoles(r);
     setIsLoggedIn(true);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     fetch("https://localhost:5050/auth/logout", {
       method: "POST",
       credentials: "include",
     }).finally(() => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("roles");
-
-      setUsername("");
-      setUserId("");
-      setRoles([]);
+      localStorage.clear();
       setIsLoggedIn(false);
-
       navigate("/login");
     });
-  };
+  }, [navigate]);
 
   const refreshAccessToken = useCallback(async () => {
+    if (location.pathname === "/login") return;
+
     try {
-      const response = await fetch("https://localhost:5050/auth/refresh", {
+      const res = await fetch("https://localhost:5050/auth/refresh", {
         method: "POST",
         credentials: "include",
       });
 
-      console.log("refreshAccessToken response status:", response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("refreshAccessToken data:", data);
-        if (data.accessToken) {
-          login(data.accessToken);
-        } else {
-          logout();
-        }
+      if (res.ok) {
+        const { accessToken } = await res.json();
+        accessToken ? login(accessToken) : logout();
       } else {
         logout();
       }
-    } catch (error) {
-      console.error("refreshAccessToken error:", error);
+    } catch {
       logout();
     }
-  }, []);
+  }, [login, logout, location.pathname]);
 
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    if (location.pathname === "/login") return;
+
     const token = localStorage.getItem("token");
-    console.log("AuthProvider: token from localStorage =", token);
-
-    if (!token) {
-      refreshAccessToken();
-      return;
+    if (token) {
+      const parsed = parseJwt(token);
+      if (parsed && parsed.exp >= Date.now() / 1000) {
+        setUsername(localStorage.getItem("username") || "");
+        setUserId(localStorage.getItem("userId") || "");
+        setRoles(JSON.parse(localStorage.getItem("roles")) || []);
+        setIsLoggedIn(true);
+        return;
+      }
     }
 
-    const parsedToken = parseJwt(token);
-    console.log("AuthProvider: parsedToken =", parsedToken);
-
-    if (!parsedToken) {
-      refreshAccessToken();
-      return;
-    }
-
-    const isExpired = parsedToken.exp < Date.now() / 1000;
-    console.log("AuthProvider: token isExpired =", isExpired);
-
-    if (isExpired) {
-      refreshAccessToken();
-      return;
-    }
-
-    setUsername(localStorage.getItem("username") || "");
-    setUserId(localStorage.getItem("userId") || "");
-    setRoles(JSON.parse(localStorage.getItem("roles")) || []);
-    setIsLoggedIn(true);
-  }, [refreshAccessToken]);
+    refreshAccessToken();
+  }, [refreshAccessToken, location.pathname]);
 
   return (
     <AuthContext.Provider
-      value={{
-        isLoggedIn,
-        login,
-        logout,
-        refreshAccessToken,
-        username,
-        userId,
-        roles,
-      }}
+      value={{ isLoggedIn, login, logout, refreshAccessToken, username, userId, roles }}
     >
       {children}
     </AuthContext.Provider>
