@@ -24,7 +24,7 @@ export default function AddBrand({ isOpen, onAdd, onClose, onError }) {
         }
 
         try {
-            const token = localStorage.getItem("token"); // Adjust based on where you store the JWT
+            const token = localStorage.getItem("token"); 
 
             const res = await fetch(`${BASE}/brands`, {
                 method: "POST",
@@ -68,10 +68,11 @@ export default function AddBrand({ isOpen, onAdd, onClose, onError }) {
                         />
                     </div>
 
-                    <div className="form-actions">
-                        <button type="button" onClick={onClose}>Cancel</button>
-                        <button type="submit">Save</button>
-                    </div>
+                <div className="form-actions">
+  <button type="button" onClick={onClose}>Cancel</button>
+  <button type="submit">Save</button>
+</div>
+
                 </form>
             </div>
         </div>
