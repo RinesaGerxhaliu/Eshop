@@ -30,6 +30,19 @@ function UserProfile() {
     pageSize: 2,
     totalCount: 0,
   });
+  const isAdmin = () => {
+  // Supozojmë që userInfo.role ose userInfo.roles ekziston
+  if (!userInfo) return false;
+  if (userInfo.role) {
+    return userInfo.role.toLowerCase() === "admin";
+  }
+  // Nëse rolet janë në një array
+  if (userInfo.roles && Array.isArray(userInfo.roles)) {
+    return userInfo.roles.some(r => r.toLowerCase() === "admin");
+  }
+  return false;
+};
+
 
   const getToken = () => localStorage.getItem("token");
 
@@ -179,8 +192,16 @@ const handleOrdersPageRedirect = () => {
           <h2 className="myaccount">My Info</h2>
           <div className="button-group">
             <button onClick={() => setActiveSection("info")}>My Info</button>
-            <button onClick={() => setActiveSection("addressBook")}>My Address Book</button>
-            <button onClick={handleOrdersPageRedirect}>My Orders</button>
+          <div className="button-group">
+ 
+
+  {!isAdmin() && (
+    <>
+      <button onClick={() => setActiveSection("addressBook")}>My Address Book</button>
+      <button onClick={handleOrdersPageRedirect}>My Orders</button>
+    </>
+  )}
+</div>
           </div>
         </div>
 

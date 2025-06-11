@@ -36,27 +36,30 @@
 .wishlist-heart.active {
   color: #c16696; 
 }
+.product-infoo {
+  position: relative;
+}
+
+.wishlist-container {
+  position: absolute;
+  top: 2px;
+  right: 40px;
+}
 
 .product-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 80px;
+  margin-top: 20px;
   width: 100%;
 }
 
 .product-name {
-  white-space: nowrap; 
-  flex-grow: 1;        
-  font-size: 34px;
+  font-size: 27px !important;
+  font-weight: 600;
+  color: #222;
   margin: 0;
-  margin-right: 100px  !important;
+  white-space: normal;
 }
 
-.product-title-row .wishlist-heart {
-  gap: 80px;
- 
-}
+
 
 .product-images {
   flex: 1;

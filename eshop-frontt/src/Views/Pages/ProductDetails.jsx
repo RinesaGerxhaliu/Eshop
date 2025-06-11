@@ -36,7 +36,6 @@ const ProductDetails = () => {
         `https://localhost:5050/products/${id}/average-rating`
       );
 
-
       if (!response.ok) throw new Error("Failed to fetch average rating");
       const data = await response.json();
       setAverageRating(data.averageRating);
@@ -45,7 +44,6 @@ const ProductDetails = () => {
       setAverageRating(null);
     }
   };
-
 
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -121,7 +119,6 @@ const ProductDetails = () => {
     return response.ok;
   };
 
-
   const handleAddToCart = async (e) => {
     e.preventDefault();
 
@@ -153,10 +150,10 @@ const ProductDetails = () => {
       const body = cartExists
         ? JSON.stringify({ userName: username, ShoppingCartItem: itemPayload })
         : JSON.stringify({
-          shoppingCart: {
-            items: [itemPayload],
-          },
-        });
+            shoppingCart: {
+              items: [itemPayload],
+            },
+          });
 
       let response = await fetch(url, {
         method: "POST",
@@ -208,7 +205,7 @@ const ProductDetails = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (response.status === 404) {
@@ -236,7 +233,6 @@ const ProductDetails = () => {
           },
         });
       }
-
 
       if (response.status === 401) {
         token = await refreshToken();
@@ -432,7 +428,6 @@ const ProductDetails = () => {
     }
   };
 
-
   const handleStarClick = (star) => {
     setRating(star);
   };
@@ -457,25 +452,23 @@ const ProductDetails = () => {
 
             <div className="product-infoo">
               <div className="product-title-row">
-                <h1 className="product-name">{product.name}</h1>
                 {!isAdmin && (
-                  <button
-                    className={`wishlist-heart ${isFavorite ? "active" : ""}`}
-                    onClick={handleWishlistToggle}
-                    title={
-                      isFavorite ? "Remove from Wishlist" : "Add to Wishlist"
-                    }
-                    aria-pressed={isFavorite}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      fontSize: "1.5rem",
-                    }}
-                  >
-                    <FaHeart color={isFavorite ? "red" : "gray"} />
-                  </button>
+                  <div className="wishlist-container">
+                    <button
+                      className={`wishlist-heart ${isFavorite ? "active" : ""}`}
+                      onClick={handleWishlistToggle}
+                      title={
+                        isFavorite ? "Remove from Wishlist" : "Add to Wishlist"
+                      }
+                      aria-pressed={isFavorite}
+                    >
+                      <FaHeart color={isFavorite ? "red" : "gray"} />
+                    </button>
+                  </div>
                 )}
+                <div className="product-title-row">
+                  <h1 className="product-name">{product.name}</h1>
+                </div>
               </div>
 
               <p className="product-descriptionn">{product.description}</p>
@@ -488,7 +481,9 @@ const ProductDetails = () => {
                 <div className="product-rating">
                   <span className="rating-label">Average Rating:</span>
                   <span className="stars">{renderStars(averageRating)}</span>
-                  <span className="rating-value">{averageRating.toFixed(1)}</span>
+                  <span className="rating-value">
+                    {averageRating.toFixed(1)}
+                  </span>
                 </div>
               )}
 
@@ -517,8 +512,8 @@ const ProductDetails = () => {
                         {isAdding
                           ? "Adding..."
                           : isAdded
-                            ? "Added"
-                            : "Add to Cart"}
+                          ? "Added"
+                          : "Add to Cart"}
                       </button>
                     </div>
                   </div>
@@ -526,11 +521,14 @@ const ProductDetails = () => {
               )}
 
               {!isAdmin && (
-                <button className="add-to-cart" onClick={() => {
-                  setRating(0);
-                  setHoverRating(0);
-                  setIsReviewModalOpen(true);
-                }}>
+                <button
+                  className="add-to-cart"
+                  onClick={() => {
+                    setRating(0);
+                    setHoverRating(0);
+                    setIsReviewModalOpen(true);
+                  }}
+                >
                   Leave a Review
                 </button>
               )}
@@ -556,7 +554,11 @@ const ProductDetails = () => {
                             <button
                               key={star}
                               type="button"
-                              className={`star-btn ${(hoverRating || rating) >= star ? 'selected' : ''}`}
+                              className={`star-btn ${
+                                (hoverRating || rating) >= star
+                                  ? "selected"
+                                  : ""
+                              }`}
                               onClick={() => setRating(star)}
                               onMouseEnter={() => setHoverRating(star)}
                               onMouseLeave={() => setHoverRating(0)}
@@ -565,7 +567,6 @@ const ProductDetails = () => {
                             </button>
                           ))}
                         </div>
-
                       </div>
 
                       <div className="form-group">
