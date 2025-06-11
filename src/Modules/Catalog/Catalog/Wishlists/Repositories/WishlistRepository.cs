@@ -18,7 +18,12 @@ public class WishlistRepository(CatalogDbContext context) : IWishlistRepository
 
         return await query.FirstOrDefaultAsync(w => w.UserName == userName, cancellationToken);
     }
-
+    public async Task<Wishlist?> GetByUserNameAsync(string userName, CancellationToken cancellationToken)
+    {
+        return await context.Wishlists
+            .Include(w => w.Items) // optional: include related items
+            .FirstOrDefaultAsync(w => w.UserName == userName, cancellationToken);
+    }
     public async Task CreateWishlist(Wishlist wishlist, CancellationToken cancellationToken = default)
     {
         await context.Wishlists.AddAsync(wishlist, cancellationToken);

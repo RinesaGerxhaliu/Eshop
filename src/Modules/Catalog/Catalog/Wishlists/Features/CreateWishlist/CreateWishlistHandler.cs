@@ -22,11 +22,21 @@ internal class CreateWishlistHandler(IWishlistRepository repository)
 {
     public async Task<CreateWishlistResult> Handle(CreateWishlistCommand command, CancellationToken cancellationToken)
     {
-        var wishlist = CreateNewWishlist(command.Wishlist);
+        // Check if a wishlist already exists for the given user
+        var existingWishlist = await repository.GetByUserNameAsync(command.Wishlist.UserName, cancellationToken);
 
-        await repository.CreateWishlist(wishlist, cancellationToken);
+        if (existingWishlist != null)
+        {
+            // Optionally, you could update the existing wishlist items here
+            return new CreateWishlistResult(existingWishlist.Id);
+        }
 
-        return new CreateWishlistResult(wishlist.Id);
+        // If no wishlist exists, create a new one
+        var newWishlist = CreateNewWishlist(command.Wishlist);
+
+        await repository.CreateWishlist(newWishlist, cancellationToken);
+
+        return new CreateWishlistResult(newWishlist.Id);
     }
 
     private Wishlist CreateNewWishlist(WishlistDTO wishlistDto)
@@ -48,6 +58,4 @@ internal class CreateWishlistHandler(IWishlistRepository repository)
 
         return newWishlist;
     }
-
 }
-

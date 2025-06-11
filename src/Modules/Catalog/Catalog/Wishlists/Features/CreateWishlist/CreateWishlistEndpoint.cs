@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
-
 namespace Catalog.Wishlists.Features.CreateWishlist;
 
 public record CreateWishlistRequest
@@ -18,13 +17,13 @@ public class CreateWishlistEndpoint : ICarterModule
     {
         app.MapPost("/wishlist", async (CreateWishlistRequest request, ISender sender, ClaimsPrincipal user) =>
         {
-
             var userName = user.Identity?.Name;
             if (string.IsNullOrEmpty(userName))
             {
                 return Results.BadRequest("UserName is null or empty.");
             }
 
+            // Force the wishlist to use the authenticated user's username
             var updatedWishlist = request.Wishlist with { UserName = userName };
 
             var command = new CreateWishlistCommand(updatedWishlist);
@@ -38,8 +37,7 @@ public class CreateWishlistEndpoint : ICarterModule
         .Produces<CreateWishlistResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Create Wishlist")
-        .WithDescription("Create Wishlist")
+        .WithDescription("Creates a wishlist if one doesn't exist for the authenticated user. Returns the existing one if it does.")
         .RequireAuthorization();
     }
 }
-
