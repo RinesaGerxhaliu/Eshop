@@ -1,4 +1,4 @@
-/* Cute script + friendly sans */
+
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap');
 
 :root {
@@ -33,79 +33,97 @@ body {
 .reservation-btn:hover {
     background-color: #7e00a0;
 }
-/* HeroSection.css */
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap');
-
 :root {
-
-  --primary-color: #af4889;               /* deep purple for contrast */
+  --overlay-color: rgba(54, 53, 53, 0.5);
+  --primary-color: #8a2be2;
   --font-script: 'Pacifico', cursive;
   --font-sans: 'Quicksand', sans-serif;
 }
+
 .hero-section {
   position: relative;
-  background-image: var(--bg-img);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  min-height: 80vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
+  overflow: hidden;
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
   background: var(--overlay-color);
-  /* subtle blur for extra pop */
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
+  z-index: 1;
 }
 
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   text-align: center;
-  padding: 0 1rem;
-  max-width: 600px;
+  padding: 2rem 2rem;
+  max-width: 700px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  
 }
 
 .hero-content h1 {
   font-family: var(--font-script);
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-  color: var(--primary-color);
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 .hero-content p {
   font-family: var(--font-sans);
-  font-size: 1.25rem;
-  margin-bottom: 1.5rem;
-  color: #f0f0f0;   /* slightly off-white for readability */
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+
 }
 
 .hero-btn {
   font-family: var(--font-sans);
   font-weight: 600;
-  background-color: var(--primary-color);
+ background-color: #777;
   color: #fff;
-  padding: 0.75rem 2rem;
+  padding: 0.8rem 2.2rem;
   border-radius: 50px;
   text-decoration: none;
-  transition: background-color 0.3s, transform 0.2s;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+ 
 }
 
 .hero-btn:hover {
-  background-color: #5a0070;
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 768px) {
-  .hero-content h1 { font-size: 2.5rem; }
-  .hero-content p  { font-size: 1rem; }
-  .hero-btn        { padding: 0.5rem 1.5rem; }
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .hero-btn {
+    padding: 0.6rem 1.8rem;
+    font-size: 1rem;
+  }
 }
 
 
