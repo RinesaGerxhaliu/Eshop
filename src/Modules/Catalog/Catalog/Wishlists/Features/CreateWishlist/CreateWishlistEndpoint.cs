@@ -19,19 +19,21 @@ public class CreateWishlistEndpoint : ICarterModule
         {
             var userName = user.Identity?.Name;
             if (string.IsNullOrEmpty(userName))
-            {
                 return Results.BadRequest("UserName is null or empty.");
+
+            // Check if wishlist exists
+            var existing = await context.Wishlists.FirstOrDefaultAsync(x => x.UserName == userName);
+            if (existing != null)
+            {
+                // Return existing wishlist (or just its ID)
+                return Results.Ok(existing); // or Results.Conflict(existing)
             }
 
-            // Force the wishlist to use the authenticated user's username
+            // Only now: create the wishlist for this user
             var updatedWishlist = request.Wishlist with { UserName = userName };
-
             var command = new CreateWishlistCommand(updatedWishlist);
-
             var result = await sender.Send(command);
-
             var response = result.Adapt<CreateWishlistResponse>();
-
             return Results.Created($"/wishlist/{response.Id}", response);
         })
         .Produces<CreateWishlistResponse>(StatusCodes.Status201Created)

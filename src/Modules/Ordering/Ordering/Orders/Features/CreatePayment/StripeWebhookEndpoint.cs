@@ -94,7 +94,6 @@ public class StripeWebhookEndpoint : ICarterModule
 
             return Results.Ok();
         })
-        .RequireAuthorization()
         .WithName("StripeWebhook")
         .WithSummary("Handles Stripe payment_intent.succeeded")
         .Accepts<string>("application/json")

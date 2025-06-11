@@ -27,6 +27,7 @@ public class CreatePaymentEndpoint : ICarterModule
             }
             return Results.Ok(response);
         })
+        .RequireAuthorization()
         .Accepts<CreatePaymentRequest>("application/json")
         .Produces<CreatePaymentResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest);

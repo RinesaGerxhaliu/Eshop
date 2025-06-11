@@ -68,29 +68,20 @@ const Wishlist = () => {
       }
 
       if (response.status === 404) {
+        // Don't send username or id in body
         const createResponse = await fetch("https://localhost:5050/wishlist", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            wishlist: {
-              id: crypto.randomUUID(),
-              userName: username,
-              items: [],
-            },
-          }),
+          body: JSON.stringify({ wishlist: { items: [] } }),
         });
-
         if (!createResponse.ok) {
           throw new Error("Failed to create wishlist");
         }
-
-        // 🔁 Try again now that wishlist is created
         return await getWishlist();
       }
-
       if (!response.ok) throw new Error("Failed to fetch wishlist");
 
       const data = await response.json();
