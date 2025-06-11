@@ -1,4 +1,4 @@
-import { FaUserCog, FaBoxOpen, FaSignOutAlt, FaChartBar, FaShippingFast } from "react-icons/fa";
+import { FaUserCog, FaBoxOpen, FaSignOutAlt, FaChartBar, FaShippingFast, FaShoppingCart } from "react-icons/fa";
 import { MdRateReview, MdStore } from "react-icons/md";
 import { FaListUl } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
@@ -49,6 +49,11 @@ const AdminSidebar = () => {
         <li onClick={() => navigate("/admin-dashboard/shipping-method")}>
           <FaShippingFast className="sidebar-icon" />
           Shipping Methods
+        </li>
+
+        <li onClick={() => navigate("/admin-dashboard/manage-orders")}>
+          <FaShoppingCart className="sidebar-icon" />
+          Manage Orders
         </li>
 
         <li onClick={handleLogout}>

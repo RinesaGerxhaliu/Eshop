@@ -3,7 +3,7 @@
 public record OrderDto(
     Guid Id,
     Guid CustomerId,
-    DateTime CretaedAt,
+    DateTime CreatedAt,
     List<OrderItemDto> Items,
     Guid ShippingMethodId,                      
     Guid? SavedAddressId,                       

@@ -7,6 +7,7 @@ import ManageReviews from '../../Components/ManageReviews';
 import ManageBrands from '../../Components/ManageBrands';
 import ManageCategories from '../../Components/ManageCategories';
 import ShippingMethod from '../../Components/ShippingMethod';
+import ManageOrders from '../../Components/ManageOrders';
 import Subcategories from '../../Components/Subcategories';  
 
 const AdminDashboard = () => {
@@ -31,8 +32,8 @@ const AdminDashboard = () => {
           <Route path="manage-reviews" element={<ManageReviews />} />
           <Route path="manage-brands" element={<ManageBrands />} />
           <Route path="manage-categories" element={<ManageCategories />} />
-          <Route path="shipping-method" element={<ShippingMethod />}>
-
+          <Route path="shipping-method" element={<ShippingMethod />}/>
+          <Route path="manage-orders" element={<ManageOrders />}>
           </Route>
         </Routes>
       </div>
