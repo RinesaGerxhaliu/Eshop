@@ -6,7 +6,7 @@ import "../Styles/ManageOrders.css";
 import { useCurrency } from "../contexts/CurrencyContext";
 
 const BASE_URL = "https://localhost:5050";
-const PAGE_SIZE = 1000;
+const PAGE_SIZE = 5;
 
 const shipmentStatusNames = {
   0: "Pending",
@@ -48,7 +48,7 @@ export default function ManageOrders() {
     }
   };
 
-    const loadOrders = async () => {
+        const loadOrders = async () => {
   setLoading(true);
   try {
     let ordersList = [];
@@ -56,57 +56,107 @@ export default function ManageOrders() {
     if (filterStatus) {
       const res = await api.get(`/orders/by-shipment-status/${filterStatus.value}`);
       ordersList = res.data.orders || [];
+
+      // Apliko pagination manualisht për filtrin
+      const pagedOrders = ordersList.slice(
+        pageIndex * PAGE_SIZE,
+        (pageIndex + 1) * PAGE_SIZE
+      );
+
+      setTotalCount(ordersList.length);
+
+      const detailedOrders = await Promise.all(
+        pagedOrders.map(async (order) => {
+          let shipmentDetails = null;
+          try {
+            const shipmentRes = await api.get(`/shipments/order/${order.id || order.orderId}`);
+            shipmentDetails = shipmentRes.data;
+          } catch {}
+
+          const itemsWithDetails = await Promise.all(
+            (order.items || []).map(async (item) => {
+              const product = await fetchProductDetails(item.productId);
+              return {
+                ...item,
+                productName: product?.name || item.productId,
+                imageUrl: product?.imageUrl || null,
+              };
+            })
+          );
+
+          return {
+            ...order,
+            shipmentDetails,
+            items: itemsWithDetails,
+          };
+        })
+      );
+
+      setOrders(detailedOrders);
     } else {
       const res = await api.get("/orders", {
         params: {
-          pageIndex: 0,
-          pageSize: 10000,
+          pageIndex,
+          pageSize: PAGE_SIZE,
         },
       });
-      console.log("Full orders response", res.data);
-      ordersList = res.data.orders.data || [];
+
+      const page = res.data.orders ?? res.data.Orders ?? {};
+      const items = Array.isArray(page.data)
+        ? page.data
+        : Array.isArray(page.items)
+        ? page.items
+        : [];
+
+      const count =
+        typeof page.count === "number"
+          ? page.count
+          : typeof page.totalCount === "number"
+          ? page.totalCount
+          : typeof page.totalItems === "number"
+          ? page.totalItems
+          : items.length;
+
+      const detailedOrders = await Promise.all(
+        items.map(async (order) => {
+          let shipmentDetails = null;
+          try {
+            const shipmentRes = await api.get(`/shipments/order/${order.id || order.orderId}`);
+            shipmentDetails = shipmentRes.data;
+          } catch {}
+
+          const itemsWithDetails = await Promise.all(
+            (order.items || []).map(async (item) => {
+              const product = await fetchProductDetails(item.productId);
+              return {
+                ...item,
+                productName: product?.name || item.productId,
+                imageUrl: product?.imageUrl || null,
+              };
+            })
+          );
+
+          return {
+            ...order,
+            shipmentDetails,
+            items: itemsWithDetails,
+          };
+        })
+      );
+
+      setOrders(detailedOrders);
+      setTotalCount(count);
     }
-
-    // Merr shipment details për secilën porosi
-    const detailedOrders = await Promise.all(
-  ordersList.map(async (order) => {
-    let shipmentDetails = null;
-
-    try {
-      const shipmentRes = await api.get(`/shipments/order/${order.id || order.orderId}`);
-      shipmentDetails = shipmentRes.data;
-    } catch {
-      // nese nuk ka shipment, e le me null
-    }
-
-    const itemsWithDetails = await Promise.all(
-      (order.items || []).map(async (item) => {
-        const product = await fetchProductDetails(item.productId);
-        return {
-          ...item,
-          productName: product?.name || item.productId,
-          imageUrl: product?.imageUrl || null,
-        };
-      })
-    );
-
-    return {
-      ...order,
-      shipmentDetails,
-      items: itemsWithDetails,
-    };
-  })
-);
-
-
-    setOrders(detailedOrders);
-    setTotalCount(detailedOrders.length);
   } catch (err) {
     console.error("Error loading orders", err);
+    setTotalCount(0);
   } finally {
     setLoading(false);
   }
 };
+
+
+
 
 
   useEffect(() => {
@@ -306,7 +356,7 @@ export default function ManageOrders() {
 
     </table>
 
-    {totalCount > 0 && (
+    {totalPages > 1 && (
       <div className="mr-pagination">
         <button
           className="mr-btn mr-btn-secondary"
