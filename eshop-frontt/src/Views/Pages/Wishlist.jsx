@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "../../Styles/ShoppingCart.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
+import { Link } from "react-router-dom";
 
 const Wishlist = () => {
   const { refreshAccessToken } = useAuth();
@@ -186,23 +187,29 @@ const Wishlist = () => {
                 {!item.imageUrl ? (
                   <div className="image-placeholder">No Image</div>
                 ) : (
-                  <img
-                    src={`https://localhost:5050${item.imageUrl}`}
-                    alt={item.productName}
-                    className="cart-item-image"
-                  />
+                  <Link to={`/products/${item.productId}`}>
+                    <img
+                      src={`https://localhost:5050${item.imageUrl}`}
+                      alt={item.productName}
+                      className="cart-item-image"
+                    />
+                  </Link>
                 )}
               </div>
 
               <div className="cart-item-details">
                 <p>
-                  <strong>{item.productName}</strong>
+                  <Link to={`/products/${item.productId}`} className="product-link">
+                    <strong>{item.productName}</strong>
+                  </Link>
                 </p>
                 <p>Price: {format ? format(convert(item.price)) : item.price.toFixed(2)}</p>
               </div>
 
               <div className="remove-button-container">
-                <button onClick={() => removeItemFromWishlist(item.productId)}>Remove</button>
+                <button onClick={() => removeItemFromWishlist(item.productId)}>
+                  Remove
+                </button>
               </div>
             </li>
           ))}

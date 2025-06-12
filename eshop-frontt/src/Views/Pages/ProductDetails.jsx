@@ -4,7 +4,7 @@ import "../../Styles/ProductDetails.css";
 import { useCurrency } from "../../contexts/CurrencyContext";
 import ProductReviews from "./ProductReviews";
 import { useAuth } from "../../contexts/AuthContext";
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 const ProductDetails = () => {
@@ -148,54 +148,54 @@ const ProductDetails = () => {
   };
 
   const fetchWishlistStatus = async () => {
-  const username = localStorage.getItem("username");
-  let token = localStorage.getItem("token");
-  if (!username || !token) return setIsFavorite(false);
+    const username = localStorage.getItem("username");
+    let token = localStorage.getItem("token");
+    if (!username || !token) return setIsFavorite(false);
 
-  try {
-    // Try GET wishlist
-    let response = await fetch(`https://localhost:5050/wishlist/${username}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (response.status === 404) {
-      // If not found, POST (create)
-      const createResponse = await fetch("https://localhost:5050/wishlist", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ wishlist: { items: [] } }) // No username or id
+    try {
+      // Try GET wishlist
+      let response = await fetch(`https://localhost:5050/wishlist/${username}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!createResponse.ok) throw new Error("Failed to create wishlist");
 
-      // After POST, do a single GET to fetch it.
-      response = await fetch(`https://localhost:5050/wishlist/${username}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      if (response.status === 404) {
+        // If not found, POST (create)
+        const createResponse = await fetch("https://localhost:5050/wishlist", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ wishlist: { items: [] } }) // No username or id
+        });
+        if (!createResponse.ok) throw new Error("Failed to create wishlist");
+
+        // After POST, do a single GET to fetch it.
+        response = await fetch(`https://localhost:5050/wishlist/${username}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+
+      if (response.status === 401) {
+        // Refresh token and retry GET (never POST again)
+        token = await refreshToken();
+        localStorage.setItem("token", token);
+        response = await fetch(`https://localhost:5050/wishlist/${username}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+
+      if (!response.ok) throw new Error("Failed to fetch wishlist");
+
+      const data = await response.json();
+      const items = data.wishlist?.items || [];
+      const found = items.some((item) => item.productId === id);
+      setIsFavorite(found);
+    } catch (error) {
+      console.error("Could not load wishlist status", error);
+      setIsFavorite(false);
     }
-
-    if (response.status === 401) {
-      // Refresh token and retry GET (never POST again)
-      token = await refreshToken();
-      localStorage.setItem("token", token);
-      response = await fetch(`https://localhost:5050/wishlist/${username}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    }
-
-    if (!response.ok) throw new Error("Failed to fetch wishlist");
-
-    const data = await response.json();
-    const items = data.wishlist?.items || [];
-    const found = items.some((item) => item.productId === id);
-    setIsFavorite(found);
-  } catch (error) {
-    console.error("Could not load wishlist status", error);
-    setIsFavorite(false);
-  }
-};
+  };
 
 
   const handleWishlistToggle = async () => {
@@ -312,13 +312,14 @@ const ProductDetails = () => {
               <div className="product-title-row">
                 {!isAdmin && (
                   <div className="wishlist-container">
+
                     <button
                       className={`wishlist-heart ${isFavorite ? "active" : ""}`}
                       onClick={handleWishlistToggle}
                       title={isFavorite ? "Remove from Wishlist" : "Add to Wishlist"}
                       aria-pressed={isFavorite}
                     >
-                      <FaHeart color={isFavorite ? "red" : "gray"} />
+                      {isFavorite ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
                     </button>
                   </div>
                 )}

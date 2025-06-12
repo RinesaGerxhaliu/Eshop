@@ -21,6 +21,7 @@ import CreateOrderPage from './Views/Pages/CreateOrderPage';
 import StripeProvider from "./StripeProvider";
 import CheckoutForm from './Views/Pages/CheckoutForm';
 import GetOrders from './Views/Pages/GetOrders.jsx';
+import OrderConfirmationPage from './Views/Pages/OrderConfirmationPage'; // Update the path as needed!
 
 function App() {
   return (
@@ -64,8 +65,8 @@ function AppContent() {
         <Route path="/products/sorted/by-price" element={<FilteredProducts />} />
         <Route path="/products/sorted/by-price-descending" element={<FilteredProducts />} />
         <Route path="/products" element={<ProductSearchResults />} />
-     
         <Route path="/user-orders/:userId" element={<GetOrders />} />
+        <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
         <Route
           path="/admin-dashboard/*"
           element={

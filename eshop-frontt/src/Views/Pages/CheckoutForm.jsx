@@ -97,7 +97,7 @@ export default function CheckoutForm() {
       setErrorMsg(error.message);
       setProcessing(false);
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
-      navigate(`/order-confirmation`);
+      navigate("/order-confirmation", { state: { order: draftOrder } });
     }
   };
 

@@ -1,0 +1,86 @@
+.order-confirmation-container {
+  max-width: 700px;
+  margin: 60px auto 0 auto;
+  padding: 2rem 1.5rem 2.5rem 1.5rem;
+  background: #fff0f8;
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px rgba(177, 69, 123, 0.09);
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+}
+
+.order-confirmation-container h2 {
+  font-size: 2.4rem;
+  color: #8b005d;
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.order-confirmation-container p {
+  font-size: 1.2rem;
+  color: #2a2533;
+  margin-bottom: 2.2rem;
+}
+
+.confirm-orders-link {
+  display: block;
+  margin: 2.3rem auto 1.3rem auto;
+  background: #d73387;         /* <- bright pink! */
+  color: #fff;
+  font-size: 1.25rem;
+  border: none;
+  border-radius: 1rem;
+  padding: 1.1rem 0;
+  width: 100%;
+  max-width: 400px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: background 0.25s;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(215, 51, 135, 0.11);
+}
+
+.confirm-orders-link:hover,
+.confirm-orders-link:focus {
+  background: #a71e62;     /* darker pink for hover */
+  color: #fff;
+}
+
+
+.back-home-link {
+  display: inline-block;
+  margin: 2.5rem auto 0 auto;
+  color: #c2186b;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none !important;  /* override accidental background */
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  width: auto;
+  transition: color 0.2s;
+}
+
+.back-home-link:hover,
+.back-home-link:focus {
+  color: #a71e62;
+  text-decoration: underline;
+}
+
+
+
+@media (max-width: 600px) {
+  .order-confirmation-container {
+    max-width: 95vw;
+    padding: 1.5rem 0.4rem 2rem 0.4rem;
+  }
+  .confirm-orders-link {
+    max-width: 95vw;
+    font-size: 1rem;
+    padding: 0.85rem 0;
+  }
+}
