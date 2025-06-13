@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
-import '../../../assets/styles/login.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
+import "../../../assets/styles/login.css";
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const validate = () => {
     const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Invalid email format';
+    if (!email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(email))
+      newErrors.email = "Invalid email format";
 
-    if (!password) newErrors.password = 'Password is required';
-    else if (password.length < 4) newErrors.password = 'Password must be at least 4 characters';
+    if (!password) newErrors.password = "Password is required";
+    else if (password.length < 4)
+      newErrors.password = "Password must be at least 4 characters";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -27,25 +29,24 @@ function Login() {
     if (!validate()) return;
 
     try {
-      const response = await fetch(
-        'https://localhost:5050/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            client_id: 'myclient'
-          }),
-          credentials: 'include'
-        }
-      );
+      const response = await fetch("https://localhost:5050/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          client_id: "myclient",
+        }),
+        credentials: "include",
+      });
 
       if (!response.ok) {
         const err = await response.json();
-        setErrors({ general: err.error_description || 'Invalid email or password' });
+        setErrors({
+          general: err.error_description || "Invalid email or password",
+        });
         return;
       }
 
@@ -53,9 +54,9 @@ function Login() {
 
       login(data.accessToken);
 
-      navigate('/homepage');
+      navigate("/homepage");
     } catch {
-      setErrors({ general: 'Something went wrong, please try again later' });
+      setErrors({ general: "Something went wrong, please try again later" });
     }
   };
 
@@ -65,34 +66,58 @@ function Login() {
         <div className="login-form-inner">
           <h2>Sign in</h2>
           <form onSubmit={handleLogin}>
-            {errors.general && <div className="error-message">{errors.general}</div>}
+            {errors.general && (
+              <div className="error-message">{errors.general}</div>
+            )}
 
             <label>Email Address *</label>
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter email"
             />
-            {errors.email && <div className="error-message">{errors.email}</div>}
+            {errors.email && (
+              <div className="error-message">{errors.email}</div>
+            )}
 
             <label>Password *</label>
             <input
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"
             />
-            {errors.password && <div className="error-message">{errors.password}</div>}
+            {errors.password && (
+              <div className="error-message">{errors.password}</div>
+            )}
+            <a
+              href="#"
+              onClick={() => navigate("/forgot-password")}
+              className="forgot-password-link"
+            >
+              Forgot your password?
+            </a>
 
             <button type="submit">Sign in</button>
 
-            <div className="login-links" style={{ textAlign: 'center', marginTop: '10px' }}>
-              <a href="#" onClick={() => navigate('/register')} className="link-text">
+            <div
+              className="login-links"
+              style={{ textAlign: "center", marginTop: "10px" }}
+            >
+              <a
+                href="#"
+                onClick={() => navigate("/register")}
+                className="link-text"
+              >
                 Don't have an account yet? Create Account
               </a>
               <br />
-              <a href="#" onClick={() => navigate('/homepage')} className="link-textt">
+              <a
+                href="#"
+                onClick={() => navigate("/homepage")}
+                className="link-textt"
+              >
                 Go to Home
               </a>
             </div>

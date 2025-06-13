@@ -29,11 +29,12 @@ const ProductDetails = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [averageRating, setAverageRating] = useState(null);
 
-  // Helper to refresh token if expired
+
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
     const username = localStorage.getItem("username");
-    if (!refreshToken || !username) throw new Error("No refresh token or username found.");
+    if (!refreshToken || !username)
+      throw new Error("No refresh token or username found.");
 
     const response = await fetch("https://localhost:5050/auth/refresh", {
       method: "POST",
@@ -59,10 +60,11 @@ const ProductDetails = () => {
     }
   };
 
-  // Average rating for stars
   const fetchAverageRating = async () => {
     try {
-      const response = await fetch(`https://localhost:5050/products/${id}/average-rating`);
+      const response = await fetch(
+        `https://localhost:5050/products/${id}/average-rating`
+      );
       if (!response.ok) throw new Error("Failed to fetch average rating");
       const data = await response.json();
       setAverageRating(data.averageRating);
@@ -78,19 +80,21 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  // Star rendering helper
+
   const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating - fullStars >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    for (let i = 0; i < fullStars; i++) stars.push(<FaStar key={"full-" + i} color="#FFD700" />);
+    for (let i = 0; i < fullStars; i++)
+      stars.push(<FaStar key={"full-" + i} color="#FFD700" />);
     if (hasHalfStar) stars.push(<FaStarHalfAlt key="half" color="#FFD700" />);
-    for (let i = 0; i < emptyStars; i++) stars.push(<FaRegStar key={"empty-" + i} color="#FFD700" />);
+    for (let i = 0; i < emptyStars; i++)
+      stars.push(<FaRegStar key={"empty-" + i} color="#FFD700" />);
     return stars;
   };
 
-  // ADD TO CART
+
   const checkIfCartExists = async (username, token) => {
     const response = await fetch(`https://localhost:5050/basket/${username}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -125,7 +129,10 @@ const ProductDetails = () => {
 
       let response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body,
       });
 
@@ -134,7 +141,10 @@ const ProductDetails = () => {
         localStorage.setItem("token", token);
         response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body,
         });
       }
@@ -150,38 +160,29 @@ const ProductDetails = () => {
   const fetchWishlistStatus = async () => {
     const username = localStorage.getItem("username");
     let token = localStorage.getItem("token");
-    if (!username || !token) return setIsFavorite(false);
+
+    if (!username || !token) {
+      setIsFavorite(false);
+      return;
+    }
 
     try {
-      // Try GET wishlist
-      let response = await fetch(`https://localhost:5050/wishlist/${username}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.status === 404) {
-        // If not found, POST (create)
-        const createResponse = await fetch("https://localhost:5050/wishlist", {
-          method: "POST",
+      let response = await fetch(
+        `https://localhost:5050/wishlist/${username}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
           },
-          body: JSON.stringify({ wishlist: { items: [] } }) // No username or id
-        });
-        if (!createResponse.ok) throw new Error("Failed to create wishlist");
-
-        // After POST, do a single GET to fetch it.
-        response = await fetch(`https://localhost:5050/wishlist/${username}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      }
-
+        }
+      );
       if (response.status === 401) {
-        // Refresh token and retry GET (never POST again)
         token = await refreshToken();
+        if (!token) throw new Error("Unable to refresh token");
         localStorage.setItem("token", token);
         response = await fetch(`https://localhost:5050/wishlist/${username}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
       }
 
@@ -197,6 +198,11 @@ const ProductDetails = () => {
     }
   };
 
+  useEffect(() => {
+    if (id) {
+      fetchWishlistStatus();
+    }
+  }, [id]);
 
   const handleWishlistToggle = async () => {
     const username = localStorage.getItem("username");
@@ -231,7 +237,10 @@ const ProductDetails = () => {
 
         let response = await fetch(postUrl, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body,
         });
 
@@ -240,7 +249,10 @@ const ProductDetails = () => {
           localStorage.setItem("token", token);
           response = await fetch(postUrl, {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
             body,
           });
         }
@@ -265,16 +277,30 @@ const ProductDetails = () => {
     try {
       let response = await fetch("https://localhost:5050/products/reviews", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ productId: id, reviewText, rating: parseInt(rating) }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: id,
+          reviewText,
+          rating: parseInt(rating),
+        }),
       });
       if (response.status === 401) {
         token = await refreshToken();
         localStorage.setItem("token", token);
         response = await fetch("https://localhost:5050/products/reviews", {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ productId: id, reviewText, rating: parseInt(rating) }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: id,
+            reviewText,
+            rating: parseInt(rating),
+          }),
         });
       }
       if (!response.ok) throw new Error("Failed to submit review");
@@ -312,14 +338,21 @@ const ProductDetails = () => {
               <div className="product-title-row">
                 {!isAdmin && (
                   <div className="wishlist-container">
-
                     <button
                       className={`wishlist-heart ${isFavorite ? "active" : ""}`}
                       onClick={handleWishlistToggle}
-                      title={isFavorite ? "Remove from Wishlist" : "Add to Wishlist"}
+                      title={
+                        isFavorite ? "Remove from Wishlist" : "Add to Wishlist"
+                      }
                       aria-pressed={isFavorite}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "1.5rem",
+                      }}
                     >
-                      {isFavorite ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
+                      <FaHeart color={isFavorite ? "red" : "gray"} />
                     </button>
                   </div>
                 )}
@@ -330,13 +363,17 @@ const ProductDetails = () => {
 
               <p className="product-descriptionn">{product.description}</p>
               <p className="product-pricee">
-                {product.price ? format(convert(product.price)) : "Price not available"}
+                {product.price
+                  ? format(convert(product.price))
+                  : "Price not available"}
               </p>
               {averageRating != null && (
                 <div className="product-rating">
                   <span className="rating-label">Average Rating:</span>
                   <span className="stars">{renderStars(averageRating)}</span>
-                  <span className="rating-value">{averageRating.toFixed(1)}</span>
+                  <span className="rating-value">
+                    {averageRating.toFixed(1)}
+                  </span>
                 </div>
               )}
 
@@ -345,12 +382,28 @@ const ProductDetails = () => {
                   <div className="product-options">
                     <div className="quantity-cart-row">
                       <div className="quantity">
-                        <button type="button" className="qty-btn" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>–</button>
+                        <button
+                          type="button"
+                          className="qty-btn"
+                          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        >
+                          –
+                        </button>
                         <span className="qty-value">{quantity}</span>
-                        <button type="button" className="qty-btn" onClick={() => setQuantity((q) => q + 1)}>+</button>
+                        <button
+                          type="button"
+                          className="qty-btn"
+                          onClick={() => setQuantity((q) => q + 1)}
+                        >
+                          +
+                        </button>
                       </div>
                       <button className="add-to-cart" type="submit">
-                        {isAdding ? "Adding..." : isAdded ? "Added" : "Add to Cart"}
+                        {isAdding
+                          ? "Adding..."
+                          : isAdded
+                          ? "Added"
+                          : "Add to Cart"}
                       </button>
                     </div>
                   </div>
@@ -374,8 +427,12 @@ const ProductDetails = () => {
                 <div className="review-modal open">
                   <div className="review-modal-content">
                     <h3>Leave a Review</h3>
-                    {reviewError && <p className="text-danger">{reviewError}</p>}
-                    {reviewSuccess && <p className="text-success">{reviewSuccess}</p>}
+                    {reviewError && (
+                      <p className="text-danger">{reviewError}</p>
+                    )}
+                    {reviewSuccess && (
+                      <p className="text-success">{reviewSuccess}</p>
+                    )}
 
                     <form onSubmit={handleReviewSubmit} className="review-form">
                       <div className="form-group">
@@ -385,7 +442,11 @@ const ProductDetails = () => {
                             <button
                               key={star}
                               type="button"
-                              className={`star-btn ${(hoverRating || rating) >= star ? "selected" : ""}`}
+                              className={`star-btn ${
+                                (hoverRating || rating) >= star
+                                  ? "selected"
+                                  : ""
+                              }`}
                               onClick={() => setRating(star)}
                               onMouseEnter={() => setHoverRating(star)}
                               onMouseLeave={() => setHoverRating(0)}
@@ -406,7 +467,10 @@ const ProductDetails = () => {
                       </div>
                       <button type="submit">Submit Review</button>
                     </form>
-                    <button className="btn btn-secondary" onClick={() => setIsReviewModalOpen(false)}>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setIsReviewModalOpen(false)}
+                    >
                       Close
                     </button>
                   </div>
@@ -418,7 +482,11 @@ const ProductDetails = () => {
       </section>
       {!isAdmin && (
         <div className="reviews-container">
-          <ProductReviews key={refreshReviewsKey} productId={id} onReviewsChange={fetchAverageRating} />
+          <ProductReviews
+            key={refreshReviewsKey}
+            productId={id}
+            onReviewsChange={fetchAverageRating}
+          />
         </div>
       )}
     </div>

@@ -82,7 +82,7 @@ html, body {
 }
 .login-image {
   flex: 1;
-  background-image: url('../images/makeupp.jpg');
+  background-image: url('../images/Login.jpeg');
   background-size: cover;
   background-position: center;
 }
